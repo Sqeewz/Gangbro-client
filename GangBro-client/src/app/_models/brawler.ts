@@ -1,0 +1,9 @@
+export class Brawler {
+}
+
+export interface Brawler {
+    displayName: string;
+    avatar_url: string;
+    mission_success_count: number;
+    mission_join_count: number;
+}

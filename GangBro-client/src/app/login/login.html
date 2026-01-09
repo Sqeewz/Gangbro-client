@@ -1,0 +1,63 @@
+<div class="login-container">
+    <mat-card>
+        <mat-card-content>
+            <h3>
+                @if(mode === 'login'){ Login }
+                @else { Register }
+            </h3>
+
+            <form (ngSubmit)="onSubmit()" [formGroup]="form" autocomplete="off">
+
+                <mat-form-field appearance="outline">
+                    <mat-label>Username</mat-label>
+                    <input matInput type="text" placeholder="username" (input)="updateErrorMessage('username')"
+                        formControlName="username">
+                    @if(form.controls['username'].invalid){
+                    <mat-error>{{errorMessage.username()}}</mat-error>
+                    }
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                    <mat-label>Password</mat-label>
+                    <input matInput type="password" placeholder="password" (input)="updateErrorMessage('password')"
+                        formControlName="password">
+                    @if(form.controls['password'].invalid){
+                    <mat-error>{{errorMessage.password()}}</mat-error>
+                    }
+                </mat-form-field>
+
+                @if(mode === 'register'){
+                <mat-form-field appearance="outline">
+                    <mat-label>Confirm Password</mat-label>
+                    <input matInput type="password" placeholder="confirm password"
+                        (input)="updateErrorMessage('confirm_password')" formControlName="confirm_password">
+                    @if(form.controls['confirm_password'].invalid){
+                    <mat-error>{{errorMessage.confirm_password()}}</mat-error>
+                    }
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                    <mat-label>Display Name</mat-label>
+                    <input matInput type="text" placeholder="display name" (input)="updateErrorMessage('display_name')"
+                        formControlName="display_name">
+                    @if(form.controls['display_name'].invalid){
+                    <mat-error>{{errorMessage.display_name()}}</mat-error>
+                    }
+                </mat-form-field>
+                }
+
+                <button mat-raised-button type="submit" class="blue" [disabled]="!form.valid">
+                    @if (mode==='login'){ LOGIN }
+                    @if (mode!=='login'){ GET START }
+                </button>
+            </form>
+
+            <div class="login-spacer">or</div>
+            @if(mode==='login'){
+            <div class="toggle">New to MyApp? <span (click)="toggleMode()">Sign Up</span></div>
+            }
+            @if(mode!=='login'){
+            <div class="toggle">Already have an account? <span (click)="toggleMode()">Log in</span></div>
+            }
+        </mat-card-content>
+    </mat-card>
+</div>
