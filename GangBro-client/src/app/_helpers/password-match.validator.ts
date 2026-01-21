@@ -1,4 +1,4 @@
-import { AbstractControl, ValidationErrors, ValidatorFn } from "@angular/forms";
+import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 
 export function PasswordMatchValidator(
     ctrl_password_name: string,
@@ -7,14 +7,10 @@ export function PasswordMatchValidator(
     return (formGroup: AbstractControl): ValidationErrors | null => {
         const ctrlPassword = formGroup.get(ctrl_password_name)
         const ctrlConfirmPassword = formGroup.get(ctrl_confirm_password_name)
-
         if (!ctrlPassword || !ctrlConfirmPassword) return null
-        
-        if (ctrlPassword.value !== ctrlConfirmPassword.value) {
+        if (ctrlPassword.value !== ctrlConfirmPassword.value)
             ctrlConfirmPassword.setErrors({ mismatch: true })
-        } else {
-            ctrlConfirmPassword.setErrors(null)
-        }
+        else ctrlConfirmPassword.setErrors(null)
         return null
     }
 }

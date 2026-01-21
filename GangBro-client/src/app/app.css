@@ -3,12 +3,10 @@
     flex-direction: column;
     height: 100vh;
     width: 100%;
-    border: 1px solid red;
 }
 
 .content {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-    border: 1px solid rgba(1, 143, 48, 0.511);
 }

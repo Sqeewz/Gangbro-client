@@ -1,8 +1,33 @@
-<mat-toolbar class="my-navbar">
-    <span>GangBro</span>
+<mat-toolbar class="navbar">
+    <!-- Home button -->
+    <span class="home-btn" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+        The Convergence
+    </span>
+
     <span class="spacer"></span>
-    <button matButton routerLink="/login">
+
+    @if (!isLoggedIn()) {
+    <button mat-button routerLink="/login" routerLinkActive="active" class="login-btn">
+        <mat-icon>login</mat-icon>
         <span>Login</span>
     </button>
-</mat-toolbar>
+    } @else {
+    <button mat-button [matMenuTriggerFor]="profileMenu" class="profile-btn">
+        <div class="profile-btn-content">
+            <img [src]="avatar_url()" class="avatar" [alt]="display_name() + ' avatar'">
+            <span class="display-name">{{display_name()}}</span>
+        </div>
+    </button>
 
+    <mat-menu #profileMenu="matMenu" class="profile-menu" xPosition="before">
+        <button mat-menu-item routerLink="/profile">
+            <mat-icon>manage_accounts</mat-icon>
+            <span>Profile</span>
+        </button>
+        <button mat-menu-item (click)="logout()">
+            <mat-icon>logout</mat-icon>
+            <span>Logout</span>
+        </button>
+    </mat-menu>
+    }
+</mat-toolbar>

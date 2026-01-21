@@ -1,48 +1,85 @@
-.my-navbar {
+/* Simple Navbar Container */
+.navbar {
+    background: #ffffff !important;
+    color: #333 !important;
+    border-bottom: 1px solid #e0e0e0;
     display: flex;
-    justify-content: center;
     align-items: center;
-    gap: 5px;
+    padding: 0 24px;
+    height: 64px;
+}
 
+/* Home Button */
+.home-btn {
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: #333;
+    cursor: pointer;
+    text-decoration: none;
+}
 
-    button {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        border: none;
-        background: none;
+/* Spacer */
+.spacer {
+    flex: 1 1 auto;
+}
 
+/* Profile Button */
+.profile-btn {
+    color: #333 !important;
+    padding: 8px 12px !important;
+    height: auto !important;
+    border-radius: 4px !important;
+}
 
-        mat-icon {
-            margin: 0;
-            margin-right: 0.2em;
-            padding: 0;
-        }
-    }
+.profile-btn-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
 
+.display-name {
+    font-weight: 400;
+    font-size: 1.1rem;
+    color: #333;
+}
 
-    .home-btn {
-        font-size: x-large;
-    }
+.avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+}
 
+/* Login Button */
+.login-btn {
+    color: #333 !important;
+}
 
-    button:not(.home-btn) {
-        font-size: medium;
-        margin-top: 0.5em;
-    }
+/* Dropdown Menu */
+::ng-deep .profile-menu {
+    margin-top: 4px;
+    border-radius: 4px !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;
+    min-width: 140px !important;
+    background-color: #f0f0f0 !important;
+    /* Light grey as in screenshot */
+}
 
+::ng-deep .mat-mdc-menu-item {
+    padding: 0 16px !important;
+    min-height: 48px !important;
+    font-size: 1rem !important;
+    color: #333 !important;
+}
 
-    button.active:not(.home-btn) {
-        border-bottom: 0.15em solid #fd2121;
-    }
+::ng-deep .mat-mdc-menu-item mat-icon {
+    margin-right: 12px !important;
+    color: #444 !important;
+    font-size: 22px !important;
+    width: 22px !important;
+    height: 22px !important;
+}
 
-
-    .avatar {
-        margin-right: 5px;
-        width: 35px;
-        height: 35px;
-        border-radius: 50%;
-        object-fit: cover;
-    }
+::ng-deep .mat-mdc-menu-item:hover:not([disabled]) {
+    background-color: rgba(0, 0, 0, 0.05) !important;
 }
