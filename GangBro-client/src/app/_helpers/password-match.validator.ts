@@ -9,8 +9,8 @@ export function PasswordMatchValidator(
         const ctrlConfirmPassword = formGroup.get(ctrl_confirm_password_name)
         if (!ctrlPassword || !ctrlConfirmPassword) return null
         if (ctrlPassword.value !== ctrlConfirmPassword.value)
-            ctrlConfirmPassword.setErrors({ mismatch: true })
-        else ctrlConfirmPassword.setErrors(null)
+            setTimeout(() => ctrlConfirmPassword.setErrors({ mismatch: true }), 0)
+        else setTimeout(() => ctrlConfirmPassword.setErrors(null), 0)
         return null
     }
 }

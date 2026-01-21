@@ -18,7 +18,7 @@ import { PasswordValidator } from '../_helpers/password.validator';
 export class Login {
   private _routerService: Router = inject(Router)
   private _passportService: PassportService = inject(PassportService)
-  errorFromServer = ''
+  errorFromServer = signal('')
 
   mode: 'login' | 'register' = 'login'
   form: FormGroup
@@ -39,61 +39,64 @@ export class Login {
 
       password: new FormControl(null, [
         Validators.required,
-        PasswordValidator(8, 10)
+        Validators.maxLength(20),
+        PasswordValidator(8, 20)
       ])
     })
   }
 
   updateErrorMessage(ctrlName: string): void {
-    const control = this.form.controls[ctrlName]
-    if (!control) return
-    switch (ctrlName) {
-      case 'username':
-        if (control.hasError('required'))
-          this.errorMessage.username.set('required')
-        else if (control.hasError('minlength'))
-          this.errorMessage.username.set('must be at least 4 characters long')
-        else if (control.hasError('maxlength'))
-          this.errorMessage.username.set('must be 16 characters or fewer')
-        else
-          this.errorMessage.username.set('')
-        break
+    setTimeout(() => {
+      const control = this.form.controls[ctrlName]
+      if (!control) return
+      switch (ctrlName) {
+        case 'username':
+          if (control.hasError('required'))
+            this.errorMessage.username.set('required')
+          else if (control.hasError('minlength'))
+            this.errorMessage.username.set('must be at least 4 characters long')
+          else if (control.hasError('maxlength'))
+            this.errorMessage.username.set('must be 16 characters or fewer')
+          else
+            this.errorMessage.username.set('')
+          break
 
-      case 'password':
-        if (control.hasError('required'))
-          this.errorMessage.password.set('required')
-        else if (control.hasError('invalidMinLength'))
-          this.errorMessage.password.set('must be at least 8 characters long')
-        else if (control.hasError('invalidMaxLength'))
-          this.errorMessage.password.set('must be 10 characters or fewer')
-        else if (control.hasError('invalidLowerCase'))
-          this.errorMessage.password.set('must contain minimum of 1 lower-case letter [a-z].')
-        else if (control.hasError('invalidUpperCase'))
-          this.errorMessage.password.set('must contain minimum of 1 capital letter [A-Z].')
-        else if (control.hasError('invalidNumeric'))
-          this.errorMessage.password.set('must contain minimum of 1 numeric character [0-9].')
-        else if (control.hasError('invalidSpecialChar'))
-          this.errorMessage.password.set('must contain minimum of 1 special character: !@#$%^&*(),.?":{}|<>')
-        else
-          this.errorMessage.password.set('')
-        break
+        case 'password':
+          if (control.hasError('required'))
+            this.errorMessage.password.set('required')
+          else if (control.hasError('invalidMinLength'))
+            this.errorMessage.password.set('must be at least 8 characters long')
+          else if (control.hasError('invalidMaxLength'))
+            this.errorMessage.password.set('must be 20 characters or fewer')
+          else if (control.hasError('invalidLowerCase'))
+            this.errorMessage.password.set('must contain minimum of 1 lower-case letter [a-z].')
+          else if (control.hasError('invalidUpperCase'))
+            this.errorMessage.password.set('must contain minimum of 1 capital letter [A-Z].')
+          else if (control.hasError('invalidNumeric'))
+            this.errorMessage.password.set('must contain minimum of 1 numeric character [0-9].')
+          else if (control.hasError('invalidSpecialChar'))
+            this.errorMessage.password.set('must contain minimum of 1 special character: !@#$%^&*(),.?":{}|<>')
+          else
+            this.errorMessage.password.set('')
+          break
 
-      case 'confirm_password':
-        if (control.hasError('required'))
-          this.errorMessage.confirm_password.set('required')
-        else if (control.hasError('mismatch'))
-          this.errorMessage.confirm_password.set('do not match password')
-        else
-          this.errorMessage.confirm_password.set('')
-        break
+        case 'confirm_password':
+          if (control.hasError('required'))
+            this.errorMessage.confirm_password.set('required')
+          else if (control.hasError('mismatch'))
+            this.errorMessage.confirm_password.set('do not match password')
+          else
+            this.errorMessage.confirm_password.set('')
+          break
 
-      case 'display_name':
-        if (control.hasError('required'))
-          this.errorMessage.display_name.set('required')
-        else
-          this.errorMessage.display_name.set('')
-        break
-    }
+        case 'display_name':
+          if (control.hasError('required'))
+            this.errorMessage.display_name.set('required')
+          else
+            this.errorMessage.display_name.set('')
+          break
+      }
+    }, 0)
   }
 
   toggleMode(): void {
@@ -117,13 +120,13 @@ export class Login {
 
   async onSubmit(): Promise<void> {
     if (this.mode === 'login') {
-      this.errorFromServer = await this._passportService.login(this.form.value)
+      this.errorFromServer.set(await this._passportService.login(this.form.value))
     } else {
-      this.errorFromServer = await this._passportService.register(this.form.value)
+      this.errorFromServer.set(await this._passportService.register(this.form.value))
     }
 
-    if (this.errorFromServer === '') {
-      this._routerService.navigate(['/'])
+    if (this.errorFromServer() === '') {
+      this._routerService.navigate(['/profile'])
     }
   }
 }

@@ -6,8 +6,8 @@ export const guestGuard: CanActivateFn = (route, state) => {
     const passportService = inject(PassportService)
     const router = inject(Router)
 
-    if (passportService.data()?.access_token) {
-        router.navigate(['/'])
+    if (passportService.data()?.token) {
+        router.navigate(['/profile'])
         return false
     }
 

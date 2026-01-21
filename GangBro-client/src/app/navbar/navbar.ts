@@ -26,7 +26,7 @@ export class Navbar {
   constructor() {
     this.display_name = computed(() => this._passportService.data()?.display_name)
     this.avatar_url = computed(() => getAvatar(this._passportService.data()))
-    this.isLoggedIn = computed(() => !!this._passportService.data()?.access_token)
+    this.isLoggedIn = computed(() => !!this._passportService.data()?.token)
   }
 
   logout(): void {
