@@ -1,0 +1,12 @@
+{
+    "rest-client.environmentVariables": {
+        "$shared": {
+           
+        },
+        "dev": {
+            "base_URL": "http://127.0.0.1:8000/api",
+            "menta_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzY2MTk2ODk4LCJpYXQiOjE3NjYxMTA0OTh9.FrjSLW__BZo3cSYuM3SPjX57uWJPxbLNNmvnS59Dnlg"
+        },
+       
+    }
+}

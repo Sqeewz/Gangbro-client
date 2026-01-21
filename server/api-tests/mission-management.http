@@ -1,0 +1,39 @@
+@env = local
+@base_url = http://127.0.0.1:8000/api
+@test_token = eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzY2MTk2ODk4LCJpYXQiOjE3NjYxMTA0OTh9.FrjSLW__BZo3cSYuM3SPjX57uWJPxbLNNmvnS59Dnlg
+### create new mission
+
+# @prompt mission_name Mission Name
+# @prompt description Mission Description
+
+POST {{base_url}}/mission-management
+Content-Type: application/json
+Authorization: Bearer {{test_token}}
+
+{
+  "name": "{{mission_name}}",
+  "description": "{{description}}"
+}
+
+
+### update mission
+# @prompt mission_id Mission ID
+# @prompt mission_name Mission Name
+# @prompt description Mission Description
+PATCH {{base_url}}/mission-management/{{mission_id}}
+Content-Type: application/json
+Authorization: Bearer {{test_token}}
+
+{
+  "name": "{{mission_name}}",
+  "description": "{{description}}"
+}
+
+### delete mission
+# @prompt mission_id Mission ID
+DELETE {{base_url}}/mission-management/{{mission_id}}
+Content-Type: application/json
+Authorization: Bearer {{test_token}}  
+
+
+

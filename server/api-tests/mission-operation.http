@@ -1,0 +1,22 @@
+@base_url = http://127.0.0.1:8000/api
+@test_token = eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzY2MTk2ODk4LCJpYXQiOjE3NjYxMTA0OTh9.FrjSLW__BZo3cSYuM3SPjX57uWJPxbLNNmvnS59Dnlg
+
+### set mission to in-progress
+# @prompt mission_id Mission ID to Set In-Progress
+PATCH  {{base_url}}/mission/in-progress/{{mission_id}}
+Content-Type: application/json
+Authorization: Bearer {{test_token}}
+
+
+### set mission to completed
+# @prompt mission_id Mission ID to Set Completed
+PATCH  {{base_url}}/mission/to-completed/{{mission_id}}
+Content-Type: application/json
+Authorization: Bearer {{test_token}}
+
+
+### set mission to failed
+# @prompt mission_id Mission ID to Set Failed
+PATCH  {{base_url}}/mission/to-failed/{{mission_id}}
+Content-Type: application/json
+Authorization: Bearer {{test_token}}
