@@ -1,9 +1,11 @@
 use anyhow::{Ok, Result};
 use async_trait::async_trait;
 use chrono::{Duration, Utc};
-use diesel::{
-    ExpressionMethods, QueryDsl, RunQueryDsl, SelectableHelper, insert_into,
-};
+// use diesel::{
+//     ExpressionMethods, QueryDsl, RunQueryDsl, SelectableHelper, insert_into,
+//     query_dsl::methods::{FilterDsl, SelectDsl},
+// };
+use diesel::{dsl::insert_into, prelude::*};
 use std::sync::Arc;
 
 use crate::{
@@ -11,7 +13,9 @@ use crate::{
     domain::{
         entities::brawlers::{BrawlerEntity, RegisterBrawlerEntity},
         repositories::brawlers::BrawlerRepository,
-        value_objects::{base64_image::Base64Image, uploaded_image::UploadedImage, mission_model::MissionModel},
+        value_objects::{
+            base64_image::Base64Image, mission_model::MissionModel, uploaded_image::UploadedImage,
+        },
     },
     infrastructure::{
         cloudinary::{self, UploadImageOptions},
@@ -56,6 +60,7 @@ impl BrawlerRepository for BrawlerPostgres {
         };
         let token = generate_token(jwt_env.secret, &claims)?;
         Ok(Passport {
+            user_id,
             token,
             display_name,
             avatar_url: None,
@@ -94,41 +99,47 @@ impl BrawlerRepository for BrawlerPostgres {
         Ok(uploaded_img)
     }
 
-    async fn crew_counting(&self, mission_id: i32) -> Result<u32> {
-        let mut connection = Arc::clone(&self.db_pool).get()?;
-
-        let count: i64 = crew_memberships::table
-            .filter(crew_memberships::mission_id.eq(mission_id))
-            .count()
-            .get_result(&mut connection)?;
-
-        Ok(count as u32)
-    }
-
     async fn get_missions(&self, brawler_id: i32) -> Result<Vec<MissionModel>> {
-        let mut connection = Arc::clone(&self.db_pool).get()?;
+        let mut conn = Arc::clone(&self.db_pool).get()?;
 
+        // Use a raw SQL query to select the MissionModel fields including
+        // the chief's display name and the crew count.
         let sql = r#"
-            SELECT 
-                m.id, 
-                m.name, 
-                m.description, 
-                m.status, 
-                m.chief_id, 
-                b.display_name AS chief_display_name, 
-                (SELECT COUNT(*) FROM crew_memberships cm WHERE cm.mission_id = m.id) AS crew_count, 
-                m.created_at, 
-                m.updated_at
-            FROM missions m
-            JOIN brawlers b ON m.chief_id = b.id
-            WHERE m.chief_id = $1
-            ORDER BY m.created_at DESC
+SELECT DISTINCT
+    missions.id,
+    missions.name,
+    missions.description,
+    missions.status,
+    missions.chief_id,
+    brawlers.display_name AS chief_display_name,
+    (SELECT COUNT(*) FROM crew_memberships WHERE crew_memberships.mission_id = missions.id) AS crew_count,
+    missions.created_at,
+    missions.updated_at
+FROM missions
+INNER JOIN brawlers ON brawlers.id = missions.chief_id
+LEFT JOIN crew_memberships cm ON cm.mission_id = missions.id
+WHERE missions.deleted_at IS NULL
+    AND (missions.chief_id = $1 OR cm.brawler_id = $1)
+ORDER BY missions.created_at DESC
         "#;
 
-        let result = diesel::sql_query(sql)
+        let results = diesel::sql_query(sql)
             .bind::<diesel::sql_types::Int4, _>(brawler_id)
-            .load::<MissionModel>(&mut connection)?;
+            .load::<MissionModel>(&mut conn)?;
 
-        Ok(result)
+        Ok(results)
+    }
+
+    async fn crew_counting(&self, mission_id: i32) -> Result<u32> {
+        let mut conn = Arc::clone(&self.db_pool).get()?;
+
+        let result = crew_memberships::table
+            .filter(crew_memberships::mission_id.eq(mission_id))
+            .count()
+            .first::<i64>(&mut conn)?;
+
+        let count = u32::try_from(result)?;
+
+        Ok(count)
     }
 }

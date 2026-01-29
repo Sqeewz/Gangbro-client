@@ -1,23 +1,10 @@
-<h2 mat-dialog-title>Create New Mission</h2>
+<h4 mat-dialog-title>New Mission</h4>
 <mat-dialog-content>
-    <div class="form-container">
-        <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Mission Name</mat-label>
-            <input matInput [(ngModel)]="addMission.name" placeholder="Ex. Operation Skyfall" required autofocus>
-            @if (!addMission.name) {
-            <mat-error>Name is required</mat-error>
-            }
-        </mat-form-field>
+    <input type="text" [(ngModel)]="addMission.name" placeholder="Mission Name" />
+    <textarea [(ngModel)]="addMission.description" placeholder="Mission Description"></textarea>
 
-        <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Description</mat-label>
-            <textarea matInput [(ngModel)]="addMission.description" placeholder="Brief mission details..."
-                rows="4"></textarea>
-        </mat-form-field>
-    </div>
+    <mat-dialog-actions>
+        <button matButton mat-dialog-close>Cancel</button>
+        <button (click)="onSubmit()" mat-stroked-button type="submit" [disabled]="!addMission.name"> Create</button>
+    </mat-dialog-actions>
 </mat-dialog-content>
-
-<mat-dialog-actions align="end">
-    <button mat-button mat-dialog-close>Cancel</button>
-    <button mat-flat-button color="primary" (click)="onSubmit()" [disabled]="!addMission.name">Create Mission</button>
-</mat-dialog-actions>

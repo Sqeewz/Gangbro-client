@@ -1,15 +1,11 @@
-use chrono::NaiveDateTime;
-use serde::{Deserialize, Serialize};
-
-use diesel::{
-    sql_types::{BigInt, Int4, Nullable, Text, Timestamp, Varchar},
-    QueryableByName,
-};
 use crate::domain::{
     entities::missions::{AddMissionEntity, EditMissionEntity},
     value_objects::mission_statuses::MissionStatuses,
 };
-
+use chrono::NaiveDateTime;
+use diesel::prelude::QueryableByName;
+use diesel::sql_types::{BigInt, Int4, Nullable, Text, Timestamp, Varchar};
+use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, QueryableByName)]
 pub struct MissionModel {
     #[diesel(sql_type = Int4)]

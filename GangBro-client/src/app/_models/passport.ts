@@ -1,4 +1,5 @@
 export interface Passport {
+    user_id: number;
     token: string;
     display_name: string;
     avatar_url?: string;

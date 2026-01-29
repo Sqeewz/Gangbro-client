@@ -8,7 +8,7 @@ import { getAvatar } from '../_helpers/util'
 
 @Component({
   selector: 'app-navbar',
-  imports: [MatToolbarModule, MatButtonModule, MatMenuModule, RouterLink],
+  imports: [MatToolbarModule, MatButtonModule, MatMenuModule, RouterLink, RouterLinkActive],
   templateUrl: './navbar.html',
   styleUrl: './navbar.scss',
 })

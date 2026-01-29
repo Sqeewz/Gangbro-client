@@ -1,55 +1,78 @@
-import { CommonModule, DatePipe } from '@angular/common';
-import { Component, computed, inject, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { BehaviorSubject } from 'rxjs';
-import { MissionFilter } from '../_models/mission-filter';
-import { Mission } from '../_models/mission';
-import { MissionService } from '../_service/mission-service';
-import { PassportService } from '../_service/passport-service';
+import { Component, computed, inject, Signal } from '@angular/core'
+import { MissionFilter } from '../_models/mission-filter'
+import { Mission } from '../_models/mission'
+import { FormsModule } from '@angular/forms'
+import { BehaviorSubject } from 'rxjs'
+import { AsyncPipe, DatePipe } from '@angular/common'
+import { MissionService } from '../_service/mission-service'
+import { PassportService } from '../_service/passport-service'
+
 
 @Component({
   selector: 'app-missions',
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    MatButtonModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    DatePipe
-  ],
+  imports: [FormsModule, AsyncPipe, DatePipe],
   templateUrl: './missions.html',
   styleUrl: './missions.scss',
 })
-export class Missions implements OnInit {
-  private _missionService = inject(MissionService);
-  private _passportService = inject(PassportService);
+export class Missions {
+  private _mission = inject(MissionService)
+  private _passport = inject(PassportService)
+  filter: MissionFilter = {}
+  // missions: Mission[] = []
 
-  isSignin = computed(() => this._passportService.isSignin());
+  private _missionsSubject = new BehaviorSubject<Mission[]>([])
+  readonly missions$ = this._missionsSubject.asObservable()
+  isSignin: Signal<boolean>
+  myUserId: Signal<number | undefined>
 
-  filter: MissionFilter = {
-    name: '',
-    status: undefined
-  };
+  constructor() {
+    this.isSignin = computed(() => this._passport.data() !== undefined)
+    this.myUserId = computed(() => this._passport.data()?.user_id)
+    this.filter = {} // Reset filter to show all
+    this._mission.filter = this.filter
+    this.loadMyMission()
+  }
 
-  private _missionsSubject = new BehaviorSubject<Mission[]>([]);
-  missions$ = this._missionsSubject.asObservable();
+  async loadMyMission() {
+    const userData = this._passport.data()
+    // if (userData?.user_id) {
+    //   this.filter.exclude_chief_id = userData.user_id
+    // }
 
-  ngOnInit() {
-    this.onSubmit();
+    // 1. Get all candidates (excluding own created)
+    const allMissions = await this._mission.getByFilter(this.filter)
+
+    // 2. Get my joined missions
+    let myJoinedMissionIds: number[] = []
+    if (this.isSignin()) {
+      try {
+        const myJoined = await this._mission.getMyMissions()
+        myJoinedMissionIds = myJoined.map(m => m.id)
+      } catch (error) {
+        console.error('Failed to load my missions', error)
+      }
+    }
+
+    // 3. Filter out joined missions ONLY if they are active. Show History.
+    const filtered = allMissions.filter(m => {
+      if (m.status === 'Completed' || m.status === 'Failed') return true;
+      return !myJoinedMissionIds.includes(m.id)
+    })
+    this._missionsSubject.next(filtered)
   }
 
   async onSubmit() {
+    this.loadMyMission()
+  }
+
+  async onJoin(missionId: number) {
+    if (!confirm('Join this mission?')) return
     try {
-      const missions = await this._missionService.getByFilter(this.filter);
-      this._missionsSubject.next(missions);
+      await this._mission.join(missionId)
+      await this.loadMyMission() // Refresh list
     } catch (error) {
-      console.error('Error fetching missions:', error);
+      console.error('Failed to join mission', error)
+      alert('Failed to join mission')
     }
   }
 }

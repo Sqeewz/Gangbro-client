@@ -33,6 +33,9 @@ export class MissionService {
     if (filter.status) {
       params.push(`status=${encodeURIComponent(filter.status)}`)
     }
+    if (filter.exclude_chief_id) {
+      params.push(`exclude_chief_id=${filter.exclude_chief_id}`)
+    }
 
     return params.join("&")
   }
@@ -46,8 +49,46 @@ export class MissionService {
 
   async getMyMissions(): Promise<Mission[]> {
     const url = this._base_url + '/brawler/my-missions'
+    console.log('get ' + url)
     const observable = this._http.get<Mission[]>(url)
     const missions = await firstValueFrom(observable)
     return missions
   }
+
+
+  async join(missionId: number): Promise<void> {
+    const url = this._base_url + `/crew/join/${missionId}`
+    await firstValueFrom(this._http.post(url, {}))
+  }
+
+  async leave(missionId: number): Promise<void> {
+    const url = this._base_url + `/crew/leave/${missionId}`
+    await firstValueFrom(this._http.delete(url))
+  }
+
+  async update(missionId: number, data: any): Promise<void> {
+    const url = this._base_url + `/mission-management/${missionId}`
+    await firstValueFrom(this._http.patch(url, data))
+  }
+
+  async start(missionId: number): Promise<void> {
+    const url = this._base_url + `/mission/in-progress/${missionId}`
+    await firstValueFrom(this._http.patch(url, {}))
+  }
+
+  async complete(missionId: number): Promise<void> {
+    const url = this._base_url + `/mission/to-completed/${missionId}`
+    await firstValueFrom(this._http.patch(url, {}))
+  }
+
+  async fail(missionId: number): Promise<void> {
+    const url = this._base_url + `/mission/to-failed/${missionId}`
+    await firstValueFrom(this._http.patch(url, {}))
+  }
+
+  async delete(missionId: number): Promise<void> {
+    const url = this._base_url + `/mission-management/${missionId}`
+    await firstValueFrom(this._http.delete(url))
+  }
+
 }

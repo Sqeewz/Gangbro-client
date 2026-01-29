@@ -1,46 +1,48 @@
-<div class="mission-container">
-    <div class="filter-bar">
-        <label class="search-label">Search</label>
-        <input type="text" [(ngModel)]="filter.name" placeholder="Mission Name" class="search-input" />
-        <select [(ngModel)]="filter.status" class="status-select">
-            <option [ngValue]="undefined">-- Select Status --</option>
-            <option value="Open">Open</option>
-            <option value="InProgress">In Progress</option>
-            <option value="Completed">Completed</option>
-            <option value="Failed">Failed</option>
-        </select>
-        <button (click)="onSubmit()" class="go-btn" mat-raised-button color="primary">Go</button>
-    </div>
-
-    <div class="mission-table">
-        <div class="table-header">
-            <div class="col name">Name</div>
-            <div class="col description">Description</div>
-            <div class="col crew">Number of Crew</div>
-            <div class="col status">Status</div>
-            <div class="col created">Created at</div>
-            <div class="col updated">Updated at</div>
-            <div class="col actions">Actions</div>
-        </div>
-
-        @if((missions$ | async)?.length) {
-        @for (mission of missions$ | async; track mission.id) {
-        <div class="table-row">
-            <div class="col name">{{mission.name}}</div>
-            <div class="col description" [title]="mission.description">{{mission.description || ''}}</div>
-            <div class="col crew">{{mission.crew_count}}</div>
-            <div class="col status">{{mission.status}}</div>
-            <div class="col created">{{mission.created_at | date:'short'}}</div>
-            <div class="col updated">{{mission.updated_at | date:'short'}}</div>
-            <div class="col actions">
-                @if(isSignin()){
-                <a href="javascript:void(0)" class="action-link">Join</a>
-                }
-            </div>
-        </div>
-        }
-        } @else {
-        <div class="no-data">No missions found.</div>
+<div class="filter-form">
+    <h3>Search</h3>
+    <!-- FormsModule  -->
+    <input type="text" [(ngModel)]="filter.name" placeholder="Mission Name" />
+    <select [(ngModel)]="filter.status">
+        <option value="">All Statuses</option>
+        <option value="Open">Open</option>
+        <option value="InProgress">In Progress</option>
+        <option value="Completed">Completed</option>
+        <option value="Failed">Failed</option>
+    </select>
+    <button (click)="onSubmit()">Go</button>
+</div>
+<div class="mission-list">
+    @if((missions$ | async)?.length) {
+    <div class="header">
+        <span class="name">Name</span>
+        <span class="description">Description</span>
+        <span class="name">Chief</span>
+        <span class="crew_count">Number of Crew</span>
+        <span class="status">Status</span>
+        <span class="created_at">Created at</span>
+        <span class="updated_at">Updated at</span>
+        @if(isSignin()){
+        <span class="action">Actions</span>
         }
     </div>
+    @for (mission of missions$ | async; track mission.id) {
+    <div class="contents">
+        <span class="name">{{mission.name}}</span>
+        <span class="description">{{mission.description}}</span>
+        <span class="name">{{mission.chief_display_name}}</span>
+        <span class="crew_count">{{mission.crew_count}}</span>
+        <span class="status">{{mission.status}}</span>
+        <span class="created_at">{{mission.created_at | date:'short'}}</span>
+        <span class="updated_at">{{mission.updated_at | date:'short'}}</span>
+
+        <!-- fix: จะ join ไม่ได้ ถ้า chief_id ตรงกับ user_id ที่ login -->
+        <!-- แนวทาง เช่น หา user id จาก token หรือ ปรับให้ passport มี user_id โดยส่งมาจาก backend  -->
+        @if(isSignin() && mission.status === 'Open' && mission.chief_id !== myUserId()){
+        <!-- Note: We need myId here to properly hide own missions. For now, backend blocks join. -->
+        <button (click)="onJoin(mission.id)" class="action">Join</button>
+        }
+
+    </div>
+    }
+    }
 </div>

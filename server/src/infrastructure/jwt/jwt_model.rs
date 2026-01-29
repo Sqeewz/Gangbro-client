@@ -10,6 +10,7 @@ use crate::infrastructure::jwt::generate_token;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Passport {
     // pub token_type: String,
+    pub user_id: i32,
     pub token: String,
     // pub expires_in: usize,
     pub display_name: String,
@@ -26,6 +27,7 @@ impl Passport {
         };
         let token = generate_token(jwt_env.secret, &claims)?;
         Ok(Self {
+            user_id,
             token,
             display_name,
             avatar_url,

@@ -7,28 +7,23 @@ use crate::{domain::{
     value_objects::mission_model::{AddMissionModel, EditMissionModel},
 }};
 
-pub struct MissionManagementUseCase<T1, T2>
+pub struct MissionManagementUseCase<T1>
 where
     T1: MissionManagementRepository + Send + Sync,
-    T2: MissionViewingRepository + Send + Sync,
 {
     mission_management_repository: Arc<T1>,
-    mission_viewing_repository: Arc<T2>,
 }
 
 use anyhow::Result;
-impl<T1, T2> MissionManagementUseCase<T1, T2>
+impl<T1> MissionManagementUseCase<T1>
 where
     T1: MissionManagementRepository + Send + Sync,
-    T2: MissionViewingRepository + Send + Sync,
 {
     pub fn new(
         mission_management_repository: Arc<T1>,
-        mission_viewing_repository: Arc<T2>,
     ) -> Self {
         Self {
             mission_management_repository,
-            mission_viewing_repository,
         }
     }
 
@@ -65,15 +60,15 @@ where
             }
         }
 
-        let crew_count = self
-            .mission_viewing_repository
-            .crew_counting(mission_id)
-            .await?;
-        if crew_count > 0 {
-            return Err(anyhow::anyhow!(
-                "Mission has been taken by brawler for now!"
-            ));
-        }
+        // let crew_count = self
+        //     .mission_viewing_repository
+        //     .crew_counting(mission_id)
+        //     .await?;
+        // if crew_count > 0 {
+        //     return Err(anyhow::anyhow!(
+        //         "Mission has been taken by brawler for now!"
+        //     ));
+        // }
 
         let edit_mission_entity = edit_mission_model.to_entity(chief_id);
 
@@ -86,15 +81,15 @@ where
     }
 
     pub async fn remove(&self, mission_id: i32, chief_id: i32) -> Result<()> {
-        let crew_count = self
-            .mission_viewing_repository
-            .crew_counting(mission_id)
-            .await?;
-        if crew_count > 0 {
-            return Err(anyhow::anyhow!(
-                "Mission has been taken by brawler for now!"
-            ));
-        }
+        // let crew_count = self
+        //     .mission_viewing_repository
+        //     .crew_counting(mission_id)
+        //     .await?;
+        // if crew_count > 0 {
+        //     return Err(anyhow::anyhow!(
+        //         "Mission has been taken by brawler for now!"
+        //     ));
+        // }
 
         self.mission_management_repository
             .remove(mission_id, chief_id)
