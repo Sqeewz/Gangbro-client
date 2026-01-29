@@ -120,9 +120,11 @@ export class Login {
 
   async onSubmit(): Promise<void> {
     if (this.mode === 'login') {
-      this.errorFromServer.set(await this._passportService.login(this.form.value))
+      const error = await this._passportService.login(this.form.value)
+      this.errorFromServer.set(error ?? '')
     } else {
-      this.errorFromServer.set(await this._passportService.register(this.form.value))
+      const error = await this._passportService.register(this.form.value)
+      this.errorFromServer.set(error ?? '')
     }
 
     if (this.errorFromServer() === '') {

@@ -2,7 +2,8 @@ use crate::{
     domain::{
         repositories::brawlers::BrawlerRepository,
         value_objects::{
-            base64_image::Base64Image, brawler_model::RegisterBrawlerModel, uploaded_image::UploadedImage,
+            base64_image::Base64Image, brawler_model::RegisterBrawlerModel, mission_model::MissionModel,
+            uploaded_image::UploadedImage,
         },
     },
     infrastructure::{argon2::hash, cloudinary::UploadImageOptions, jwt::jwt_model::Passport},
@@ -59,5 +60,13 @@ where
             .await?;
 
         Ok(uploaded)
+    }
+
+    pub async fn crew_counting(&self, mission_id: i32) -> Result<u32> {
+        self.brawler_repository.crew_counting(mission_id).await
+    }
+
+    pub async fn get_missions(&self, brawler_id: i32) -> Result<Vec<MissionModel>> {
+        self.brawler_repository.get_missions(brawler_id).await
     }
 }

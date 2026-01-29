@@ -1,0 +1,154 @@
+.mission-container {
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Filter Bar */
+.filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+
+    .search-label {
+        font-weight: 700;
+        font-size: 16px;
+        color: #333;
+    }
+
+    .search-input {
+        padding: 8px 12px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        width: 250px;
+        font-size: 14px;
+
+        &:focus {
+            outline: none;
+            border-color: #80bdff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .25);
+        }
+    }
+
+    .status-select {
+        padding: 8px 30px 8px 12px;
+        /* Extra padding for arrow if needed */
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        width: 180px;
+        font-size: 14px;
+        background-color: white;
+
+        &:focus {
+            outline: none;
+            border-color: #80bdff;
+        }
+    }
+
+    .go-btn {
+        background-color: #1976d2;
+        color: white;
+        border: none;
+        padding: 8px 24px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 14px;
+        transition: background-color 0.2s;
+
+        &:hover {
+            background-color: #1565c0;
+        }
+    }
+}
+
+/* Mission Table */
+.mission-table {
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    overflow-x: auto;
+    /* Handle overflow if screen is small */
+
+    .table-header {
+        display: grid;
+        grid-template-columns: 1.5fr 2fr 1fr 1fr 1.5fr 1.5fr 0.8fr;
+        background-color: #f8f9fa;
+        font-weight: 700;
+        font-size: 14px;
+        color: #495057;
+        padding: 15px;
+        border-bottom: 1px solid #dee2e6;
+        align-items: center;
+    }
+
+    .table-row {
+        display: grid;
+        grid-template-columns: 1.5fr 2fr 1fr 1fr 1.5fr 1.5fr 0.8fr;
+        padding: 15px;
+        border-bottom: 1px solid #eaeff4;
+        align-items: center;
+        background-color: #fff;
+        font-size: 14px;
+        color: #212529;
+
+        &:last-child {
+            border-bottom: none;
+        }
+
+        &:hover {
+            background-color: #f8f9fa;
+        }
+    }
+
+    .col {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        padding-right: 15px;
+
+        &.description {
+            /* Allow description to show a bit more context if needed, or keep unified */
+        }
+
+        &.status {
+            text-transform: capitalize;
+        }
+    }
+
+    .action-link {
+        color: #1976d2;
+        text-decoration: none;
+        font-weight: 500;
+        cursor: pointer;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+
+    .no-data {
+        padding: 40px;
+        text-align: center;
+        color: #6c757d;
+        font-style: italic;
+    }
+}
+
+@media (max-width: 900px) {
+    .filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+
+        .search-input,
+        .status-select {
+            width: 100%;
+        }
+    }
+
+    .mission-table {
+        min-width: 800px;
+        /* Force scroll */
+    }
+}

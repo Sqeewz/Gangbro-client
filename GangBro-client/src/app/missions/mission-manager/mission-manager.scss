@@ -1,0 +1,76 @@
+.mission-container {
+  padding: 16px;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+}
+
+.controls-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+
+  .search-label {
+    font-weight: bold;
+    color: #333;
+  }
+
+  .search-field,
+  .status-field {
+    width: 200px;
+
+    // Remove bottom margin typically added by mat-form-field
+    margin-bottom: -1.25em;
+  }
+}
+
+.go-btn {
+  height: 48px;
+  margin-bottom: 2px;
+}
+
+/* Structure */
+.example-container {
+  position: relative;
+}
+
+.example-table-container {
+  position: relative;
+  min-height: 200px;
+  max-height: 400px;
+  overflow: auto;
+}
+
+table {
+  width: 100%;
+}
+
+.example-loading-shade {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 56px;
+  right: 0;
+  background: rgba(0, 0, 0, 0.15);
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.example-rate-limit-reached {
+  max-width: 360px;
+  text-align: center;
+}
+
+/* Column Widths */
+.mat-column-number,
+.mat-column-state {
+  width: 64px;
+}
+
+.mat-column-created {
+  width: 124px;
+}

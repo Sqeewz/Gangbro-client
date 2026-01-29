@@ -2,8 +2,7 @@ use anyhow::{Ok, Result};
 use async_trait::async_trait;
 use chrono::{Duration, Utc};
 use diesel::{
-    ExpressionMethods, RunQueryDsl, SelectableHelper, insert_into,
-    query_dsl::methods::{FilterDsl, SelectDsl},
+    ExpressionMethods, QueryDsl, RunQueryDsl, SelectableHelper, insert_into,
 };
 use std::sync::Arc;
 
@@ -12,11 +11,14 @@ use crate::{
     domain::{
         entities::brawlers::{BrawlerEntity, RegisterBrawlerEntity},
         repositories::brawlers::BrawlerRepository,
-        value_objects::{base64_image::Base64Image, uploaded_image::UploadedImage},
+        value_objects::{base64_image::Base64Image, uploaded_image::UploadedImage, mission_model::MissionModel},
     },
     infrastructure::{
         cloudinary::{self, UploadImageOptions},
-        database::{postgresql_connection::PgPoolSquad, schema::brawlers},
+        database::{
+            postgresql_connection::PgPoolSquad,
+            schema::{brawlers, crew_memberships},
+        },
         jwt::{
             generate_token,
             jwt_model::{Claims, Passport},
@@ -90,5 +92,43 @@ impl BrawlerRepository for BrawlerPostgres {
             .execute(&mut conn)?;
 
         Ok(uploaded_img)
+    }
+
+    async fn crew_counting(&self, mission_id: i32) -> Result<u32> {
+        let mut connection = Arc::clone(&self.db_pool).get()?;
+
+        let count: i64 = crew_memberships::table
+            .filter(crew_memberships::mission_id.eq(mission_id))
+            .count()
+            .get_result(&mut connection)?;
+
+        Ok(count as u32)
+    }
+
+    async fn get_missions(&self, brawler_id: i32) -> Result<Vec<MissionModel>> {
+        let mut connection = Arc::clone(&self.db_pool).get()?;
+
+        let sql = r#"
+            SELECT 
+                m.id, 
+                m.name, 
+                m.description, 
+                m.status, 
+                m.chief_id, 
+                b.display_name AS chief_display_name, 
+                (SELECT COUNT(*) FROM crew_memberships cm WHERE cm.mission_id = m.id) AS crew_count, 
+                m.created_at, 
+                m.updated_at
+            FROM missions m
+            JOIN brawlers b ON m.chief_id = b.id
+            WHERE m.chief_id = $1
+            ORDER BY m.created_at DESC
+        "#;
+
+        let result = diesel::sql_query(sql)
+            .bind::<diesel::sql_types::Int4, _>(brawler_id)
+            .load::<MissionModel>(&mut connection)?;
+
+        Ok(result)
     }
 }

@@ -34,7 +34,7 @@ where
             .expect("missing value")
             .parse()?;
 
-        let mission = self.mission_viewing_repository.get_one(mission_id).await?;
+        let mission = self.mission_viewing_repository.view_detail(mission_id).await?;
 
         if mission.chief_id == brawler_id {
             return Err(anyhow::anyhow!(
@@ -68,7 +68,7 @@ where
     }
 
     pub async fn leave(&self, mission_id: i32, brawler_id: i32) -> Result<()> {
-        let mission = self.mission_viewing_repository.get_one(mission_id).await?;
+        let mission = self.mission_viewing_repository.view_detail(mission_id).await?;
 
         let leaving_condition = mission.status == MissionStatuses::Open.to_string()
             || mission.status == MissionStatuses::Failed.to_string();

@@ -1,33 +1,21 @@
-<mat-toolbar class="navbar">
-    <!-- Home button -->
-    <span class="home-btn" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-        The Convergence
-    </span>
+<mat-toolbar class="my-navbar">
+    <div class="brand-section">
+        <span class="app-title" routerLink="/">GangBro</span>
+        <button mat-button class="page-title" routerLink="/missions">Missions</button>
+    </div>
 
     <span class="spacer"></span>
 
-    @if (!isLoggedIn()) {
-    <button mat-button routerLink="/login" routerLinkActive="active" class="login-btn">
-        <mat-icon>login</mat-icon>
-        <span>Login</span>
-    </button>
-    } @else {
-    <button mat-button [matMenuTriggerFor]="profileMenu" class="profile-btn">
-        <div class="profile-btn-content">
-            <img [src]="avatar_url()" class="avatar" [alt]="display_name() + ' avatar'">
-            <span class="display-name">{{display_name()}}</span>
-        </div>
-    </button>
+    @if (display_name()) {
+    <div class="user-section" [matMenuTriggerFor]="menu">
+        <img [src]="avatar_url()" alt="avatar" class="avatar">
+        <span class="username">{{display_name()}}</span>
+    </div>
 
-    <mat-menu #profileMenu="matMenu" class="profile-menu" xPosition="before">
-        <button mat-menu-item routerLink="/profile">
-            <mat-icon>manage_accounts</mat-icon>
-            <span>Profile</span>
-        </button>
-        <button mat-menu-item (click)="logout()">
-            <mat-icon>logout</mat-icon>
-            <span>Logout</span>
-        </button>
+    <mat-menu #menu="matMenu">
+        <button mat-menu-item routerLink="/profile">Profile</button>
+        <button mat-menu-item routerLink="/chief">My Missions</button>
+        <button mat-menu-item (click)="logout()">Log-out</button>
     </mat-menu>
     }
 </mat-toolbar>

@@ -1,0 +1,46 @@
+<div class="mission-container">
+    <div class="filter-bar">
+        <label class="search-label">Search</label>
+        <input type="text" [(ngModel)]="filter.name" placeholder="Mission Name" class="search-input" />
+        <select [(ngModel)]="filter.status" class="status-select">
+            <option [ngValue]="undefined">-- Select Status --</option>
+            <option value="Open">Open</option>
+            <option value="InProgress">In Progress</option>
+            <option value="Completed">Completed</option>
+            <option value="Failed">Failed</option>
+        </select>
+        <button (click)="onSubmit()" class="go-btn" mat-raised-button color="primary">Go</button>
+    </div>
+
+    <div class="mission-table">
+        <div class="table-header">
+            <div class="col name">Name</div>
+            <div class="col description">Description</div>
+            <div class="col crew">Number of Crew</div>
+            <div class="col status">Status</div>
+            <div class="col created">Created at</div>
+            <div class="col updated">Updated at</div>
+            <div class="col actions">Actions</div>
+        </div>
+
+        @if((missions$ | async)?.length) {
+        @for (mission of missions$ | async; track mission.id) {
+        <div class="table-row">
+            <div class="col name">{{mission.name}}</div>
+            <div class="col description" [title]="mission.description">{{mission.description || ''}}</div>
+            <div class="col crew">{{mission.crew_count}}</div>
+            <div class="col status">{{mission.status}}</div>
+            <div class="col created">{{mission.created_at | date:'short'}}</div>
+            <div class="col updated">{{mission.updated_at | date:'short'}}</div>
+            <div class="col actions">
+                @if(isSignin()){
+                <a href="javascript:void(0)" class="action-link">Join</a>
+                }
+            </div>
+        </div>
+        }
+        } @else {
+        <div class="no-data">No missions found.</div>
+        }
+    </div>
+</div>

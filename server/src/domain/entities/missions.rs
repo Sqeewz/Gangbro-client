@@ -1,11 +1,12 @@
 use chrono::NaiveDateTime;
 use diesel::prelude::*;
+use serde::Serialize;
 
 use crate::{
     domain::value_objects::mission_model::MissionModel, infrastructure::database::schema::missions,
 };
 
-#[derive(Debug, Clone, Identifiable, Selectable, Queryable)]
+#[derive(Debug, Clone, Identifiable, Selectable, Queryable, Serialize)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 #[diesel(table_name = missions)]
 pub struct MissionEntity {
@@ -20,13 +21,14 @@ pub struct MissionEntity {
 }
 
 impl MissionEntity {
-    pub fn to_model(&self, crew_count: i64) -> MissionModel {
+    pub fn to_model(&self, crew_count: i64, chief_display_name: String) -> MissionModel {
         MissionModel {
             id: self.id,
             name: self.name.clone(),
             description: self.description.clone(),
             status: self.status.clone(),
             chief_id: self.chief_id,
+            chief_display_name,
             crew_count,
             created_at: self.created_at,
             updated_at: self.updated_at,

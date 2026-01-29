@@ -30,7 +30,7 @@ where
     }
 
     pub async fn in_progress(&self, mission_id: i32, chief_id: i32) -> Result<i32> {
-        let mission = self.missiom_viewing_repository.get_one(mission_id).await?;
+        let mission = self.missiom_viewing_repository.view_detail(mission_id).await?;
 
         let crew_count = self
             .missiom_viewing_repository
@@ -59,7 +59,7 @@ where
         Ok(result)
     }
     pub async fn to_completed(&self, mission_id: i32, chief_id: i32) -> Result<i32> {
-        let mission = self.missiom_viewing_repository.get_one(mission_id).await?;
+        let mission = self.missiom_viewing_repository.view_detail(mission_id).await?;
 
         let update_condition = mission.status == MissionStatuses::InProgress.to_string()
             && mission.chief_id == chief_id;
@@ -74,7 +74,7 @@ where
         Ok(result)
     }
     pub async fn to_failed(&self, mission_id: i32, chief_id: i32) -> Result<i32> {
-        let mission = self.missiom_viewing_repository.get_one(mission_id).await?;
+        let mission = self.missiom_viewing_repository.view_detail(mission_id).await?;
 
         let update_condition = mission.status == MissionStatuses::InProgress.to_string()
             && mission.chief_id == chief_id;

@@ -1,89 +1,90 @@
-import { inject, Injectable, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { firstValueFrom, Observable } from 'rxjs';
-import { environment } from '../../environments/environment';
-import { LoginModel, Passport, RegisterModel } from '../_models/passport';
+import { HttpClient } from '@angular/common/http'
+import { inject, Injectable, signal } from '@angular/core'
+import { environment } from '../../environments/environment' ///
+import { LoginModel, Passport, RegisterModel } from '../_models/passport'
+import { firstValueFrom } from 'rxjs'
+import { H } from '@angular/cdk/keycodes'
+import { getAvatar } from '../_helpers/util'
+
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root',
 })
 export class PassportService {
-    private _storage_key = 'passport'
-    private _api_url = environment.baseUrl
-    private _http: HttpClient = inject(HttpClient)
+  private _key = 'passport'
+  private _base_url = environment.baseUrl + '/api'
+  private _http = inject(HttpClient)
 
-    data = signal<Passport | undefined>(undefined)
+  data = signal<undefined | Passport>(undefined)
+  avatar = signal<string>("")
+  isSignin = signal<boolean>(false)
 
-    constructor() {
-        this.getPassportFromLocalStorage()
+  saveAvatarImgUrl(url: string) {
+    let passport = this.data()
+    if (passport) {
+      passport.avatar_url = url
+      this.avatar.set(url)
+      this.data.set(passport)
+      this.savePassportToLocalStorage()
+    }
+  }
+
+  private loadPassportFormLocalStorage(): string | null {
+    const jsonString = localStorage.getItem(this._key)
+    if (!jsonString) return 'not found'
+    try {
+      const passport = JSON.parse(jsonString) as Passport
+      this.data.set(passport)
+      const avatar = getAvatar(passport)
+      this.avatar.set(avatar)
+    } catch (error) {
+      return `${error}`
+    }
+    return null
+  }
+
+  private savePassportToLocalStorage() {
+    const passport = this.data()
+    if (!passport) return
+    const jsonString = JSON.stringify(passport)
+    localStorage.setItem(this._key, jsonString)
+    this.isSignin.set(true)
+  }
+
+  constructor() {
+    this.loadPassportFormLocalStorage()
+  }
+
+  destroy() {
+    this.data.set(undefined)
+    this.avatar.set("")
+    localStorage.removeItem(this._key)
+    this.isSignin.set(false)
+  }
+
+  async login(login: LoginModel): Promise<null | string> {
+    const api_url = this._base_url + '/authentication/login'
+    return await this.fetchPassport(api_url, login)
+  }
+
+  async register(register: RegisterModel): Promise<null | string> {
+    const api_url = this._base_url + '/brawler/register'
+    return await this.fetchPassport(api_url, register)
+  }
+
+  private async fetchPassport(api_url: string, model: LoginModel | RegisterModel): Promise<string | null> {
+    try {
+      const result = this._http.post<Passport>(api_url, model)
+      const passport = await firstValueFrom(result)
+      this.data.set(passport)
+      this.savePassportToLocalStorage()
+      return null
+    } catch (error: any) {
+      // console.error(error)
+      // console.log(error.error)
+      return error.error
     }
 
-    private getPassportFromLocalStorage(): void {
-        const jsonStr = localStorage.getItem(this._storage_key)
-        if (!jsonStr) return
-        try {
-            const passport: Passport = JSON.parse(jsonStr) as Passport
-            this.data.set(passport)
-        } catch (error) {
-            console.error(error)
-        }
-    }
+  }
 
-    private savePassportToLocalStorage(): void {
-        const passport = this.data()
-        if (!passport) return
-        const passportJson = JSON.stringify(passport)
-        localStorage.setItem(this._storage_key, passportJson)
-    }
-
-    async login(loginData: LoginModel): Promise<string> {
-        try {
-            const url = this._api_url + '/authentication/login'
-            const source: Observable<Passport> = this._http.post<Passport>(url, loginData)
-            const passport: Passport = await firstValueFrom(source)
-            this.data.set(passport)
-            this.savePassportToLocalStorage()
-        } catch (error: any) {
-            console.error(error)
-            // Handle different error types
-            if (error.error && typeof error.error === 'string') {
-                return error.error
-            } else if (error.message) {
-                return error.message
-            } else if (error.status === 0) {
-                return 'Cannot connect to server'
-            }
-            return 'An error occurred'
-        }
-        return ''
-    }
-
-    destroy(): void {
-        localStorage.removeItem(this._storage_key)
-        this.data.set(undefined)
-    }
-
-    async register(registerData: RegisterModel): Promise<string> {
-        try {
-            const url = this._api_url + '/brawlers/register'
-
-            // Challenge ! [เขียนโค้ด ที่นี่ เพื่อให้การทำงาน สมบูรณ์]
-            const source: Observable<Passport> = this._http.post<Passport>(url, registerData)
-            const passport: Passport = await firstValueFrom(source)
-            this.data.set(passport)
-
-            this.savePassportToLocalStorage()
-        } catch (error: any) {
-            console.error(error)
-            if (error.error && typeof error.error === 'string') {
-                return error.error
-            } else if (error.message) {
-                return error.message
-            } else if (error.status === 0) {
-                return 'Cannot connect to server'
-            }
-            return 'An error occurred during registration'
-        }
-        return ''
-    }
 }

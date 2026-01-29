@@ -24,40 +24,17 @@ where
     }
 
     pub async fn get_one(&self, mission_id: i32) -> Result<MissionModel> {
-        let crew_count = self
-            .mission_viewing_repository
-            .crew_counting(mission_id)
-            .await?;
-
-        let model = self.mission_viewing_repository.get_one(mission_id).await?;
-
-        let result = model.to_model(crew_count);
-
-        Ok(result)
+        self.mission_viewing_repository.view_detail(mission_id).await
     }
 
     pub async fn get_all(&self, filter: &MissionFilter) -> Result<Vec<MissionModel>> {
-        let models = self.mission_viewing_repository.get_all(filter).await?;
-
-        let mut result = Vec::new();
-
-        for model in models.into_iter() {
-            let crew_count = self
-                .mission_viewing_repository
-                .crew_counting(model.id)
-                .await
-                .unwrap_or(0);
-
-            result.push(model.to_model(crew_count));
-        }
-
-        Ok(result)
+        self.mission_viewing_repository.gets(filter).await
     }
     
     pub async fn get_mission_count(&self, mission_id: i32) -> Result<Vec<BrawlerModel>> {
         let result = self
             .mission_viewing_repository
-            .get_mission_count(mission_id)
+            .get_mission_crew(mission_id)
             .await?;
 
         Ok(result)
