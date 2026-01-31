@@ -10,7 +10,7 @@ import { MissionFilter } from '../_models/mission-filter'
 import { Mission } from '../_models/mission'
 import { FormsModule } from '@angular/forms'
 import { BehaviorSubject } from 'rxjs'
-import { AsyncPipe, DatePipe, LowerCasePipe, UpperCasePipe } from '@angular/common'
+import { AsyncPipe, UpperCasePipe } from '@angular/common'
 import { MissionService } from '../_service/mission-service'
 import { PassportService } from '../_service/passport-service'
 import { ConfirmDialog } from '../_dialog/confirm-dialog/confirm-dialog'
@@ -19,7 +19,7 @@ import { ConfirmDialog } from '../_dialog/confirm-dialog/confirm-dialog'
 @Component({
   selector: 'app-missions',
   standalone: true,
-  imports: [FormsModule, AsyncPipe, DatePipe, LowerCasePipe, UpperCasePipe, MatMenuModule, MatButtonModule, MatSnackBarModule, MatDialogModule],
+  imports: [FormsModule, AsyncPipe, UpperCasePipe, MatMenuModule, MatButtonModule, MatSnackBarModule, MatDialogModule],
   templateUrl: './missions.html',
   styleUrl: './missions.scss',
 })
