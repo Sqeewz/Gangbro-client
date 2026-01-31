@@ -1,23 +1,41 @@
-<h2 mat-dialog-title>Upload Image</h2>
-<mat-dialog-content>
-    <div class="content-container">
-        @if (imgPreview()) {
-        <div class="image-preview">
-            <img [src]="imgPreview()" alt="upload image">
+<div class="gang-dialog">
+    <h2 mat-dialog-title class="dialog-title">UPLOAD IDENTITY DATA</h2>
+
+    <mat-dialog-content class="form-container">
+        <div class="content-container">
+            @if (imgPreview()) {
+            <div class="image-preview gang-card">
+                <img [src]="imgPreview()" alt="upload image">
+            </div>
+            } @else {
+            <div class="placeholder-preview">
+                <mat-icon>file_upload</mat-icon>
+                <span>NO DATA SELECTED</span>
+            </div>
+            }
+
+            @if (imgFile) {
+            <div class="file-info">
+                <span class="label">FILE:</span>
+                <span class="value">{{imgFile.name}}</span>
+            </div>
+            }
+
+            @if (errorMsg()) {
+            <p class="error-msg alert-glow">{{errorMsg()}}</p>
+            }
         </div>
-        }
-        @if (imgFile) {
-        <p>{{imgFile.name}}</p>
-        }
-        @if (errorMsg()) {
-        <p class="error-msg">{{errorMsg()}}</p>
-        }
-    </div>
 
-    <input type="file" #filePicker (change)="onImgPicked($event)" accept=".jpg, .png">
+        <input type="file" #filePicker (change)="onImgPicked($event)" accept=".jpg, .png" style="display: none;">
+    </mat-dialog-content>
 
-    <mat-dialog-actions>
-        <button matButton (click)="filePicker.click()">Pick Image</button>
-        <button matButton (click)="onSubmit()" [disabled]="!imgFile">Upload</button>
+    <mat-dialog-actions align="end" class="dialog-actions">
+        <button class="gang-btn secondary sm" (click)="filePicker.click()">
+            {{ imgFile ? 'CHANGE DATA' : 'SELECT DATA' }}
+        </button>
+        <button class="gang-btn sm" (click)="onSubmit()" [disabled]="!imgFile">
+            INITIALIZE UPLOAD
+        </button>
+        <button class="gang-btn secondary sm" mat-dialog-close>ABORT</button>
     </mat-dialog-actions>
-</mat-dialog-content>
+</div>

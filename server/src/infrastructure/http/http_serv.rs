@@ -22,6 +22,7 @@ use crate::{
     infrastructure::{
         database::postgresql_connection::PgPoolSquad,
         http::routers::{self},
+        notifications::broadcaster::GlobalBroadcaster,
     },
 };
 
@@ -33,7 +34,7 @@ fn static_serve() -> Router {
     Router::new().fallback_service(service)
 }
 
-fn api_serve(db_pool: Arc<PgPoolSquad>) -> Router {
+fn api_serve(db_pool: Arc<PgPoolSquad>, broadcaster: Arc<GlobalBroadcaster>) -> Router {
     Router::new()
         .nest("/brawler", routers::brawlers::routes(Arc::clone(&db_pool)))
         .nest(
@@ -42,28 +43,41 @@ fn api_serve(db_pool: Arc<PgPoolSquad>) -> Router {
         )
         .nest(
             "/mission",
-            routers::missions_operations::routes(Arc::clone(&db_pool)),
+            routers::missions_operations::routes(Arc::clone(&db_pool), Arc::clone(&broadcaster)),
         )
         .nest(
             "/crew",
-            routers::crew_operations::routes(Arc::clone(&db_pool)),
+            routers::crew_operations::routes(Arc::clone(&db_pool), Arc::clone(&broadcaster)),
         )
         .nest(
             "/mission-management",
             routers::missions_management::routes(Arc::clone(&db_pool)),
         )
         .nest(
+            "/mission-chats",
+            routers::mission_chats::routes(Arc::clone(&db_pool)),
+        )
+        .nest(
             "/authentication",
             routers::authentication::routes(Arc::clone(&db_pool)),
+        )
+        .nest(
+            "/system",
+            routers::system::routes(crate::infrastructure::database::repositories::system::SystemPostgres::new(Arc::clone(&db_pool))),
+        )
+        .nest(
+            "/notifications",
+            routers::notifications::routes(Arc::clone(&broadcaster)),
         )
         .nest("/util", routers::default_routers::routes())
         .fallback(|| async { (StatusCode::NOT_FOUND, "API not found") })
 }
 
 pub async fn start(config: Arc<DotEnvyConfig>, db_pool: Arc<PgPoolSquad>) -> Result<()> {
+    let broadcaster = Arc::new(GlobalBroadcaster::new());
     let app = Router::new()
         .merge(static_serve())
-        .nest("/api", api_serve(db_pool))
+        .nest("/api", api_serve(db_pool, broadcaster))
         // .fallback(default_router::health_check)
         // .route("/health_check", get(default_router::health_check)
         // .route("/make-error", get(default_router::make_error)

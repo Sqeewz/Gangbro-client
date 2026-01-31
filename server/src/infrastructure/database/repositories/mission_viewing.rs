@@ -49,13 +49,14 @@ SELECT m.id,
         COALESCE(b.display_name, '') AS chief_display_name,
         COUNT(cm.brawler_id) AS crew_count,
         m.created_at,
-        m.updated_at
+        m.updated_at,
+        m.category
 FROM missions m
 LEFT JOIN brawlers b ON b.id = m.chief_id
 LEFT JOIN crew_memberships cm ON cm.mission_id = m.id
 WHERE m.deleted_at IS NULL
     AND m.id = $1
-GROUP BY m.id, b.display_name, m.name, m.description, m.status, m.chief_id, m.created_at, m.updated_at
+GROUP BY m.id, b.display_name, m.name, m.description, m.status, m.chief_id, m.created_at, m.updated_at, m.category
 LIMIT 1
         "#;
 
@@ -80,7 +81,8 @@ SELECT m.id,
         COALESCE(b.display_name, '') AS chief_display_name,
         COUNT(cm.brawler_id) AS crew_count,
         m.created_at,
-        m.updated_at
+        m.updated_at,
+        m.category
 FROM missions m
 LEFT JOIN brawlers b ON b.id = m.chief_id
 LEFT JOIN crew_memberships cm ON cm.mission_id = m.id
@@ -88,21 +90,31 @@ WHERE m.deleted_at IS NULL
     AND ($1::varchar IS NULL OR m.status = $1)
     AND ($2::varchar IS NULL OR m.name ILIKE $2)
     AND ($3::int4 IS NULL OR m.chief_id != $3)
-GROUP BY m.id, b.display_name, m.name, m.description, m.status, m.chief_id, m.created_at, m.updated_at
+    AND ($4::varchar IS NULL OR m.category = $4)
+GROUP BY m.id, b.display_name, m.name, m.description, m.status, m.chief_id, m.created_at, m.updated_at, m.category
 ORDER BY 
     CASE WHEN m.status IN ('Completed', 'Failed') THEN 1 ELSE 0 END ASC,
     m.created_at DESC
+LIMIT $5 OFFSET $6
         "#;
 
         // Prepare optional bind values
         let status_bind: Option<String> = mission_filter.status.as_ref().map(|s| s.to_string());
         let name_bind: Option<String> = mission_filter.name.as_ref().map(|n| format!("%{}%", n));
         let exclude_chief_id_bind: Option<i32> = mission_filter.exclude_chief_id;
+        let category_bind: Option<String> = mission_filter.category.clone();
+        
+        let limit = mission_filter.limit.unwrap_or(20);
+        let page = mission_filter.page.unwrap_or(1);
+        let offset = (page - 1) * limit;
 
         let rows = diesel::sql_query(sql)
-            .bind::<Nullable<Varchar>, _>(status_bind)
-            .bind::<Nullable<Varchar>, _>(name_bind)
-            .bind::<Nullable<diesel::sql_types::Int4>, _>(exclude_chief_id_bind)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Varchar>, _>(status_bind)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Varchar>, _>(name_bind)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Int4>, _>(exclude_chief_id_bind)
+            .bind::<diesel::sql_types::Nullable<diesel::sql_types::Varchar>, _>(category_bind)
+            .bind::<diesel::sql_types::Int8, _>(limit)
+            .bind::<diesel::sql_types::Int8, _>(offset)
             .load::<MissionModel>(&mut conn)?;
 
         Ok(rows)

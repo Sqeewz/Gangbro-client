@@ -1,10 +1,32 @@
-<h4 mat-dialog-title>New Mission</h4>
-<mat-dialog-content>
-    <input type="text" [(ngModel)]="addMission.name" placeholder="Mission Name" />
-    <textarea [(ngModel)]="addMission.description" placeholder="Mission Description"></textarea>
+<div class="gang-dialog">
+    <h2 mat-dialog-title class="dialog-title">{{ addMission.name ? 'UPDATE MISSION' : 'NEW MISSION' }}</h2>
 
-    <mat-dialog-actions>
-        <button matButton mat-dialog-close>Cancel</button>
-        <button (click)="onSubmit()" mat-stroked-button type="submit" [disabled]="!addMission.name"> Create</button>
+    <mat-dialog-content class="form-container">
+        <div class="input-group">
+            <label>MISSION NAME</label>
+            <input type="text" [(ngModel)]="addMission.name" placeholder="Enter mission title..." class="gang-input" />
+        </div>
+
+        <div class="input-group">
+            <label>OPERATIONAL DETAILS</label>
+            <textarea [(ngModel)]="addMission.description" placeholder="Describe the objectives..."
+                class="gang-textarea"></textarea>
+        </div>
+
+        <div class="input-group">
+            <label>SECTOR / CATEGORY</label>
+            <select id="category" [(ngModel)]="addMission.category" class="gang-select">
+                @for (cat of categories; track cat) {
+                <option [value]="cat">{{cat | uppercase}}</option>
+                }
+            </select>
+        </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end" class="dialog-actions">
+        <button class="gang-btn secondary sm" mat-dialog-close>ABORT</button>
+        <button class="gang-btn sm" (click)="onSubmit()" [disabled]="!addMission.name">
+            {{ addMission.name ? 'REDEPLOY' : 'DEPLOY MISSION' }}
+        </button>
     </mat-dialog-actions>
-</mat-dialog-content>
+</div>

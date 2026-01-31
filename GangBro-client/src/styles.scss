@@ -1,42 +1,229 @@
 // Include theming for Angular Material with `mat.theme()`.
 // This Sass mixin will define CSS variables that are used for styling Angular Material
 // components according to the Material 3 design spec.
-// Learn more about theming and how to use it for your application's
-// custom components at https://material.angular.dev/guide/theming
 @use '@angular/material' as mat;
+
+// Define manual palettes since M3 theming with direct hex values was causing map errors.
+$gang-primary-palette: mat.m2-define-palette(mat.$m2-deep-purple-palette, A200, A100, A400);
+$gang-accent-palette: mat.m2-define-palette(mat.$m2-yellow-palette, A200, A100, A400);
+
+$gang-theme: mat.m2-define-dark-theme((color: (primary: $gang-primary-palette,
+        accent: $gang-accent-palette,
+      )));
+
+html {
+  @include mat.all-component-themes($gang-theme);
+}
+
+// We don't need $gang-theme variable if we use mat.theme() directly on html.
+// If customization is needed, CSS variables below handle the specific 'Gang' look.
+
+:root {
+  --gang-bg: #0a0a0c;
+  --gang-surface: #151518;
+  --gang-primary: #9d50bb; // Vibrant Purple
+  --gang-primary-rgb: 157, 80, 187;
+  --gang-secondary: #6e48aa; // Deep Purple
+  --gang-secondary-rgb: 110, 72, 170;
+  --gang-accent: #f9d423; // Neon Yellow
+  --gang-text: #ffffff;
+  --gang-text-muted: #a0a0b0;
+  --gang-border: rgba(255, 255, 255, 0.08);
+
+  // Gradients
+  --gang-gradient-main: linear-gradient(135deg, #9d50bb 0%, #6e48aa 100%);
+  --gang-gradient-accent: linear-gradient(135deg, #f9d423 0%, #ff4e50 100%);
+  --gang-glow-purple: 0 0 15px rgba(157, 80, 187, 0.4);
+  --gang-glow-yellow: 0 0 15px rgba(249, 212, 35, 0.4);
+}
 
 html {
   height: 100%;
-  @include mat.theme((
-    color: (
-      primary: mat.$azure-palette,
-      tertiary: mat.$blue-palette,
-    ),
-    typography: Roboto,
-    density: 0,
-  ));
-}
+  // Apply the dark theme (already applied in html block above, so we can remove this or ensure it's not duplicated)
+  // @include mat.all-component-themes($gang-theme);
 
-body {
-  // Default the application to a light color theme. This can be changed to
-  // `dark` to enable the dark color theme, or to `light dark` to defer to the
-  // user's system settings.
-  color-scheme: light;
-
-  // Set a default background, font and text colors for the application using
-  // Angular Material's system-level CSS variables. Learn more about these
-  // variables at https://material.angular.dev/guide/system-variables
-  background-color: var(--mat-sys-surface);
-  color: var(--mat-sys-on-surface);
-  font: var(--mat-sys-body-medium);
-
-  // Reset the user agent margin.
-  margin: 0;
-  height: 100%;
-}
-body {
+  body {
+    background-color: var(--gang-bg);
+    color: var(--gang-text);
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    height: 100vh;
     display: flex;
-    flex-direction: column ;
-   margin:0;
-   height: 100vh;
+    flex-direction: column;
+  }
+}
+
+// Global Gang Styles
+.gang-card {
+  background-color: var(--gang-surface);
+  border: 1px solid var(--gang-border);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--gang-glow-purple); // Purple glow
+    border-color: var(--gang-primary);
+  }
+}
+
+.gang-title {
+  font-size: 2rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: var(--gang-gradient-main);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 1rem;
+}
+
+.gang-btn {
+  background: var(--gang-gradient-main);
+  color: white !important;
+  border: none;
+  padding: 0 24px;
+  height: 48px;
+  border-radius: 24px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    box-shadow: 0 0 15px rgba(124, 77, 255, 0.6);
+    transform: scale(1.02);
+  }
+
+  &.secondary {
+    background: transparent;
+    border: 2px solid var(--gang-primary);
+    color: var(--gang-primary) !important;
+
+    &:hover {
+      background: rgba(157, 80, 187, 0.1);
+      box-shadow: var(--gang-glow-purple);
+    }
+  }
+
+  &.accent {
+    background: var(--gang-accent);
+    color: #121212 !important;
+
+    &:hover {
+      box-shadow: var(--gang-glow-yellow);
+    }
+  }
+}
+
+// Loading Spinner Global
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(157, 80, 187, 0.1);
+  border-left-color: var(--gang-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  color: var(--gang-primary);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 800;
+  font-family: 'Oxanium', sans-serif;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--gang-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gang-surface);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gang-primary);
+}
+
+// Global Mat-Menu Gang Theme
+.gang-menu.mat-mdc-menu-panel {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+
+  .mat-mdc-menu-content {
+    background: transparent !important;
+    background-color: transparent !important;
+    padding: 0 !important;
+  }
+}
+
+.gang-menu {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  min-width: auto !important;
+
+  .mat-mdc-menu-item {
+    background: transparent !important;
+    color: var(--gang-text) !important;
+    font-family: 'Oxanium', sans-serif !important;
+    font-weight: 600 !important;
+    letter-spacing: 1px !important;
+    text-transform: uppercase !important;
+    font-size: 0.85rem !important;
+
+    border-radius: 8px !important;
+    margin-bottom: 2px !important;
+
+    &:last-child {
+      margin-bottom: 0 !important;
+    }
+
+    &:hover {
+      background: transparent !important;
+      color: var(--gang-accent) !important;
+      text-shadow: var(--gang-glow-yellow);
+    }
+
+    .mat-icon {
+      color: var(--gang-accent) !important;
+    }
+  }
 }

@@ -1,4 +1,18 @@
-<p>server-error works!</p>
-@if (errorMsg) {
-<p>{{errorMsg}}</p>
-}
+<div class="error-container">
+    <div class="glitch-wrapper">
+        <h1 class="glitch" data-text="500">500</h1>
+    </div>
+
+    <div class="error-details">
+        <h2 class="title">CRITICAL_SYSTEM_FAILURE</h2>
+        <div class="code-box">
+            <span class="prefix">LOG_OUTPUT:</span>
+            <p class="message">{{ errorMsg || 'UNKNOWN_EXCEPTION_IN_CORE_MODULE' }}</p>
+        </div>
+    </div>
+
+    <div class="actions">
+        <button class="gang-btn" routerLink="/">REBOOT_SYSTEM</button>
+        <button class="gang-btn secondary" (click)="retry()">RETRY_LINK</button>
+    </div>
+</div>

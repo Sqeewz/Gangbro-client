@@ -1,14 +1,13 @@
-use axum::{Router, extract::Path, http::StatusCode, response::IntoResponse, routing::get};
+use axum::{Json, Router, extract::Path, http::StatusCode, response::IntoResponse, routing::get};
+use serde_json::json;
 
 pub async fn health_check() -> impl IntoResponse {
-    (StatusCode::OK, " All Right, I'am Good").into_response()
+    (StatusCode::OK, Json(json!({ "status": "ok", "message": "All Right, I'm Good" }))).into_response()
 }
 
 pub async fn make_error(Path(code): Path<u16>) -> impl IntoResponse {
-    // pub async fn make_error() -> impl IntoResponse {
-    // let code = 401;
     let status_code = StatusCode::from_u16(code).unwrap();
-    (status_code, code.to_string()).into_response()
+    (status_code, Json(json!({ "error": format!("Error code: {}", code) }))).into_response()
 }
 
 pub fn routes() -> Router {

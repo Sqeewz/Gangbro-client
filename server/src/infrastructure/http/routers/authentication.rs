@@ -11,6 +11,8 @@ use crate::{
     },
 };
 
+use serde_json::json;
+
 pub async fn login<T>(
     State(user_case): State<Arc<AuthenticationUseCase<T>>>,
     Json(model): Json<LoginModel>,
@@ -21,7 +23,11 @@ where
     match user_case.login(model).await {
         Ok(passport) => (StatusCode::OK, Json(passport)).into_response(),
 
-        Err(e) => (StatusCode::BAD_REQUEST, e.to_string()).into_response(),
+        Err(e) => (
+            StatusCode::BAD_REQUEST,
+            Json(json!({ "error": e.to_string() })),
+        )
+            .into_response(),
     }
 }
 

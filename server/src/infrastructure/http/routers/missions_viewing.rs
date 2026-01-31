@@ -27,8 +27,28 @@ pub fn routes(db_pool: Arc<PgPoolSquad>) -> Router {
         .route("/{mission_id}", get(view_details))
         .route("/gets", get(gets))
         .route("/crew/{mission_id}", get(get_mission_count))
+        .route("/roster/{mission_id}", get(get_crew))
         .with_state(Arc::new(use_case))
 }
+
+pub async fn get_crew<T>(
+    State(mission_viewing_use_case): State<Arc<MissionViewingUseCase<T>>>,
+    Path(mission_id): Path<i32>,
+) -> impl IntoResponse
+where
+    T: MissionViewingRepository + Send + Sync,
+{
+    match mission_viewing_use_case.get_crew(mission_id).await {
+        Ok(brawler_models) => (StatusCode::OK, Json(brawler_models)).into_response(),
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(serde_json::json!({ "error": e.to_string() })),
+        )
+            .into_response(),
+    }
+}
+
+use serde_json::json;
 
 pub async fn view_details<T>(
     State(mission_viewing_use_case): State<Arc<MissionViewingUseCase<T>>>,
@@ -39,7 +59,11 @@ where
 {
     match mission_viewing_use_case.get_one(mission_id).await {
         Ok(mission_model) => (StatusCode::OK, Json(mission_model)).into_response(),
-        Err(e) => (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(json!({ "error": e.to_string() })),
+        )
+            .into_response(),
     }
 }
 
@@ -52,7 +76,11 @@ where
 {
     match mission_viewing_use_case.get_all(&filter).await {
         Ok(mission_models) => (StatusCode::OK, Json(mission_models)).into_response(),
-        Err(e) => (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(json!({ "error": e.to_string() })),
+        )
+            .into_response(),
     }
 }
 
@@ -65,6 +93,10 @@ where
 {
     match mission_viewing_use_case.get_mission_count(mission_id).await {
         Ok(brawler_models) => (StatusCode::OK, Json(brawler_models)).into_response(),
-        Err(e) => (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(json!({ "error": e.to_string() })),
+        )
+            .into_response(),
     }
 }

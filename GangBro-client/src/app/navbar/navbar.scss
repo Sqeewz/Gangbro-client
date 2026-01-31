@@ -1,73 +1,286 @@
-.my-navbar {
-    background: #ffffff;
-    color: #333;
-    border-bottom: 2px solid #4CAF50;
-    /* Green underline matching the image */
-    display: flex;
-    align-items: center;
-    padding: 0 16px;
-    height: 64px;
-    box-shadow: none;
-    /* Flat look as per image */
+.gang-navbar {
+    background: rgba(18, 18, 18, 0.85);
+    backdrop-filter: blur(15px);
+    border-bottom: 2px solid var(--gang-primary);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.7);
+    height: 80px;
+    padding: 0 32px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
-.brand-section {
-    display: flex;
-    align-items: center;
-    /* Changed to center for better button alignment */
-    gap: 16px;
-    /* Added gap for spacing */
-}
-
-.app-title {
-    font-size: 20px;
-    font-weight: 500;
-    color: #000;
+.gang-brand {
+    font-size: 26px;
+    font-weight: 900;
+    letter-spacing: 4px;
+    color: white;
+    margin-right: 60px;
     cursor: pointer;
-    text-decoration: none;
-    margin-right: 8px;
+    font-family: 'Oxanium', sans-serif;
+    text-shadow: 0 0 10px rgba(157, 80, 187, 0.5);
+
+    .highlight {
+        color: transparent;
+        background: var(--gang-gradient-main);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    &:hover {
+        text-shadow: 0 0 20px rgba(157, 80, 187, 0.8);
+    }
 }
 
-.page-title {
-    font-size: 14px;
-    color: #444;
-    font-weight: 400;
-    text-decoration: none;
-    cursor: pointer;
+.nav-links {
+    display: flex;
+    gap: 24px;
 }
 
-/* Active link style */
-.active {
-    color: #4CAF50 !important;
-    font-weight: 500;
+.nav-btn {
+    color: var(--gang-text-muted) !important;
+    font-family: 'Oxanium', sans-serif !important;
+    font-weight: 700 !important;
+    letter-spacing: 2px !important;
+    font-size: 0.9rem !important;
+    transition: all 0.3s ease !important;
+    height: 40px !important;
+    padding: 0 20px !important;
+    border-radius: 4px !important;
+    background: transparent !important;
+
+    &:hover {
+        color: white !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+}
+
+.gang-active {
+    color: var(--gang-accent) !important;
+    box-shadow: inset 0 -2px 0 var(--gang-accent) !important;
+    background: transparent !important;
 }
 
 .spacer {
     flex: 1 1 auto;
 }
 
-.user-section {
+.user-actions {
     display: flex;
     align-items: center;
-    cursor: pointer;
-    padding: 4px 8px;
-    border-radius: 4px;
-    gap: 8px;
+    gap: 16px;
+}
+
+.notif-btn {
+    width: 44px !important;
+    height: 44px !important;
+    color: var(--gang-text-muted) !important;
+    transition: all 0.3s ease;
+    background: transparent !important;
 
     &:hover {
-        background-color: rgba(0, 0, 0, 0.05);
+        color: var(--gang-accent) !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    .has-unread {
+        animation: pulse-glow 2s infinite;
     }
 }
 
-.avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    object-fit: cover;
+@keyframes pulse-glow {
+    0% {
+        filter: drop-shadow(0 0 2px var(--gang-accent));
+    }
+
+    50% {
+        filter: drop-shadow(0 0 8px var(--gang-accent));
+    }
+
+    100% {
+        filter: drop-shadow(0 0 2px var(--gang-accent));
+    }
 }
 
-.username {
+::ng-deep .gang-notif-menu {
+    background: #121212 !important;
+    border: 2px solid var(--gang-primary) !important;
+    border-radius: 4px !important;
+    width: 320px;
+    max-height: 450px;
+    margin-top: 15px !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8) !important;
+
+    .notif-header {
+        padding: 16px;
+        background: #1a1a1a;
+        border-bottom: 1px solid #333;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        h3 {
+            margin: 0;
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: var(--gang-accent);
+            letter-spacing: 2px;
+            font-family: 'Oxanium', sans-serif;
+        }
+
+        .clear-btn {
+            font-size: 0.65rem !important;
+            padding: 0 8px !important;
+            height: 24px !important;
+            line-height: 24px !important;
+            color: var(--gang-text-muted) !important;
+
+            &:hover {
+                color: white !important;
+                background: transparent !important;
+            }
+        }
+    }
+
+    .notif-list {
+        max-height: 350px;
+        overflow-y: auto;
+
+        &::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: var(--gang-primary);
+        }
+    }
+
+    .notif-item {
+        padding: 14px 16px;
+        border-bottom: 1px solid #222;
+        transition: all 0.2s;
+        border-left: 3px solid transparent;
+
+        &:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        &.unread {
+            background: rgba(157, 80, 187, 0.05);
+            border-left-color: var(--gang-primary);
+        }
+
+        &.success {
+            border-left-color: #00e676;
+        }
+
+        &.error {
+            border-left-color: #ff1744;
+        }
+
+        .notif-title {
+            font-family: 'Oxanium', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--gang-text-muted);
+            margin-bottom: 4px;
+        }
+
+        .notif-msg {
+            color: #ddd;
+            font-size: 0.8rem;
+            line-height: 1.4;
+            margin-bottom: 4px;
+        }
+
+        .notif-time {
+            color: #555;
+            font-size: 0.65rem;
+            font-weight: 700;
+        }
+    }
+
+    .empty-notif {
+        padding: 40px 20px;
+        text-align: center;
+        color: #444;
+        font-family: 'Oxanium', sans-serif;
+        font-size: 0.8rem;
+        font-weight: 700;
+        letter-spacing: 2px;
+    }
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    background: transparent !important;
+    font-family: 'Oxanium', sans-serif;
+    border: none !important;
+    box-shadow: none !important;
+
+    &:hover {
+        color: var(--gang-primary);
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+}
+
+.user-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 4px;
+    border: 2px solid var(--gang-secondary);
+    object-fit: cover;
+    background: var(--gang-surface);
+}
+
+.user-name {
+    font-weight: 700;
+    color: white;
     font-size: 14px;
-    font-weight: 500;
-    color: #333;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+// Global Mat-Menu overrides are in styles.scss, but we can refine here if needed
+::ng-deep .gang-menu {
+    border: 2px solid var(--gang-primary) !important;
+    background: #121212 !important;
+    margin-top: 15px !important;
+}
+
+// Aggressively remove Material button hover/focus backgrounds
+::ng-deep {
+
+    .nav-btn,
+    .notif-btn {
+
+        .mat-mdc-button-persistent-ripple::before,
+        .mat-mdc-icon-button-persistent-ripple::before {
+            display: none !important;
+        }
+
+        &:hover,
+        &:focus,
+        &:active {
+            background: transparent !important;
+            --mat-mdc-button-persistent-ripple-color: transparent !important;
+            --mat-ripple-color: transparent !important;
+        }
+    }
+
+    // Remove background from the whole button container if Material adds it
+    .mat-mdc-button:hover .mat-mdc-button-focus-overlay,
+    .mat-mdc-icon-button:hover .mat-mdc-button-focus-overlay {
+        opacity: 0 !important;
+    }
 }

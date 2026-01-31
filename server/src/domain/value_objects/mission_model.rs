@@ -26,12 +26,15 @@ pub struct MissionModel {
     pub created_at: NaiveDateTime,
     #[diesel(sql_type = Timestamp)]
     pub updated_at: NaiveDateTime,
+    #[diesel(sql_type = Varchar)]
+    pub category: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct AddMissionModel {
     pub name: String,
     pub description: Option<String>,
+    pub category: Option<String>,
 }
 
 impl AddMissionModel {
@@ -40,6 +43,7 @@ impl AddMissionModel {
             name: self.name.clone(),
             description: self.description.clone(),
             status: MissionStatuses::Open.to_string(),
+            category: self.category.clone().unwrap_or("General".to_string()),
             chief_id,
         }
     }
@@ -49,6 +53,7 @@ impl AddMissionModel {
 pub struct EditMissionModel {
     pub name: Option<String>,
     pub description: Option<String>,
+    pub category: Option<String>,
 }
 
 impl EditMissionModel {
@@ -56,6 +61,7 @@ impl EditMissionModel {
         EditMissionEntity {
             name: self.name.clone(),
             description: self.description.clone(),
+            category: self.category.clone(),
             chief_id,
         }
     }

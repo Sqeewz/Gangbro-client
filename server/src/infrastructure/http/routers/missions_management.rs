@@ -8,11 +8,14 @@ use axum::{
     response::IntoResponse,
     routing::{delete, patch, post},
 };
+use serde_json::json;
 
 use crate::{
     application::use_cases::mission_management::MissionManagementUseCase,
     domain::{
         repositories::{
+            crew_operation::CrewOperationRepository,
+            mission_chat::MissionChatRepository,
             mission_management::MissionManagementRepository,
             mission_viewing::MissionViewingRepository,
         },
@@ -22,6 +25,8 @@ use crate::{
         database::{
             postgresql_connection::PgPoolSquad,
             repositories::{
+                crew_operation::CrewOperationPostgres,
+                mission_chat::MissionChatPostgres,
                 mission_management::MissionManagementPostgres,
                 mission_viewing::MissionViewingPostgres,
             },
@@ -30,70 +35,94 @@ use crate::{
     },
 };
 
-pub async fn add<T1>(
-    State(user_case): State<Arc<MissionManagementUseCase<T1>>>,
+pub async fn add<T1, T2, T3>(
+    State(user_case): State<Arc<MissionManagementUseCase<T1, T2, T3>>>,
     Extension(user_id): Extension<i32>,
     Json(model): Json<AddMissionModel>,
 ) -> impl IntoResponse
 where
     T1: MissionManagementRepository + Send + Sync,
+    T2: MissionChatRepository + Send + Sync,
+    T3: CrewOperationRepository + Send + Sync,
 {
     match user_case.add(user_id, model).await {
         Ok(mission_id) => {
-            let json_value = serde_json::json!({
+            let json_value = json!({
                 "mission_id": mission_id,
             });
-            (StatusCode::CREATED, axum::Json(json_value)).into_response()
+            (StatusCode::CREATED, Json(json_value)).into_response()
         }
 
-        Err(e) => (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(json!({ "error": e.to_string() })),
+        )
+            .into_response(),
     }
 }
 
-pub async fn edit<T1>(
-    State(user_case): State<Arc<MissionManagementUseCase<T1>>>,
+pub async fn edit<T1, T2, T3>(
+    State(user_case): State<Arc<MissionManagementUseCase<T1, T2, T3>>>,
     Extension(user_id): Extension<i32>,
     Path(mission_id): Path<i32>,
     Json(model): Json<EditMissionModel>,
 ) -> impl IntoResponse
 where
     T1: MissionManagementRepository + Send + Sync,
+    T2: MissionChatRepository + Send + Sync,
+    T3: CrewOperationRepository + Send + Sync,
 {
     match user_case.edit(mission_id, user_id, model).await {
         Ok(mission_id) => (
             StatusCode::OK,
-            format!("Edit mission_id: {} completed!!", mission_id),
+            Json(json!({ "message": format!("Edit mission_id: {} completed!!", mission_id) }))
         )
             .into_response(),
 
-        Err(e) => (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(json!({ "error": e.to_string() })),
+        )
+            .into_response(),
     }
 }
 
-pub async fn remove<T1>(
-    State(user_case): State<Arc<MissionManagementUseCase<T1>>>,
+pub async fn remove<T1, T2, T3>(
+    State(user_case): State<Arc<MissionManagementUseCase<T1, T2, T3>>>,
     Extension(user_id): Extension<i32>,
     Path(mission_id): Path<i32>,
 ) -> impl IntoResponse
 where
     T1: MissionManagementRepository + Send + Sync,
+    T2: MissionChatRepository + Send + Sync,
+    T3: CrewOperationRepository + Send + Sync,
 {
     match user_case.remove(mission_id, user_id).await {
         Ok(_) => (
             StatusCode::OK,
-            format!("Remove mission_id: {} completed!!", mission_id),
+            Json(json!({ "message": format!("Remove mission_id: {} completed!!", mission_id) }))
         )
             .into_response(),
 
-        Err(e) => (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(json!({ "error": e.to_string() })),
+        )
+            .into_response(),
     }
 }
 
 pub fn routes(db_pool: Arc<PgPoolSquad>) -> Router {
     let mission_repository = MissionManagementPostgres::new(Arc::clone(&db_pool));
-    // let viewing_repositiory = MissionViewingPostgres::new(Arc::clone(&db_pool));
+    let mission_chat_repository = MissionChatPostgres::new(Arc::clone(&db_pool));
+    let crew_operation_repository = CrewOperationPostgres::new(Arc::clone(&db_pool));
+    
     let user_case =
-        MissionManagementUseCase::new(Arc::new(mission_repository));
+        MissionManagementUseCase::new(
+            Arc::new(mission_repository), 
+            Arc::new(mission_chat_repository),
+            Arc::new(crew_operation_repository)
+        );
 
     Router::new()
         .route("/", post(add))

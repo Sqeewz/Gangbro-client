@@ -8,12 +8,15 @@ pub fn load() -> Result<DotEnvyConfig> {
      let server = Server {
         port: std::env::var("SERVER_PORT")
             .expect("SERVER_PORT is valid")
+            .trim()
             .parse()?,
         body_limit: std::env::var("SERVER_BODY_LIMIT")
             .expect("SERVER_BODY_LIMIT is valid")
+            .trim()
             .parse()?,
         timeout: std::env::var("SERVER_TIMEOUT")
             .expect("SERVER_TIMEOUT is valid")
+            .trim()
             .parse()?,
     };
 

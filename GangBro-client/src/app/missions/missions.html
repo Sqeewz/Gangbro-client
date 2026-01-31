@@ -1,48 +1,140 @@
-<div class="filter-form">
-    <h3>Search</h3>
-    <!-- FormsModule  -->
-    <input type="text" [(ngModel)]="filter.name" placeholder="Mission Name" />
-    <select [(ngModel)]="filter.status">
-        <option value="">All Statuses</option>
-        <option value="Open">Open</option>
-        <option value="InProgress">In Progress</option>
-        <option value="Completed">Completed</option>
-        <option value="Failed">Failed</option>
-    </select>
-    <button (click)="onSubmit()">Go</button>
-</div>
-<div class="mission-list">
-    @if((missions$ | async)?.length) {
-    <div class="header">
-        <span class="name">Name</span>
-        <span class="description">Description</span>
-        <span class="name">Chief</span>
-        <span class="crew_count">Number of Crew</span>
-        <span class="status">Status</span>
-        <span class="created_at">Created at</span>
-        <span class="updated_at">Updated at</span>
-        @if(isSignin()){
-        <span class="action">Actions</span>
-        }
+<div class="lobby-container">
+    <div class="lobby-header">
+        <h2 class="lobby-title">MISSION HUB: GANG OPERATIONS</h2>
     </div>
-    @for (mission of missions$ | async; track mission.id) {
-    <div class="contents">
-        <span class="name">{{mission.name}}</span>
-        <span class="description">{{mission.description}}</span>
-        <span class="name">{{mission.chief_display_name}}</span>
-        <span class="crew_count">{{mission.crew_count}}</span>
-        <span class="status">{{mission.status}}</span>
-        <span class="created_at">{{mission.created_at | date:'short'}}</span>
-        <span class="updated_at">{{mission.updated_at | date:'short'}}</span>
 
-        <!-- fix: จะ join ไม่ได้ ถ้า chief_id ตรงกับ user_id ที่ login -->
-        <!-- แนวทาง เช่น หา user id จาก token หรือ ปรับให้ passport มี user_id โดยส่งมาจาก backend  -->
-        @if(isSignin() && mission.status === 'Open' && mission.chief_id !== myUserId()){
-        <!-- Note: We need myId here to properly hide own missions. For now, backend blocks join. -->
-        <button (click)="onJoin(mission.id)" class="action">Join</button>
+    <div class="lobby-main">
+        @if (isLoading()) {
+        <div class="loading-overlay">
+            <div class="spinner"></div>
+            <span>SYNCING SECTOR DATA...</span>
+        </div>
         }
+        <!-- Left Panel: Mission List -->
+        <div class="mission-lobby-panel">
+            <div class="panel-header">
+                <div class="col-name">MISSION</div>
+                <div class="col-category">CATEGORY</div>
+                <div class="col-chief">CHIEF</div>
+                <div class="col-crew">CREW</div>
+                <div class="col-status">STATUS</div>
+                <div class="col-action"></div>
+            </div>
 
+            <div class="panel-content scrollable">
+                @for (mission of missions$ | async; track mission.id) {
+                <div class="mission-row" (click)="onView(mission)" [class.active]="selectedMission?.id === mission.id">
+                    <div class="col-name">
+                        <span class="indicator" [class]="mission.status"></span>
+                        {{mission.name}}
+                    </div>
+                    <div class="col-category">
+                        <span class="cat-tag">{{mission.category || 'General'}}</span>
+                    </div>
+                    <div class="col-chief">{{mission.chief_display_name}}</div>
+                    <div class="col-crew">{{mission.crew_count}} / 10</div>
+                    <div class="col-status">
+                        <span class="status-cell" [class]="mission.status">{{mission.status}}</span>
+                    </div>
+                    <div class="col-action">
+                        @if(isSignin() && mission.status === 'Open' && mission.chief_id !== myUserId()){
+                        <button (click)="$event.stopPropagation(); onJoin(mission.id)"
+                            class="lobby-btn join">JOIN</button>
+                        }
+                    </div>
+                </div>
+                } @empty {
+                <div class="empty-lobby">NO ACTIVE MISSIONS IN SECTOR</div>
+                }
+            </div>
+
+            <div class="panel-footer">
+                <div class="filter-controls">
+                    <input type="text" [(ngModel)]="filter.name" placeholder="SEARCH MISSION..." (input)="onSubmit()" />
+
+                    <select [(ngModel)]="filter.category" (change)="onSubmit()" aria-placeholder="ALL CATEGORIES">
+                        <option value="">ALL CATEGORIES</option>
+                        <option value="General">GENERAL</option>
+                        <option value="Assault">ASSAULT</option>
+                        <option value="Escort">ESCORT</option>
+                        <option value="Recon">RECON</option>
+                        <option value="Supply">SUPPLY</option>
+                        <option value="Sabotage">SABOTAGE</option>
+                        <option value="Extraction">EXTRACTION</option>
+                    </select>
+                    <select [(ngModel)]="filter.status" (change)="onSubmit()" aria-placeholder="ALL STATUS">
+                        <option value="">ALL STATUS</option>
+                        <option value="Open">OPEN</option>
+                        <option value="In-Progress">IN-PROGRESS</option>
+                        <option value="Completed">COMPLETED</option>
+                        <option value="Failed">FAILED</option>
+                    </select>
+                    <button class="refresh-btn" (click)="onSubmit()">REFRESH</button>
+
+                    <div class="pagination-controls">
+                        <button [disabled]="(filter.page || 1) <= 1" (click)="onPrevPage()"
+                            class="page-btn">PREV</button>
+                        <span class="page-info">PAGE {{filter.page || 1}}</span>
+                        <button (click)="onNextPage()" class="page-btn">NEXT</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Intel / Preview -->
+        <div class="intel-panel">
+            <div class="intel-frame">
+                <div class="intel-header">MISSION INTEL</div>
+                <div class="intel-image-placeholder">
+                    <div class="video-noise"></div>
+                    <img [src]="selectedMission ? 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=300' : 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=300'"
+                        alt="Intel">
+                </div>
+                <div class="intel-body">
+                    @if(selectedMission){
+                    <div class="selected-intel">
+                        <h3 class="mission-name">{{selectedMission.name | uppercase}}</h3>
+
+                        <div class="intel-stats">
+                            <div class="stat-row">
+                                <span class="label">SECTOR:</span>
+                                <span class="value">{{selectedMission.category || 'General'}}</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="label">COMMANDER:</span>
+                                <span class="value">{{selectedMission.chief_display_name}}</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="label">STATUS:</span>
+                                <span class="value" [class]="selectedMission.status">{{selectedMission.status}}</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="label">UNIT COUNT:</span>
+                                <span class="value">{{selectedMission.crew_count}}</span>
+                            </div>
+                        </div>
+
+                        <div class="intel-desc">
+                            <div class="desc-header">INTELLIGENCE REPORT</div>
+                            <p>{{selectedMission.description || 'No classified data available.'}}</p>
+                        </div>
+                    </div>
+                    } @else {
+                    <p class="intel-text">SELECT A MISSION TO VIEW CLASSIFIED DATA AND OBJECTIVES.</p>
+                    }
+                </div>
+            </div>
+
+            <div class="lobby-actions">
+                @if(selectedMission && isSignin() && selectedMission.status === 'Open' && selectedMission.chief_id !==
+                myUserId()) {
+                <button class="lobby-btn primary start" (click)="onJoin(selectedMission.id)">JOIN MISSION</button>
+                } @else if(isSignin()) {
+                <button class="lobby-btn primary start" (click)="onAdd()">CREATE MISSION</button>
+                }
+
+                <button class="lobby-btn secondary" (click)="selectedMission = null">CANCEL</button>
+            </div>
+        </div>
     </div>
-    }
-    }
 </div>

@@ -1,0 +1,42 @@
+<div class="gang-dialog">
+    <h2 mat-dialog-title class="dialog-title">{{ mission.name | uppercase }}</h2>
+    <mat-dialog-content class="mission-details">
+        <div class="detail-grid">
+            <div class="detail-item">
+                <span class="label">SECTOR</span>
+                <span class="value badge-{{(mission.category || 'General') | lowercase}}">{{ mission.category ||
+                    'General' }}</span>
+            </div>
+
+            <div class="detail-item">
+                <span class="label">COMMANDER</span>
+                <span class="value">{{ mission.chief_display_name }}</span>
+            </div>
+
+            <div class="detail-item">
+                <span class="label">STATUS</span>
+                <span class="value status-{{mission.status | lowercase}}">{{ mission.status }}</span>
+            </div>
+
+            <div class="detail-item">
+                <span class="label">UNIT COUNT</span>
+                <span class="value">{{ mission.crew_count }}</span>
+            </div>
+
+            <div class="detail-item full-width">
+                <span class="label">ESTABLISHED</span>
+                <span class="value">{{ mission.created_at | date:'medium' }}</span>
+            </div>
+        </div>
+
+        <div class="description-section">
+            <h3 class="section-title">INTELLIGENCE REPORT</h3>
+            <div class="description-box">
+                <p>{{ mission.description || 'No classified data available.' }}</p>
+            </div>
+        </div>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end" class="dialog-actions">
+        <button class="gang-btn secondary sm" mat-dialog-close>CLOSE</button>
+    </mat-dialog-actions>
+</div>

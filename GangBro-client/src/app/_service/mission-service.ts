@@ -5,6 +5,7 @@ import { MissionFilter } from '../_models/mission-filter'
 import { firstValueFrom } from 'rxjs'
 import { Mission } from '../_models/mission'
 import { AddMission } from '../_models/add-mission'
+import { Brawler } from '../_models/brawler'
 
 @Injectable({
   providedIn: 'root',
@@ -23,6 +24,26 @@ export class MissionService {
     return missions
   }
 
+  async getById(id: number): Promise<Mission> {
+    const url = this._base_url + `/view/${id}`
+    return await firstValueFrom(this._http.get<Mission>(url))
+  }
+
+  async getRoster(id: number): Promise<Brawler[]> {
+    const url = this._base_url + `/view/roster/${id}`
+    return await firstValueFrom(this._http.get<Brawler[]>(url))
+  }
+
+  async getChatMessages(missionId: number): Promise<any[]> {
+    const url = this._base_url + `/mission-chats/${missionId}`
+    return await firstValueFrom(this._http.get<any[]>(url))
+  }
+
+  async sendChatMessage(missionId: number, message: string): Promise<void> {
+    const url = this._base_url + `/mission-chats/${missionId}`
+    await firstValueFrom(this._http.post(url, { message }))
+  }
+
   private createQueryString(filter: MissionFilter): string {
     this.filter = filter
     const params: string[] = []
@@ -33,8 +54,17 @@ export class MissionService {
     if (filter.status) {
       params.push(`status=${encodeURIComponent(filter.status)}`)
     }
+    if (filter.category && filter.category.trim()) {
+      params.push(`category=${encodeURIComponent(filter.category.trim())}`)
+    }
     if (filter.exclude_chief_id) {
       params.push(`exclude_chief_id=${filter.exclude_chief_id}`)
+    }
+    if (filter.page) {
+      params.push(`page=${filter.page}`)
+    }
+    if (filter.limit) {
+      params.push(`limit=${filter.limit}`)
     }
 
     return params.join("&")

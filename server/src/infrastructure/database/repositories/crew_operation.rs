@@ -23,7 +23,7 @@ impl CrewOperationPostgres {
 
 #[async_trait]
 impl CrewOperationRepository for CrewOperationPostgres {
-    async fn join(&self, crew_member_ships: CrewMembershipEntity) -> Result<()> {
+    async fn join(&self, crew_member_ships: CrewMembershipEntity, _allow_bypass: bool) -> Result<()> {
         let mut conn = Arc::clone(&self.db_pool).get()?;
         insert_into(crew_memberships::table)
             .values(crew_member_ships)

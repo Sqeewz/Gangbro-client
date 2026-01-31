@@ -1,1 +1,143 @@
-<p>home works!</p>
+<div class="homepage-wrapper">
+    <!-- Hero Section -->
+    <div class="section hero-section reveal">
+        <div class="hero-container">
+            <div class="gang-title-large">
+                GANG <span class="highlight">BRO</span>
+                <div class="subtitle">UNITED WE STAND</div>
+            </div>
+
+            <div class="clock-wrapper">
+                <div id="time">
+                    <div class="time-block">
+                        <span id="hour">{{ hours() }}</span>
+                        <span class="label">HOURS</span>
+                    </div>
+                    <div class="dots">:</div>
+                    <div class="time-block">
+                        <span id="minutes">{{ minutes() }}</span>
+                        <span class="label">MINUTES</span>
+                    </div>
+                    <div class="dots">:</div>
+                    <div class="time-block">
+                        <span id="seconds">{{ seconds() }}</span>
+                        <span class="label">SECONDS</span>
+                    </div>
+                    <div class="ampm-block">
+                        <span id="ampm">{{ ampm() }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="gang-btn primary" routerLink="/missions">ENTER MISSIONS</button>
+            </div>
+
+            <div class="scroll-indicator">
+                <span>SCROLL TO EXPLORE</span>
+                <div class="mouse"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Us Section -->
+    <div class="section about-section">
+        <div class="content-container">
+            <div class="section-title reveal">
+                <span class="line"></span>
+                ABOUT US
+            </div>
+            <div class="about-grid">
+                <div class="about-text reveal">
+                    <h2>DOMINATING THE <span class="accent">DIGITAL UNDERWORLD</span></h2>
+                    <p>GangBro is not just a platform; it’s an elite hub for aspiring developers and digital
+                        strategists.
+                        Designed as a hands-on learning environment for Internet Programming, we specialize in
+                        high-stakes mission management,
+                        complex task coordination, and fostering the strongest brotherhood in the silicon sectors.</p>
+                    <p>Founded on the principles of absolute loyalty and surgical precision, we provide the tools for
+                        brawlers to organize, execute, and profit from the most dangerous missions in the grid.</p>
+                    <div class="feature-list">
+                        <div class="feature-item reveal" style="transition-delay: 0.1s;">
+                            <span class="icon">⚡</span>
+                            <div class="feature-info">
+                                <strong>REAL-TIME OPS</strong>
+                                <p>Coordinate through secure encrypted channels.</p>
+                            </div>
+                        </div>
+                        <div class="feature-item reveal" style="transition-delay: 0.2s;">
+                            <span class="icon">🛡️</span>
+                            <div class="feature-info">
+                                <strong>IRONCLAD SECURITY</strong>
+                                <p>Your intel is protected by the latest block-ciphers.</p>
+                            </div>
+                        </div>
+                        <div class="feature-item reveal" style="transition-delay: 0.3s;">
+                            <span class="icon">📜</span>
+                            <div class="feature-info">
+                                <strong>MISSION CENTER</strong>
+                                <p>Create, deploy, and complete assignments designed to push your programming limits.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-image reveal">
+                    <div class="image-frame">
+                        <img src="assets/bg-home.png" alt="Syndicate Operations">
+                        <div class="glitch-overlay"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Section -->
+    <div class="section stats-section">
+        <div class="content-container">
+            <div class="section-title reveal">
+                <span class="line"></span>
+                NETWORK PERFORMANCE
+            </div>
+            <div class="stats-grid" style="position: relative;">
+                @if (isLoading()) {
+                <div class="loading-overlay" style="border-radius: 12px; background: rgba(0,0,0,0.5);">
+                    <div class="spinner" style="width: 25px; height: 25px;"></div>
+                </div>
+                }
+                <div class="stat-card reveal" style="transition-delay: 0.1s;">
+                    <div class="stat-value">{{ activeMembers() }}</div>
+                    <div class="stat-label">ACTIVE BRAWLERS</div>
+                    <div class="stat-bar">
+                        <div class="fill" style="width: 85%"></div>
+                    </div>
+                </div>
+                <div class="stat-card reveal" style="transition-delay: 0.2s;">
+                    <div class="stat-value">{{ missionsCompleted() }}</div>
+                    <div class="stat-label">MISSIONS ACCOMPLISHED</div>
+                    <div class="stat-bar">
+                        <div class="fill" style="width: 92%"></div>
+                    </div>
+                </div>
+                <div class="stat-card reveal" style="transition-delay: 0.3s;">
+                    <div class="stat-value">{{ opsSuccessRate() }}%</div>
+                    <div class="stat-label">OPERATION SUCCESS RATE</div>
+                    <div class="stat-bar">
+                        <div class="fill" [style.width.%]="opsSuccessRate()"></div>
+                    </div>
+                </div>
+                <div class="stat-card reveal" style="transition-delay: 0.4s;">
+                    <div class="stat-value">{{ serverUptime() }}</div>
+                    <div class="stat-label">CORE UPTIME</div>
+                    <div class="stat-bar">
+                        <div class="fill" style="width: 99%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-msg reveal">
+                TRUSTED BY ELITE GANGS WORLDWIDE
+            </div>
+        </div>
+    </div>
+</div>

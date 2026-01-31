@@ -1,9 +1,9 @@
 import { Component, inject } from '@angular/core'
-import { Router } from '@angular/router'
+import { Router, RouterModule } from '@angular/router'
 
 @Component({
   selector: 'app-server-error',
-  imports: [],
+  imports: [RouterModule],
   templateUrl: './server-error.html',
   styleUrl: './server-error.scss',
 })
@@ -13,5 +13,9 @@ export class ServerError {
 
   constructor() {
     this.errorMsg = this._router.currentNavigation()?.extras.state?.['error'] as string
+  }
+
+  retry() {
+    window.location.reload()
   }
 }

@@ -1,0 +1,120 @@
+<div class="about-container">
+    @if (isLoading()) {
+    <div class="loading-state">
+        <div class="spinner"></div>
+        <p>DECRYPTING MISSION FILES...</p>
+    </div>
+    } @else if (mission(); as m) {
+    <div class="mission-header">
+        <button class="back-btn" routerLink="/my-missions">
+            <mat-icon>arrow_back</mat-icon>
+            <span>BACK TO OPS</span>
+        </button>
+        <div class="title-section">
+            <h1 class="mission-name">{{m.name | uppercase}}</h1>
+            <div class="status-indicator" [class]="m.status">
+                <span class="dot"></span>
+                {{m.status | uppercase}}
+            </div>
+        </div>
+    </div>
+
+    <div class="mission-layout">
+        <!-- Left Side: Intel -->
+        <div class="intel-section">
+            <div class="panel-frame">
+                <div class="panel-header">
+                    <mat-icon>security</mat-icon>
+                    INTELLIGENCE_REPORT
+                </div>
+                <div class="panel-body">
+                    <div class="description-text">
+                        {{m.description || 'NO ADDITIONAL INTEL PROVIDED BY COMMANDER.'}}
+                    </div>
+                    <div class="meta-grid">
+                        <div class="meta-item">
+                            <span class="label">SECTOR</span>
+                            <span class="value">{{m.category || 'GENERAL'}}</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="label">ESTABLISHED</span>
+                            <span class="value">{{m.created_at | date:'medium'}}</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="label">COMMANDER</span>
+                            <span class="value">{{m.chief_display_name}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side: Crew -->
+        <div class="crew-section">
+            <div class="panel-frame">
+                <div class="panel-header">
+                    <mat-icon>groups</mat-icon>
+                    OPERATIONAL_UNITS: {{roster().length}} / 10
+                </div>
+                <div class="panel-body">
+                    <div class="crew-list-active">
+                        @for (member of roster(); track member.display_name) {
+                        <div class="crew-member-item">
+                            <img [src]="member.avatar_url || 'assets/def.jpg'" alt="Avatar" class="member-avatar">
+                            <div class="member-info">
+                                <div class="member-name">{{member.display_name}}</div>
+                                <div class="member-stats">LVL {{member.mission_success_count || 0}}</div>
+                            </div>
+                            @if (member.display_name === m.chief_display_name) {
+                            <span class="chief-badge">CHIEF</span>
+                            }
+                        </div>
+                        } @empty {
+                        <div class="roster-placeholder">
+                            <mat-icon>radar</mat-icon>
+                            <span>SCANNING FOR ACTIVE CREW SIGNALS...</span>
+                        </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom: Chat -->
+    <div class="chat-section">
+        <div class="panel-frame">
+            <div class="panel-header">
+                <mat-icon>chat_bubble</mat-icon>
+                MISSION_COMMS_CHANNEL
+            </div>
+            <div class="panel-body no-padding">
+                <div class="chat-display">
+                    @for (msg of chatMessages(); track $index) {
+                    <div class="msg-row" [class.system]="msg.user === 'SYSTEM'"
+                        [class.self]="msg.user === currentUserName()">
+                        <span class="msg-user">[{{msg.user}}]</span>
+                        <span class="msg-text">{{msg.text}}</span>
+                        <span class="msg-time">{{msg.time | date:'HH:mm'}}</span>
+                    </div>
+                    }
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" [ngModel]="newMessageText()" (ngModelChange)="newMessageText.set($event)"
+                        (keyup.enter)="sendMessage()" placeholder="ENTER SECURE TRANSMISSION...">
+                    <button class="send-btn" (click)="sendMessage()">
+                        <mat-icon>send</mat-icon>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    } @else {
+    <div class="error-state">
+        <mat-icon>error_outline</mat-icon>
+        <p>ERROR: MISSION DATA CORRUPTED OR NOT FOUND</p>
+        <button class="gang-btn" routerLink="/my-missions">RETURN TO BASE</button>
+    </div>
+    }
+</div>

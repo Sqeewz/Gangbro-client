@@ -1,33 +1,53 @@
 use crate::infrastructure;
 use crate::config::config_loader::get_user_secret as get_user_secret_env;
-use axum::{http::{Request, StatusCode, header}, middleware::Next, body::Body, response::Response};
-use anyhow::Result;
+use axum::{Json, http::{Request, StatusCode, header}, middleware::Next, body::Body, response::{Response, IntoResponse}};
+use serde_json::json;
 
-pub async fn authorization (mut req: Request<Body>, next: Next) -> Result<Response, StatusCode> {
-    let auth_header = req
+pub async fn authorization(mut req: Request<Body>, next: Next) -> Response {
+    let auth_header = match req
         .headers()
         .get(header::AUTHORIZATION)
-        .and_then(|value| value.to_str().ok())
-        .ok_or(StatusCode::UNAUTHORIZED)?;
+        .and_then(|value| value.to_str().ok()) {
+            Some(header) => header,
+            None => return (
+                StatusCode::UNAUTHORIZED,
+                Json(json!({ "error": "Missing Authorization header" }))
+            ).into_response(),
+        };
 
-    let token = auth_header
-        .strip_prefix("Bearer ")
-        .ok_or(StatusCode::UNAUTHORIZED)?;
+    let token = match auth_header.strip_prefix("Bearer ") {
+        Some(token) => token,
+        None => return (
+            StatusCode::UNAUTHORIZED,
+            Json(json!({ "error": "Invalid Authorization header format" }))
+        ).into_response(),
+    };
 
-    let secret_env = get_user_secret_env().map_err(|_| StatusCode::UNAUTHORIZED)?;
+    let secret_env = match get_user_secret_env() {
+        Ok(secret) => secret,
+        Err(_) => return (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(json!({ "error": "Server configuration error" }))
+        ).into_response(),
+    };
 
-    let claims = 
-        infrastructure::jwt::verify_token(secret_env, token.to_string())
-            .map_err(|_| StatusCode::UNAUTHORIZED)?;
+    let claims = match infrastructure::jwt::verify_token(secret_env, token.to_string()) {
+        Ok(claims) => claims,
+        Err(_) => return (
+            StatusCode::UNAUTHORIZED,
+            Json(json!({ "error": "Invalid or expired token" }))
+        ).into_response(),
+    };
     
-    let brawler_id = claims
-        .sub
-        .parse::<i32>()
-        .map_err(|_| StatusCode::UNAUTHORIZED)?;
+    let brawler_id = match claims.sub.parse::<i32>() {
+        Ok(id) => id,
+        Err(_) => return (
+            StatusCode::UNAUTHORIZED,
+            Json(json!({ "error": "Invalid token subject" }))
+        ).into_response(),
+    };
 
     req.extensions_mut().insert::<i32>(brawler_id);
-
-    Ok(next.run(req).await)
-    
-    }
+    next.run(req).await
+}
 

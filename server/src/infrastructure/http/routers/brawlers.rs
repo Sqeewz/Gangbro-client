@@ -20,6 +20,8 @@ use crate::{
     },
 };
 
+use serde_json::json;
+
 pub fn routes(db_pool: Arc<PgPoolSquad>) -> Router {
     let repository = BrawlerPostgres::new(db_pool);
     let user_case = BrawlersUseCase::new(Arc::new(repository));
@@ -44,7 +46,11 @@ where
 {
     match brawlers_use_case.get_missions(brawler_id).await {
         Ok(missions) => (StatusCode::OK, Json(missions)).into_response(),
-        Err(e) => (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(json!({ "error": e.to_string() })),
+        )
+            .into_response(),
     }
 }
 
@@ -58,7 +64,11 @@ where
     match user_case.register(model).await {
         Ok(passport) => (StatusCode::CREATED, Json(passport)).into_response(),
 
-        Err(e) => (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(json!({ "error": e.to_string() })),
+        )
+            .into_response(),
     }
 }
 
@@ -76,6 +86,10 @@ where
     {
         Ok(upload_img) => (StatusCode::OK, Json(upload_img)).into_response(),
 
-        Err(e) => (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(json!({ "error": e.to_string() })),
+        )
+            .into_response(),
     }
 }

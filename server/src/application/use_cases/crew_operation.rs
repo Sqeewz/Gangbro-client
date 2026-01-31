@@ -5,6 +5,9 @@ use crate::domain::{
     },
     value_objects::mission_statuses::MissionStatuses,
 };
+use crate::infrastructure::notifications::broadcaster::GlobalBroadcaster;
+use serde_json::json;
+
 use anyhow::Result;
 use std::sync::Arc;
 
@@ -15,6 +18,7 @@ where
 {
     crew_operation_repository: Arc<T1>,
     mission_viewing_repository: Arc<T2>,
+    broadcaster: Arc<GlobalBroadcaster>,
 }
 
 impl<T1, T2> CrewOperationUseCase<T1, T2>
@@ -22,21 +26,23 @@ where
     T1: CrewOperationRepository + Send + Sync + 'static,
     T2: MissionViewingRepository + Send + Sync,
 {
-    pub fn new(crew_operation_repository: Arc<T1>, mission_viewing_repository: Arc<T2>) -> Self {
+    pub fn new(crew_operation_repository: Arc<T1>, mission_viewing_repository: Arc<T2>, broadcaster: Arc<GlobalBroadcaster>) -> Self {
         Self {
             crew_operation_repository,
             mission_viewing_repository,
+            broadcaster,
         }
     }
 
-    pub async fn join(&self, mission_id: i32, brawler_id: i32) -> Result<()> {
+    pub async fn join(&self, mission_id: i32, brawler_id: i32, allow_bypass: bool) -> Result<()> {
         let max_crew_per_mission = std::env::var("MAX_CREW_PER_MISSION")
             .expect("missing value")
+            .trim()
             .parse()?;
 
         let mission = self.mission_viewing_repository.get_one(mission_id).await?;
 
-        if mission.chief_id == brawler_id {
+        if !allow_bypass && mission.chief_id == brawler_id {
             return Err(anyhow::anyhow!(
                 "Chiefs cannot join their own missions as crew members"
             ));
@@ -61,8 +67,14 @@ where
             .join(CrewMembershipEntity {
                 mission_id,
                 brawler_id,
-            })
+            }, allow_bypass)
             .await?;
+
+        self.broadcaster.broadcast(json!({
+            "type": "crew_movement",
+            "mission_id": mission_id,
+            "message": format!("New brawler joined mission \"{}\"", mission.name)
+        }));
 
         Ok(())
     }
@@ -81,6 +93,12 @@ where
                 brawler_id,
             })
             .await?;
+
+        self.broadcaster.broadcast(json!({
+            "type": "crew_movement",
+            "mission_id": mission_id,
+            "message": format!("A brawler left mission \"{}\"", mission.name)
+        }));
 
         Ok(())
     }

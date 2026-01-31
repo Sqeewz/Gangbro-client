@@ -114,7 +114,8 @@ SELECT DISTINCT
     brawlers.display_name AS chief_display_name,
     (SELECT COUNT(*) FROM crew_memberships WHERE crew_memberships.mission_id = missions.id) AS crew_count,
     missions.created_at,
-    missions.updated_at
+    missions.updated_at,
+    missions.category
 FROM missions
 INNER JOIN brawlers ON brawlers.id = missions.chief_id
 LEFT JOIN crew_memberships cm ON cm.mission_id = missions.id

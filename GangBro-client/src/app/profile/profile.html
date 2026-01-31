@@ -1,7 +1,93 @@
-<p>profile works!</p>
+<div class="profile-container">
+    <!-- User Header Section -->
+    <div class="user-header">
+        <div class="avatar-wrapper" (click)="openDialog()">
+            <img [src]="avatar_url()" alt="User Avatar" class="user-avatar">
+            <div class="overlay">
+                <mat-icon>photo_camera</mat-icon>
+                <span>RECALIBRATE</span>
+            </div>
+        </div>
+        <div class="user-info">
+            <h1 class="gang-title">{{ display_name() || 'UNIDENTIFIED_AGENT' }}</h1>
+            <div class="status-indicator">
+                <span class="pulse"></span>
+                <p class="role">GANG_OPERATIVE [LEVEL_01]</p>
+            </div>
+        </div>
+    </div>
 
-<img src="{{avatar_url()}}" alt="user-avatar">
+    <!-- Stats Dashboard -->
+    <div class="dashboard-grid">
+        <div class="stat-card total">
+            <div class="stat-icon"><mat-icon>history</mat-icon></div>
+            <div class="stat-content">
+                <span class="label">MISSION_LOGS</span>
+                <p class="number">{{ historyCount() }}</p>
+            </div>
+        </div>
+        <div class="stat-card open">
+            <div class="stat-icon"><mat-icon>radio_button_checked</mat-icon></div>
+            <div class="stat-content">
+                <span class="label">OPEN_CONTRACTS</span>
+                <p class="number">{{ openCount() }}</p>
+            </div>
+        </div>
+        <div class="stat-card progress">
+            <div class="stat-icon"><mat-icon>bolt</mat-icon></div>
+            <div class="stat-content">
+                <span class="label">ACTIVE_SORTIES</span>
+                <p class="number">{{ inProgressCount() }}</p>
+            </div>
+        </div>
+        <div class="stat-card completed">
+            <div class="stat-icon"><mat-icon>check_circle</mat-icon></div>
+            <div class="stat-content">
+                <span class="label">SUCCESSFUL_OPS</span>
+                <p class="number">{{ completedCount() }}</p>
+            </div>
+        </div>
+        <div class="stat-card failed">
+            <div class="stat-icon"><mat-icon>cancel</mat-icon></div>
+            <div class="stat-content">
+                <span class="label">FAILED_OPS</span>
+                <p class="number">{{ failedCount() }}</p>
+            </div>
+        </div>
+    </div>
 
-<div class="upload-photo">
-    <button (click)="openDialog()">new Avatar</button>
+    <!-- Mission History -->
+    <div class="history-section">
+        <h2 class="section-title">CHRONOLOGICAL_LOGS</h2>
+
+        @if (historyMissions().length === 0) {
+        <div class="empty-state">
+            <mat-icon>storage</mat-icon>
+            <p>NO ARCHIVED DATA FOUND IN SYSTEM</p>
+        </div>
+        } @else {
+        <div class="mission-grid">
+            @for (m of historyMissions(); track m.id) {
+            <div class="history-card" [class.success]="m.status === 'Completed'" [class.fail]="m.status === 'Failed'">
+                <div class="card-glow"></div>
+                <div class="card-header">
+                    <span class="mission-name">{{ m.name | uppercase }}</span>
+                    <span class="status-tag" [class]="m.status | lowercase">{{ m.status }}</span>
+                </div>
+                <p class="description">{{ m.description || 'CLEARED_DOCUMENTATION' }}</p>
+                <div class="card-footer">
+                    <div class="meta-item">
+                        <mat-icon>person</mat-icon>
+                        <span>{{ m.chief_display_name }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <mat-icon>event</mat-icon>
+                        <span>{{ m.created_at | date:'dd.MM.YY' }}</span>
+                    </div>
+                </div>
+            </div>
+            }
+        </div>
+        }
+    </div>
 </div>

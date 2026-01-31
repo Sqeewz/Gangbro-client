@@ -6,5 +6,8 @@ use crate::domain::value_objects::mission_statuses::MissionStatuses;
 pub struct MissionFilter {
     pub name: Option<String>,
     pub status: Option<MissionStatuses>,
+    pub category: Option<String>,
     pub exclude_chief_id: Option<i32>,
+    pub page: Option<i64>,
+    pub limit: Option<i64>,
 }

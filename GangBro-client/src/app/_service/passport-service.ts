@@ -16,7 +16,7 @@ export class PassportService {
   private _http = inject(HttpClient)
 
   data = signal<undefined | Passport>(undefined)
-  avatar = signal<string>("")
+  avatar = signal<string>(getAvatar())
   isSignin = signal<boolean>(false)
 
   saveAvatarImgUrl(url: string) {
@@ -57,7 +57,7 @@ export class PassportService {
 
   destroy() {
     this.data.set(undefined)
-    this.avatar.set("")
+    this.avatar.set(getAvatar())
     localStorage.removeItem(this._key)
     this.isSignin.set(false)
   }
@@ -77,6 +77,7 @@ export class PassportService {
       const result = this._http.post<Passport>(api_url, model)
       const passport = await firstValueFrom(result)
       this.data.set(passport)
+      this.avatar.set(getAvatar(passport))
       this.savePassportToLocalStorage()
       return null
     } catch (error: any) {

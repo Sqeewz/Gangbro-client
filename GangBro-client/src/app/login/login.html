@@ -1,64 +1,67 @@
 <div class="login-container">
-    <mat-card>
-        <h3>@if (mode === 'login') { Login } @else { Register }</h3>
-        <form (ngSubmit)="onSubmit()" [formGroup]="form" autocomplete="off">
+    <div class="gang-login-box">
+        <h2 class="gang-title">{{ mode === 'login' ? 'ENCRYPTION LOGIN' : 'BRAWLER ACCESS' }}</h2>
+
+        <form (ngSubmit)="onSubmit()" [formGroup]="form" autocomplete="off" class="gang-form">
             <!-- Username -->
-            <mat-form-field appearance="outline">
-                <mat-label>Username</mat-label>
-                <input matInput type="text" placeholder="username" formControlName="username"
-                    (input)="updateErrorMessage('username')" maxlength="16">
-                @if (form.controls['username'].invalid) {
-                <mat-error>{{errorMessage.username()}}</mat-error>
+            <div class="input-group">
+                <label>IDENTIFIER (USERNAME)</label>
+                <input type="text" placeholder="AGENT_ID" formControlName="username"
+                    (input)="updateErrorMessage('username')" maxlength="16" class="gang-input">
+                @if (form.controls['username'].invalid && form.controls['username'].touched) {
+                <span class="error-text">{{errorMessage.username()}}</span>
                 }
-            </mat-form-field>
+            </div>
 
             <!-- Password -->
-            <mat-form-field appearance="outline">
-                <mat-label>Password</mat-label>
-                <input matInput type="password" placeholder="password" formControlName="password"
-                    (input)="updateErrorMessage('password')" maxlength="20">
-                @if (form.controls['password'].invalid) {
-                <mat-error>{{errorMessage.password()}}</mat-error>
+            <div class="input-group">
+                <label>DECRYPTION KEY (PASSWORD)</label>
+                <input type="password" placeholder="********" formControlName="password"
+                    (input)="updateErrorMessage('password')" maxlength="20" class="gang-input">
+                @if (form.controls['password'].invalid && form.controls['password'].touched) {
+                <span class="error-text">{{errorMessage.password()}}</span>
                 }
-            </mat-form-field>
+            </div>
 
             @if (mode === 'register') {
             <!-- Confirm Password -->
-            <mat-form-field appearance="outline">
-                <mat-label>Confirm Password</mat-label>
-                <input matInput type="password" placeholder="confirm password" formControlName="confirm_password"
-                    (input)="updateErrorMessage('confirm_password')" maxlength="20">
-                @if (form.controls['confirm_password'].invalid) {
-                <mat-error>{{errorMessage.confirm_password()}}</mat-error>
+            <div class="input-group">
+                <label>VERIFY KEY</label>
+                <input type="password" placeholder="********" formControlName="confirm_password"
+                    (input)="updateErrorMessage('confirm_password')" maxlength="20" class="gang-input">
+                @if (form.controls['confirm_password'].invalid && form.controls['confirm_password'].touched) {
+                <span class="error-text">{{errorMessage.confirm_password()}}</span>
                 }
-            </mat-form-field>
+            </div>
 
             <!-- Display Name -->
-            <mat-form-field appearance="outline">
-                <mat-label>Display Name</mat-label>
-                <input matInput type="text" placeholder="display name" formControlName="display_name"
-                    (input)="updateErrorMessage('display_name')">
-                @if (form.controls['display_name'].invalid) {
-                <mat-error>{{errorMessage.display_name()}}</mat-error>
+            <div class="input-group">
+                <label>CODENAME (DISPLAY NAME)</label>
+                <input type="text" placeholder="The Brawler" formControlName="display_name"
+                    (input)="updateErrorMessage('display_name')" class="gang-input">
+                @if (form.controls['display_name'].invalid && form.controls['display_name'].touched) {
+                <span class="error-text">{{errorMessage.display_name()}}</span>
                 }
-            </mat-form-field>
+            </div>
             }
 
-            <button mat-raised-button type="submit" class="blue" [disabled]="!form.valid">
-                @if (mode === 'login') { LOGIN } @else { REGISTER }
+            <button type="submit" class="gang-btn full-width" [disabled]="!form.valid">
+                {{ mode === 'login' ? 'AUTHORIZE' : 'INITIATE JOIN' }}
             </button>
         </form>
 
         @if(errorFromServer() !== '') {
-        <span class="error">{{errorFromServer()}}</span>
+        <div class="server-error">{{errorFromServer()}}</div>
         }
 
-        <div class="login-spacer">or</div>
+        <div class="login-footer">
+            <div class="spacer"><span>OR</span></div>
 
-        @if (mode === 'login') {
-        <div class="toggle">New here? <span (click)="toggleMode()">Sign Up</span></div>
-        } @else {
-        <div class="toggle">Already have an account? <span (click)="toggleMode()">Log in</span></div>
-        }
-    </mat-card>
+            @if (mode === 'login') {
+            <div class="toggle">UNREGISTERED UNIT? <span (click)="toggleMode()">CREATE ACCESS</span></div>
+            } @else {
+            <div class="toggle">ALREADY REGISTERED? <span (click)="toggleMode()">AUTHORIZE LOGIN</span></div>
+            }
+        </div>
+    </div>
 </div>

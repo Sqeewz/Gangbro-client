@@ -1,11 +1,117 @@
+.gang-dialog {
+    background: var(--gang-bg);
+    color: var(--gang-text);
+    padding: 1rem;
+    font-family: 'Oxanium', sans-serif;
+    border: 1px solid var(--gang-primary);
+    box-shadow: 0 0 30px rgba(124, 77, 255, 0.2);
+}
+
+.dialog-title {
+    color: #fff;
+    font-weight: 800;
+    letter-spacing: 2px;
+    border-bottom: 1px solid var(--gang-border);
+    margin-bottom: 1.5rem !important;
+    padding-bottom: 10px;
+}
+
 .form-container {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    padding-top: 0.5rem;
-    min-width: 400px;
+    gap: 1.5rem;
+    min-width: 450px;
+    padding: 1rem 0;
 }
 
-.full-width {
-    width: 100%;
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--gang-accent);
+        letter-spacing: 1px;
+    }
+}
+
+.gang-input,
+.gang-textarea,
+.gang-select {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--gang-border);
+    border-radius: 4px;
+    padding: 12px;
+    color: #fff;
+    font-family: 'Oxanium', sans-serif;
+    transition: all 0.3s;
+
+    &:focus {
+        outline: none;
+        border-color: var(--gang-primary);
+        background: rgba(124, 77, 255, 0.05);
+        box-shadow: 0 0 10px rgba(124, 77, 255, 0.3);
+    }
+}
+
+.gang-textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.gang-select {
+    cursor: pointer;
+
+    option {
+        background: var(--gang-surface);
+        color: #fff;
+    }
+}
+
+.dialog-actions {
+    padding: 1rem 0 0 0;
+    gap: 1rem;
+}
+
+.gang-btn {
+    background: var(--gang-gradient-main);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-weight: 700;
+    padding: 10px 24px;
+    cursor: pointer;
+    font-family: 'Oxanium', sans-serif;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    transition: all 0.3s;
+
+    &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(124, 77, 255, 0.4);
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    &.secondary {
+        background: transparent;
+        border: 1px solid var(--gang-border);
+        color: var(--gang-text-muted);
+
+        &:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: #fff;
+            color: #fff;
+        }
+    }
+
+    &.sm {
+        padding: 8px 16px;
+        font-size: 0.8rem;
+    }
 }

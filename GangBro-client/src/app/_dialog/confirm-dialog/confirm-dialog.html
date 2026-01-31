@@ -1,0 +1,13 @@
+<div class="confirm-container" [class]="data.type || 'info'">
+    <h2 mat-dialog-title class="dialog-title">{{ data.title }}</h2>
+
+    <mat-dialog-content class="dialog-content">
+        <p>{{ data.message }}</p>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end" class="dialog-actions">
+        <button class="gang-btn secondary sm" (click)="onCancel()">{{ data.cancelText || 'ABORT' }}</button>
+        <button class="gang-btn sm" [class.danger]="data.type === 'danger'" (click)="onConfirm()">{{ data.confirmText ||
+            'CONFIRM' }}</button>
+    </mat-dialog-actions>
+</div>

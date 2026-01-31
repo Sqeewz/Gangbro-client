@@ -2,28 +2,39 @@ use std::sync::Arc;
 
 use crate::{domain::{
     repositories::{
+        crew_operation::CrewOperationRepository, mission_chat::MissionChatRepository,
         mission_management::MissionManagementRepository, mission_viewing::MissionViewingRepository,
     },
     value_objects::mission_model::{AddMissionModel, EditMissionModel},
-}};
+}, domain::entities::crew_memberships::CrewMembershipEntity};
 
-pub struct MissionManagementUseCase<T1>
+pub struct MissionManagementUseCase<T1, T2, T3>
 where
     T1: MissionManagementRepository + Send + Sync,
+    T2: MissionChatRepository + Send + Sync,
+    T3: CrewOperationRepository + Send + Sync,
 {
     mission_management_repository: Arc<T1>,
+    mission_chat_repository: Arc<T2>,
+    crew_operation_repository: Arc<T3>,
 }
 
 use anyhow::Result;
-impl<T1> MissionManagementUseCase<T1>
+impl<T1, T2, T3> MissionManagementUseCase<T1, T2, T3>
 where
     T1: MissionManagementRepository + Send + Sync,
+    T2: MissionChatRepository + Send + Sync,
+    T3: CrewOperationRepository + Send + Sync,
 {
     pub fn new(
         mission_management_repository: Arc<T1>,
+        mission_chat_repository: Arc<T2>,
+        crew_operation_repository: Arc<T3>,
     ) -> Self {
         Self {
             mission_management_repository,
+            mission_chat_repository,
+            crew_operation_repository,
         }
     }
 
@@ -35,12 +46,18 @@ where
 
         let insert_mission_entity = add_mission_model.to_entity(chief_id);
 
-        let result = self
+        let mission_id = self
             .mission_management_repository
             .add(insert_mission_entity)
             .await?;
 
-        Ok(result)
+        // Chief joins the mission automatically
+        let _ = self.crew_operation_repository.join(CrewMembershipEntity {
+            brawler_id: chief_id,
+            mission_id,
+        }, true).await;
+
+        Ok(mission_id)
     }
 
     pub async fn edit(
@@ -94,6 +111,10 @@ where
         self.mission_management_repository
             .remove(mission_id, chief_id)
             .await?;
+        
+        // Delete mission chats after removal
+        let _ = self.mission_chat_repository.delete_messages(mission_id).await;
+
         Ok(())
     }
 }

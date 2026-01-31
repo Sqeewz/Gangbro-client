@@ -1,17 +1,19 @@
 use std::sync::Arc;
 
-use axum::{Extension, Router, extract::{Path, State}, http::StatusCode, middleware, response::IntoResponse, routing::patch};
+use axum::{Extension, Json, Router, extract::{Path, State}, http::StatusCode, middleware, response::IntoResponse, routing::patch};
+use serde_json::json;
 
-use crate::{application::use_cases::mission_operation::MissionOperationUseCase, domain::{repositories::{mission_operation::MissionOperationRepository, mission_viewing::MissionViewingRepository}, value_objects::mission_statuses::MissionStatuses}, infrastructure::{database::{postgresql_connection::PgPoolSquad, repositories::{mission_operation::MissionOperationPostgres, mission_viewing::MissionViewingPostgres}}, http::middleware::auth::authorization}};
+use crate::{application::use_cases::mission_operation::MissionOperationUseCase, domain::{repositories::{mission_chat::MissionChatRepository, mission_operation::MissionOperationRepository, mission_viewing::MissionViewingRepository}, value_objects::mission_statuses::MissionStatuses}, infrastructure::{database::{postgresql_connection::PgPoolSquad, repositories::{mission_chat::MissionChatPostgres, mission_operation::MissionOperationPostgres, mission_viewing::MissionViewingPostgres}}, http::middleware::auth::authorization, notifications::broadcaster::GlobalBroadcaster}};
 
-pub async fn in_progress<T1, T2>(
-    State(mission_operation_use_case): State<Arc<MissionOperationUseCase<T1, T2>>>,
+pub async fn in_progress<T1, T2, T3>(
+    State(mission_operation_use_case): State<Arc<MissionOperationUseCase<T1, T2, T3>>>,
     Extension(chief_id): Extension<i32>,
     Path(mission_id): Path<i32>,
 ) -> impl IntoResponse
 where
     T1: MissionOperationRepository + Send + Sync,
     T2: MissionViewingRepository + Send + Sync,
+    T3: MissionChatRepository + Send + Sync,
 {
     match mission_operation_use_case
         .in_progress(mission_id, chief_id)
@@ -19,21 +21,28 @@ where
     {
         Ok(mission_id) => (
             StatusCode::OK,
-            format!("Mission({}) is now {:?}" , mission_id, MissionStatuses::InProgress),
+            Json(json!({
+                "message": format!("Mission({}) is now {:?}" , mission_id, MissionStatuses::InProgress)
+            })),
         )
             .into_response(),
-        Err(e) => (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(json!({ "error": e.to_string() })),
+        )
+            .into_response(),
     }
 }
 
-pub async fn to_completed<T1, T2>(
-    State(mission_operation_use_case): State<Arc<MissionOperationUseCase<T1, T2>>>,
+pub async fn to_completed<T1, T2, T3>(
+    State(mission_operation_use_case): State<Arc<MissionOperationUseCase<T1, T2, T3>>>,
     Extension(chief_id): Extension<i32>,
     Path(mission_id): Path<i32>,
 ) -> impl IntoResponse
 where
     T1: MissionOperationRepository + Send + Sync,
     T2: MissionViewingRepository + Send + Sync,
+    T3: MissionChatRepository + Send + Sync,
 {
     match mission_operation_use_case
         .to_completed(mission_id, chief_id)
@@ -41,21 +50,28 @@ where
     {
         Ok(mission_id) => (
             StatusCode::OK,
-            format!("Mission({}) is now {:?}" , mission_id, MissionStatuses::Completed),
+            Json(json!({
+                "message": format!("Mission({}) is now {:?}" , mission_id, MissionStatuses::Completed)
+            })),
         )
             .into_response(),
-        Err(e) => (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(json!({ "error": e.to_string() })),
+        )
+            .into_response(),
     }
 }
 
-pub async fn to_failed<T1, T2>(
-    State(mission_operation_use_case): State<Arc<MissionOperationUseCase<T1, T2>>>,
+pub async fn to_failed<T1, T2, T3>(
+    State(mission_operation_use_case): State<Arc<MissionOperationUseCase<T1, T2, T3>>>,
     Extension(chief_id): Extension<i32>,
     Path(mission_id): Path<i32>,
 ) -> impl IntoResponse
 where
     T1: MissionOperationRepository + Send + Sync,
     T2: MissionViewingRepository + Send + Sync,
+    T3: MissionChatRepository + Send + Sync,
 {
     match mission_operation_use_case
         .to_failed(mission_id, chief_id)
@@ -63,20 +79,28 @@ where
     {
         Ok(mission_id) => (
             StatusCode::OK,
-            format!("Mission({}) is now {:?}" , mission_id, MissionStatuses::Failed),
+            Json(json!({
+                "message": format!("Mission({}) is now {:?}" , mission_id, MissionStatuses::Failed)
+            })),
         )
             .into_response(),
-        Err(e) => (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(json!({ "error": e.to_string() })),
+        )
+            .into_response(),
     }
 }
 
-pub fn routes(db_pool: Arc<PgPoolSquad>) -> Router {
-    // หมายเหตุ: ในสไลด์มีการสะกด Misssion (s 3 ตัว) ให้ตรวจสอบ Class Name ของคุณอีกครั้ง
+pub fn routes(db_pool: Arc<PgPoolSquad>, broadcaster: Arc<GlobalBroadcaster>) -> Router {
     let mission_operation_repository = MissionOperationPostgres::new(Arc::clone(&db_pool));
     let mission_viewing_repository = MissionViewingPostgres::new(Arc::clone(&db_pool));
+    let mission_chat_repository = MissionChatPostgres::new(Arc::clone(&db_pool));
     let use_case = MissionOperationUseCase::new(
         Arc::new(mission_operation_repository),
         Arc::new(mission_viewing_repository),
+        Arc::new(mission_chat_repository),
+        broadcaster,
     );
 
     Router::new()
