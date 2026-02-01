@@ -8,16 +8,15 @@ COPY . .
 RUN cargo build --release
 
 # Runtime stage
-FROM docker.io/library/debian:testing-slim
+FROM docker.io/library/debian:bookworm-slim
 
 WORKDIR /app
 
-# Install runtime dependencies (OpenSSL, Postgres client libs)
+# Install runtime dependencies
 RUN apt-get update && apt-get install -y \
-    openssl \
+    ca-certificates \
     libssl3 \
     libpq5 \
-    ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy the binary from the builder stage
