@@ -14,7 +14,8 @@ WORKDIR /app
 
 # Install runtime dependencies (OpenSSL, Postgres client libs)
 RUN apt-get update && apt-get install -y \
-    libssl-dev \
+    openssl \
+    libssl3 \
     libpq5 \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*

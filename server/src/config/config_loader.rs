@@ -3,7 +3,9 @@ use anyhow::Result;
 use crate::config::{config_model::{CloudinaryEnv, Database, DotEnvyConfig, JwtEnv, Server}, stage::Stage};
 
 pub fn load() -> Result<DotEnvyConfig> {
-    dotenvy::dotenv().ok();
+    if let Err(e) = dotenvy::dotenv() {
+        eprintln!("Warning: Error loading .env file: {}", e);
+    }
     
      let server = Server {
         port: std::env::var("SERVER_PORT")
