@@ -12,7 +12,13 @@ export class WebsocketService {
     constructor() { }
 
     connect(path: string): Observable<any> {
-        const wsUrl = environment.baseUrl.replace('http', 'ws') + '/api' + path;
+        let wsUrl: string;
+        if (environment.baseUrl === '') {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            wsUrl = `${protocol}//${window.location.host}/api${path}`;
+        } else {
+            wsUrl = environment.baseUrl.replace('http', 'ws') + '/api' + path;
+        }
         this.socket = new WebSocket(wsUrl);
 
         this.socket.onmessage = (event) => {
