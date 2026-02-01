@@ -1,5 +1,5 @@
 use crate::infrastructure;
-use crate::config::config_loader::get_user_secret as get_user_secret_env;
+use crate::config::config_loader::get_jwt_env;
 use axum::{Json, http::{Request, StatusCode, header}, middleware::Next, body::Body, response::{Response, IntoResponse}};
 use serde_json::json;
 
@@ -23,15 +23,15 @@ pub async fn authorization(mut req: Request<Body>, next: Next) -> Response {
         ).into_response(),
     };
 
-    let secret_env = match get_user_secret_env() {
-        Ok(secret) => secret,
+    let jwt_env = match get_jwt_env() {
+        Ok(env) => env,
         Err(_) => return (
             StatusCode::INTERNAL_SERVER_ERROR,
             Json(json!({ "error": "Server configuration error" }))
         ).into_response(),
     };
 
-    let claims = match infrastructure::jwt::verify_token(secret_env, token.to_string()) {
+    let claims = match infrastructure::jwt::verify_token(jwt_env.secret, token.to_string()) {
         Ok(claims) => claims,
         Err(_) => return (
             StatusCode::UNAUTHORIZED,
