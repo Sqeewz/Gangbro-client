@@ -29,7 +29,7 @@ export class AboutMission implements OnInit, OnDestroy {
   currentUserName = signal<string>('');
 
   // Chat signals
-  chatMessages = signal<{ user: string, text: string, time: Date }[]>([]);
+  chatMessages = signal<{ id?: number, user: string, text: string, time: Date }[]>([]);
   newMessageText = signal('');
 
   private _missionId?: number;
@@ -48,6 +48,12 @@ export class AboutMission implements OnInit, OnDestroy {
     if (passport) {
       this.currentUserName.set(passport.display_name);
     }
+
+    // Effect to scroll chat to bottom when messages change
+    effect(() => {
+      this.chatMessages();
+      setTimeout(() => this.scrollToBottom(), 100);
+    });
   }
 
   async ngOnInit() {
@@ -95,13 +101,17 @@ export class AboutMission implements OnInit, OnDestroy {
     if (!this._missionId) return;
     this.disconnectWs();
 
-    const baseUrl = environment.baseUrl === '/' ?
-      `${window.location.protocol}//${window.location.host}` :
-      environment.baseUrl;
+    let protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    let host = window.location.host;
 
-    const wsProtocol = baseUrl.startsWith('https') ? 'wss:' : 'ws:';
-    const host = baseUrl.replace(/^https?:\/\//, '');
-    const wsUrl = `${wsProtocol}//${host}/api/mission-chats/ws/${this._missionId}`;
+    // If environment.baseUrl is set (e.g. for developer mode pointing to a different backend)
+    if (environment.baseUrl && environment.baseUrl !== '/') {
+      const url = new URL(environment.baseUrl, window.location.href);
+      protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
+      host = url.host;
+    }
+
+    const wsUrl = `${protocol}//${host}/api/mission-chats/ws/${this._missionId}`;
 
     console.log('Connecting to WebSocket:', wsUrl);
     this._ws = new WebSocket(wsUrl);
@@ -115,15 +125,13 @@ export class AboutMission implements OnInit, OnDestroy {
           time: new Date(data.created_at)
         };
 
-        // Append new message if it doesn't exist (avoid duplicates from POST refresh)
+        // Append new message if it doesn't exist
         this.chatMessages.update(msgs => {
-          // simple check by text and time or ID if available
           const exists = msgs.some(m =>
-            m.text === newMessage.text &&
-            new Date(m.time).getTime() === newMessage.time.getTime() &&
-            m.user === newMessage.user
+            (m.id && m.id === data.id) ||
+            (m.text === newMessage.text && m.user === newMessage.user && Math.abs(new Date(m.time).getTime() - newMessage.time.getTime()) < 1000)
           );
-          if (!exists) return [...msgs, newMessage];
+          if (!exists) return [...msgs, { ...newMessage, id: data.id }];
           return msgs;
         });
       } catch (e) {
@@ -156,12 +164,20 @@ export class AboutMission implements OnInit, OnDestroy {
     try {
       const messages = await this._missionService.getChatMessages(this._missionId);
       this.chatMessages.set(messages.map(m => ({
+        id: m.id,
         user: m.brawler_name,
         text: m.message,
         time: new Date(m.created_at)
       })));
     } catch (e) {
       console.error('Failed to load chat', e);
+    }
+  }
+
+  scrollToBottom() {
+    const chatDisplay = document.querySelector('.chat-display');
+    if (chatDisplay) {
+      chatDisplay.scrollTop = chatDisplay.scrollHeight;
     }
   }
 

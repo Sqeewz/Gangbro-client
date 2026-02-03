@@ -141,18 +141,40 @@ async fn handle_socket<T>(
 ) where
     T: MissionChatRepository + Send + Sync + 'static,
 {
-    let (mut sender, mut _receiver) = socket.split();
+    let (mut sender, mut receiver) = socket.split();
     
     let tx = state.broadcaster.get_sender(mission_id);
     let mut rx = tx.subscribe();
 
     // Task to send messages from broadcast channel to WebSocket
-    tokio::spawn(async move {
+    let mut send_task = tokio::spawn(async move {
         while let Ok(msg) = rx.recv().await {
-            let msg_json = serde_json::to_string(&msg).unwrap();
+            let msg_json = match serde_json::to_string(&msg) {
+                Ok(json) => json,
+                Err(e) => {
+                    tracing::error!("Failed to serialize chat message: {}", e);
+                    continue;
+                }
+            };
             if sender.send(Message::Text(msg_json.into())).await.is_err() {
                 break;
             }
         }
     });
+
+    // Task to receive messages/pings from client and detect disconnect
+    let mut recv_task = tokio::spawn(async move {
+        while let Some(Ok(msg)) = receiver.next().await {
+            if matches!(msg, Message::Close(_)) {
+                break;
+            }
+            // We ignore other messages for now as we use HTTP POST for sending
+        }
+    });
+
+    // Wait for any task to finish (e.g. client disconnects or server closes)
+    tokio::select! {
+        _ = (&mut send_task) => recv_task.abort(),
+        _ = (&mut recv_task) => send_task.abort(),
+    };
 }
