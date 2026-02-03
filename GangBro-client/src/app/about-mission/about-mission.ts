@@ -101,14 +101,17 @@ export class AboutMission implements OnInit, OnDestroy {
     if (!this._missionId) return;
     this.disconnectWs();
 
-    let protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    // Force WSS if the page is loaded over HTTPS
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     let host = window.location.host;
 
-    // If environment.baseUrl is set (e.g. for developer mode pointing to a different backend)
     if (environment.baseUrl && environment.baseUrl !== '/') {
-      const url = new URL(environment.baseUrl, window.location.href);
-      protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
-      host = url.host;
+      try {
+        const url = new URL(environment.baseUrl);
+        host = url.host;
+      } catch (e) {
+        console.error('Invalid baseUrl, using current host');
+      }
     }
 
     const wsUrl = `${protocol}//${host}/api/mission-chats/ws/${this._missionId}`;
@@ -186,12 +189,18 @@ export class AboutMission implements OnInit, OnDestroy {
     if (!text || !this._missionId) return;
 
     try {
-      // Send via HTTP POST - The server will broadcast it via WebSocket to everyone
       await this._missionService.sendChatMessage(this._missionId, text);
       this.newMessageText.set('');
-      // No need to call loadChat() as WS will deliver the message
     } catch (e) {
       console.error('Failed to send message', e);
     }
+  }
+
+  ensureHttps(url: string | null): string {
+    if (!url) return 'assets/def.jpg';
+    if (url.startsWith('http://')) {
+      return url.replace('http://', 'https://');
+    }
+    return url;
   }
 }

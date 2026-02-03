@@ -60,7 +60,7 @@
                     <div class="crew-list-active">
                         @for (member of roster(); track member.display_name) {
                         <div class="crew-member-item">
-                            <img [src]="member.avatar_url || 'assets/def.jpg'" alt="Avatar" class="member-avatar">
+                            <img [src]="ensureHttps(member.avatar_url)" alt="Avatar" class="member-avatar">
                             <div class="member-info">
                                 <div class="member-name">{{member.display_name}}</div>
                                 <div class="member-stats">LVL {{member.mission_success_count || 0}}</div>
