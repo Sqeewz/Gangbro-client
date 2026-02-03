@@ -7,24 +7,30 @@ pub fn load() -> Result<DotEnvyConfig> {
         eprintln!("Warning: Error loading .env file: {}", e);
     }
     
-     let server = Server {
-        port: std::env::var("SERVER_PORT")
-            .expect("SERVER_PORT is valid")
-            .trim()
-            .parse()?,
+    // Render typically provides PORT environment variable
+    let port = std::env::var("PORT")
+        .or_else(|_| std::env::var("SERVER_PORT"))
+        .unwrap_or_else(|_| "8080".to_string())
+        .trim()
+        .parse()
+        .unwrap_or(8080);
+
+    let server = Server {
+        port,
         body_limit: std::env::var("SERVER_BODY_LIMIT")
-            .expect("SERVER_BODY_LIMIT is valid")
+            .unwrap_or_else(|_| "10".to_string())
             .trim()
-            .parse()?,
+            .parse()
+            .unwrap_or(10),
         timeout: std::env::var("SERVER_TIMEOUT")
-            .expect("SERVER_TIMEOUT is valid")
+            .unwrap_or_else(|_| "90".to_string())
             .trim()
-            .parse()?,
+            .parse()
+            .unwrap_or(90),
     };
 
-
     let database = Database {
-        url: std::env::var("DATABASE_URL").expect("DATABASE_URL not set"),
+        url: std::env::var("DATABASE_URL").expect("DATABASE_URL must be set in environment variables"),
     };
 
     let secret = std::env::var("JWT_SECRET").expect("JWT_SECRET not set");
