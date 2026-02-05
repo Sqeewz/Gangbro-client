@@ -129,8 +129,7 @@ async fn ws_handler<T>(
 where
     T: MissionChatRepository + Send + Sync + 'static,
 {
-    // Optional: Validate token here if provided in query
-    // For now we just upgrade
+    tracing::info!("[WS] Upgrading connection for mission {}", mission_id);
     ws.on_upgrade(move |socket| handle_socket(socket, state, mission_id))
 }
 
@@ -146,13 +145,16 @@ async fn handle_socket<T>(
     let tx = state.broadcaster.get_sender(mission_id);
     let mut rx = tx.subscribe();
 
+    tracing::info!("[WS] Client joined mission {} channel", mission_id);
+
     // Task to send messages from broadcast channel to WebSocket
+    // We add a ping/pong relay or just rely on traffic
     let mut send_task = tokio::spawn(async move {
         while let Ok(msg) = rx.recv().await {
             let msg_json = match serde_json::to_string(&msg) {
                 Ok(json) => json,
                 Err(e) => {
-                    tracing::error!("Failed to serialize chat message: {}", e);
+                    tracing::error!("[WS] Failed to serialize chat message: {}", e);
                     continue;
                 }
             };
@@ -164,17 +166,26 @@ async fn handle_socket<T>(
 
     // Task to receive messages/pings from client and detect disconnect
     let mut recv_task = tokio::spawn(async move {
-        while let Some(Ok(msg)) = receiver.next().await {
-            if matches!(msg, Message::Close(_)) {
-                break;
+        while let Some(result) = receiver.next().await {
+            match result {
+                Ok(msg) => {
+                    if matches!(msg, Message::Close(_)) {
+                        break;
+                    }
+                }
+                Err(_) => break,
             }
-            // We ignore other messages for now as we use HTTP POST for sending
         }
     });
 
-    // Wait for any task to finish (e.g. client disconnects or server closes)
     tokio::select! {
-        _ = (&mut send_task) => recv_task.abort(),
-        _ = (&mut recv_task) => send_task.abort(),
+        _ = (&mut send_task) => {
+            tracing::info!("[WS] Send task finished for mission {}", mission_id);
+            recv_task.abort();
+        },
+        _ = (&mut recv_task) => {
+            tracing::info!("[WS] Receiver task finished for mission {}", mission_id);
+            send_task.abort();
+        },
     };
 }
