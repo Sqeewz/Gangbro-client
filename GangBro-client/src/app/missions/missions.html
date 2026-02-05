@@ -6,8 +6,8 @@
     <div class="lobby-main">
         @if (isLoading()) {
         <div class="loading-overlay">
-            <div class="spinner"></div>
-            <span>SYNCING SECTOR DATA...</span>
+            <app-state-message type="loading" title="SYNCING SECTOR"
+                message="Decrypting mission data from the grid..."></app-state-message>
         </div>
         }
         <!-- Left Panel: Mission List -->
@@ -44,7 +44,10 @@
                     </div>
                 </div>
                 } @empty {
-                <div class="empty-lobby">NO ACTIVE MISSIONS IN SECTOR</div>
+                <app-state-message type="empty" title="NO ACTIVE OPS"
+                    message="The sector is quiet. Deploy a new mission to start the operation."
+                    [actionText]="isSignin() ? 'DEPLOY MISSION' : ''" (action)="onAdd()">
+                </app-state-message>
                 }
             </div>
 

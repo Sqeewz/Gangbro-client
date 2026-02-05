@@ -16,10 +16,24 @@ import { PassportService } from '../_service/passport-service'
 import { ConfirmDialog } from '../_dialog/confirm-dialog/confirm-dialog'
 
 
+import { MissionStatus } from './mission-status/mission-status'
+import { StateMessage } from '../_components/state-message/state-message'
+
+
 @Component({
   selector: 'app-missions',
   standalone: true,
-  imports: [FormsModule, AsyncPipe, UpperCasePipe, MatMenuModule, MatButtonModule, MatSnackBarModule, MatDialogModule],
+  imports: [
+    FormsModule,
+    AsyncPipe,
+    UpperCasePipe,
+    MatMenuModule,
+    MatButtonModule,
+    MatSnackBarModule,
+    MatDialogModule,
+    MissionStatus,
+    StateMessage,
+  ],
   templateUrl: './missions.html',
   styleUrl: './missions.scss',
 })

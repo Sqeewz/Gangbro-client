@@ -22,18 +22,16 @@ export class ErrorService {
 
       switch (error.status) {
         case 0:
-          this._snackbar.open('Cannot connect to server. Please check your internet connection.', 'OK', this._snackBarConfig);
+          this._snackbar.open('SIGNAL LOST: Cannot reach HQ. Check your uplink (internet).', 'OK', this._snackBarConfig);
           break;
         case 400:
-          this._snackbar.open(msgFromServer || 'Bad request: The server could not understand the request.', 'OK', this._snackBarConfig);
+          this._snackbar.open(msgFromServer || 'INVALID INTEL: HQ rejected the request format.', 'OK', this._snackBarConfig);
           break;
         case 401:
-          this._snackbar.open(msgFromServer || 'Unauthorized: Please login again.', 'OK', this._snackBarConfig);
-          // Optional: redirect to login if unauthorized
-          // this._router.navigate(['/login']);
+          this._snackbar.open(msgFromServer || 'ACCESS DENIED: Credentials expired. Re-authenticate.', 'OK', this._snackBarConfig);
           break;
         case 403:
-          this._snackbar.open(msgFromServer || 'Forbidden: You do not have permission to access this resource.', 'OK', this._snackBarConfig);
+          this._snackbar.open(msgFromServer || 'RESTRICTED SECTOR: You lack the clearance for this operation.', 'OK', this._snackBarConfig);
           break;
         case 404:
           if (msgFromServer) {
@@ -42,34 +40,17 @@ export class ErrorService {
             this._router.navigate(['/not-found']);
           }
           break;
-        case 405:
-          this._snackbar.open('Method Not Allowed: The requested method is not supported.', 'OK', this._snackBarConfig);
-          break;
-        case 408:
-          this._snackbar.open('Request Timeout: The server timed out waiting for the request.', 'OK', this._snackBarConfig);
-          break;
-        case 409:
-          this._snackbar.open(msgFromServer || 'Conflict: This resource already exists or there is a conflict.', 'OK', this._snackBarConfig);
-          break;
-        case 422:
-          this._snackbar.open(msgFromServer || 'Validation Error: Please check your input data.', 'OK', this._snackBarConfig);
-          break;
         case 429:
-          this._snackbar.open('Too Many Requests: You are being rate limited. Please slow down.', 'OK', this._snackBarConfig);
+          this._snackbar.open('THROTTLED: Too many operations. Cool down, Brawler.', 'OK', this._snackBarConfig);
           break;
         case 500:
-        case 501:
         case 502:
         case 503:
         case 504:
-        case 505:
-          const serverErr = msgFromServer || 'Internal Server Error: Something went wrong on our end.';
-          this._snackbar.open(serverErr, 'OK', this._snackBarConfig);
-          // Optional: redirect to server-error page
-          // this._router.navigate(['/server-error']);
+          this._snackbar.open('GRID FAILURE: Server-side disturbance detected. Stand by.', 'OK', this._snackBarConfig);
           break;
         default:
-          this._snackbar.open(msgFromServer || 'An unexpected error occurred. Please try again later.', 'OK', this._snackBarConfig);
+          this._snackbar.open(msgFromServer || 'UNKNOWN DISTURBANCE: Sector unstable. Try again.', 'OK', this._snackBarConfig);
           break;
       }
     }

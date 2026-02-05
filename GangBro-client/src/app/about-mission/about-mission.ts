@@ -8,6 +8,7 @@ import { Brawler } from '../_models/brawler';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { environment } from '../../environments/environment';
+import { CacheManager } from '../_helpers/cache';
 
 @Component({
   selector: 'app-about-mission',
@@ -29,7 +30,7 @@ export class AboutMission implements OnInit, OnDestroy {
   currentUserName = signal<string>('');
 
   // Chat signals
-  chatMessages = signal<{ id?: number, user: string, text: string, time: Date }[]>([]);
+  chatMessages = signal<{ id?: number; user: string; text: string; time: Date }[]>([]);
   newMessageText = signal('');
 
   private _missionId?: number;
@@ -38,11 +39,11 @@ export class AboutMission implements OnInit, OnDestroy {
   private _ngZone = inject(NgZone);
 
   constructor() {
-    // Effect to persist chat messages to localStorage whenever they change
+    // Effect to persist chat messages with CacheManager
     effect(() => {
       const messages = this.chatMessages();
       if (this._missionId && messages.length > 0) {
-        localStorage.setItem(`chat_cache_${this._missionId}`, JSON.stringify(messages));
+        CacheManager.set(`chat_cache_${this._missionId}`, messages, 24 * 60 * 60 * 1000); // 24h expiry
       }
     });
 
@@ -63,20 +64,18 @@ export class AboutMission implements OnInit, OnDestroy {
     if (id) {
       this._missionId = +id;
 
-      // 1. Try to load from cache immediately for instant UI
-      const cached = localStorage.getItem(`chat_cache_${this._missionId}`);
+      // 1. Try to load from cache
+      const cached = CacheManager.get<{ id?: number; user: string; text: string; time: Date }[]>(
+        `chat_cache_${this._missionId}`,
+      );
       if (cached) {
-        try {
-          this.chatMessages.set(JSON.parse(cached));
-        } catch (e) {
-          console.error('Failed to parse cached chat', e);
-        }
+        this.chatMessages.set(cached);
       }
 
       try {
         const [missionData, rosterData] = await Promise.all([
           this._missionService.getById(this._missionId),
-          this._missionService.getRoster(this._missionId)
+          this._missionService.getRoster(this._missionId),
         ]);
         this.mission.set(missionData);
         this.roster.set(rosterData);
@@ -86,7 +85,6 @@ export class AboutMission implements OnInit, OnDestroy {
 
         // 3. Connect WebSocket for real-time updates
         this.connectWs();
-
       } catch (error) {
         console.error('Failed to load mission details', error);
       } finally {
@@ -103,59 +101,57 @@ export class AboutMission implements OnInit, OnDestroy {
     if (!this._missionId) return;
     this.disconnectWs();
 
-    // Use current location for WS host, handle protocol correctly
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     let host = window.location.host;
 
-    // Optional: If environment has a specific baseUrl, extract host from it
     if (environment.baseUrl && environment.baseUrl.startsWith('http')) {
       try {
         const url = new URL(environment.baseUrl);
         host = url.host;
-      } catch (e) {
-        // Fallback to current host
-      }
+      } catch (e) { }
     }
 
-    const wsUrl = `${protocol}//${host}/api/mission-chats/ws/${this._missionId}`;
+    // Security: Send JWT token in query string
+    const token = this._passportService.data()?.token || '';
+    const wsUrl = `${protocol}//${host}/api/mission-chats/ws/${this._missionId}?token=${token}`;
 
-    console.log('[Chat] Connecting to:', wsUrl);
+    console.log('[Chat] Connecting to secured WebSocket...');
     this._ws = new WebSocket(wsUrl);
 
     this._ws.onopen = () => {
-      console.log('[Chat] WebSocket Connected');
+      console.log('[Chat] WebSocket Connected (Secure)');
       this.startHeartbeat();
     };
 
     this._ws.onmessage = (event) => {
       this._ngZone.run(() => {
         try {
+          if (event.data === 'pong') return;
+
           const data = JSON.parse(event.data);
 
           // Deduplication based on ID
-          const isDuplicate = this.chatMessages().some(m => m.id === data.id);
+          const isDuplicate = this.chatMessages().some((m) => m.id === data.id);
           if (isDuplicate) return;
 
           const newMessage = {
             id: data.id,
             user: data.brawler_name,
             text: data.message,
-            time: new Date(data.created_at)
+            time: new Date(data.created_at),
           };
 
-          this.chatMessages.update(msgs => [...msgs, newMessage]);
-
-          // Auto scroll
+          this.chatMessages.update((msgs) => [...msgs, newMessage]);
           setTimeout(() => this.scrollToBottom(), 50);
         } catch (e) {
-          console.error('[Chat] Handle message error', e);
+          // Ignore non-json messages like pings if server sends them as strings
         }
       });
     };
 
     this._ws.onclose = (event) => {
       this.stopHeartbeat();
-      console.log(`[Chat] WebSocket Disconnected (Code: ${event.code}). Reconnecting in 3s...`);
+      console.log(`[Chat] WebSocket Disconnected. Reconnecting in 3s...`);
       setTimeout(() => {
         if (this._missionId && !this._ws) this.connectWs();
       }, 3000);
@@ -172,7 +168,7 @@ export class AboutMission implements OnInit, OnDestroy {
       if (this._ws && this._ws.readyState === WebSocket.OPEN) {
         this._ws.send('ping');
       }
-    }, 25000); // 25 seconds ping (Render timeout is ~30s)
+    }, 25000);
   }
 
   private stopHeartbeat() {
@@ -191,17 +187,18 @@ export class AboutMission implements OnInit, OnDestroy {
     }
   }
 
-
   async loadChat() {
     if (!this._missionId) return;
     try {
       const messages = await this._missionService.getChatMessages(this._missionId);
-      this.chatMessages.set(messages.map(m => ({
-        id: m.id,
-        user: m.brawler_name,
-        text: m.message,
-        time: new Date(m.created_at)
-      })));
+      this.chatMessages.set(
+        messages.map((m) => ({
+          id: m.id,
+          user: m.brawler_name,
+          text: m.message,
+          time: new Date(m.created_at),
+        })),
+      );
     } catch (e) {
       console.error('Failed to load chat', e);
     }
@@ -234,3 +231,4 @@ export class AboutMission implements OnInit, OnDestroy {
     return url;
   }
 }
+
