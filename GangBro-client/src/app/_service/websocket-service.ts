@@ -13,26 +13,39 @@ export class WebsocketService {
 
     connect(path: string): Observable<any> {
         let wsUrl: string;
-        if (environment.baseUrl === '') {
-            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-            wsUrl = `${protocol}//${window.location.host}/api${path}`;
-        } else {
-            wsUrl = environment.baseUrl.replace('http', 'ws') + '/api' + path;
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        let host = window.location.host;
+
+        if (environment.baseUrl && environment.baseUrl.startsWith('http')) {
+            try {
+                const url = new URL(environment.baseUrl);
+                host = url.host;
+            } catch (e) {
+                console.error('[WS] Invalid baseUrl in environment:', environment.baseUrl);
+            }
         }
+
+        wsUrl = `${protocol}//${host}/api${path}`;
+        console.log(`[WS] Connecting to: ${wsUrl}`);
+
         this.socket = new WebSocket(wsUrl);
 
         this.socket.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            this.messageSubject.next(data);
+            try {
+                const data = JSON.parse(event.data);
+                this.messageSubject.next(data);
+            } catch (e) {
+                // Handle non-JSON or other events
+                this.messageSubject.next(event.data);
+            }
         };
 
         this.socket.onclose = (event) => {
-            console.log('WS Connection closed', event);
-            // Logic for reconnect can go here
+            console.log('[WS] Connection closed', event);
         };
 
         this.socket.onerror = (error) => {
-            console.error('WS Error', error);
+            console.error('[WS] Error detected', error);
         };
 
         return this.messageSubject.asObservable();
@@ -40,13 +53,14 @@ export class WebsocketService {
 
     send(data: any) {
         if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-            this.socket.send(JSON.stringify(data));
+            this.socket.send(typeof data === 'string' ? data : JSON.stringify(data));
         }
     }
 
     close() {
         if (this.socket) {
             this.socket.close();
+            this.socket = null;
         }
     }
 }

@@ -374,3 +374,72 @@
         grid-template-columns: 1fr;
     }
 }
+
+@media (max-width: 768px) {
+    .about-container {
+        padding: 1rem;
+    }
+
+    .mission-header {
+        margin-bottom: 2rem;
+
+        .title-section {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+            padding-bottom: 0.8rem;
+
+            .mission-name {
+                font-size: 2rem;
+                letter-spacing: 3px;
+                line-height: 1.1;
+            }
+
+            .status-indicator {
+                width: fit-content;
+            }
+        }
+    }
+
+    .description-text {
+        font-size: 1rem;
+        margin-bottom: 2rem;
+        line-height: 1.6;
+    }
+
+    .panel-frame .panel-body {
+        padding: 1.2rem;
+    }
+
+    .meta-grid {
+        gap: 1.5rem;
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .mission-header .title-section .mission-name {
+        font-size: 1.6rem;
+        letter-spacing: 2px;
+    }
+
+    .chat-section .chat-display {
+        height: 250px;
+        padding: 1rem;
+    }
+
+    .chat-input-area {
+        padding: 0.8rem;
+        gap: 0.5rem;
+
+        input {
+            padding: 8px 12px;
+            font-size: 0.8rem;
+        }
+
+        .send-btn {
+            width: 40px;
+            height: 40px;
+        }
+    }
+}

@@ -423,24 +423,27 @@
 // Responsive Design
 @media (max-width: 1024px) {
     .lobby-container {
-        margin: 10px auto;
+        width: 100%;
+        margin: 0;
+        border: none;
+        border-radius: 0;
         padding: 10px;
-        border-width: 1px;
     }
 
     .lobby-main {
         grid-template-columns: 1fr;
         height: auto;
-        gap: 15px;
+        gap: 20px;
     }
 
     .mission-lobby-panel {
-        height: 500px;
+        height: 60vh;
+        min-height: 400px;
     }
 
     .panel-header,
     .mission-row {
-        padding: 10px;
+        padding: 12px;
     }
 }
 
@@ -490,32 +493,73 @@
 }
 
 @media (max-width: 480px) {
+    .panel-header {
+        display: none; // Hide header on tiny screens, switch to card view
+    }
 
-    .panel-header,
     .mission-row {
-        grid-template-columns: 1.2fr 50px 70px;
-        padding: 8px 10px;
-        font-size: 0.75rem;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 15px;
+        margin-bottom: 10px;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--gang-border);
+        border-radius: 8px;
 
         .col-name {
-            gap: 5px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            font-size: 1rem !important;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            &::after {
+                content: attr(data-status);
+                font-size: 0.6rem;
+                padding: 2px 6px;
+                border-radius: 4px;
+                background: rgba(255, 255, 255, 0.1);
+                color: var(--gang-accent);
+                text-transform: uppercase;
+                font-weight: 800;
+            }
         }
 
         .col-crew {
-            font-size: 0.65rem;
-            text-align: center;
-        }
-    }
+            font-size: 0.8rem !important;
+            color: var(--gang-text-muted) !important;
+            text-align: left !important;
 
-    .lobby-btn.join {
-        font-size: 0.6rem;
-        padding: 4px 6px;
+            &::before {
+                content: 'OPERATIONAL UNITS: ';
+                font-weight: 800;
+                color: var(--gang-accent);
+            }
+        }
+
+        .col-action {
+            width: 100%;
+            margin-top: 5px;
+
+            .lobby-btn.join {
+                width: 100%;
+                padding: 10px !important;
+                font-size: 0.8rem !important;
+            }
+        }
     }
 
     .panel-footer {
         padding: 10px;
+    }
+
+    .pagination-controls {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 5px;
+        margin-top: 10px;
+        width: 100%;
     }
 }

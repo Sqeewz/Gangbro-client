@@ -98,6 +98,15 @@ export class AboutMission implements OnInit, OnDestroy {
 
   private startPolling() {
     this.stopPolling();
+
+    // Visual indicator that polling is active
+    const statusMsg = {
+      user: 'SYSTEM',
+      text: 'POLLING_INIT :: SECURE COMMS ACTIVE (3s interval)',
+      time: new Date()
+    };
+    this.chatMessages.update(msgs => [...msgs, statusMsg]);
+
     // Poll every 3 seconds for new messages
     this._pollingHandle = setInterval(() => {
       this.loadChat();
@@ -124,10 +133,14 @@ export class AboutMission implements OnInit, OnDestroy {
         time: new Date(m.created_at),
       }));
 
-      // Only update if something changed (to avoid unnecessary UI flashes/scrolls)
-      const current = this.chatMessages();
-      if (JSON.stringify(newMessages) !== JSON.stringify(current)) {
-        this.chatMessages.set(newMessages);
+      // Only update if number of messages changed or IDs are different (efficient update)
+      const current = this.chatMessages().filter(m => m.user !== 'SYSTEM');
+      if (newMessages.length !== current.length ||
+        (newMessages.length > 0 && newMessages[newMessages.length - 1].id !== current[current.length - 1]?.id)) {
+
+        // Preserve SYSTEM messages if any
+        const systems = this.chatMessages().filter(m => m.user === 'SYSTEM');
+        this.chatMessages.set([...systems, ...newMessages]);
       }
     } catch (e) {
       console.error('Failed to load chat via polling', e);
@@ -154,6 +167,8 @@ export class AboutMission implements OnInit, OnDestroy {
     try {
       await this._missionService.sendChatMessage(this._missionId, text);
       this.newMessageText.set('');
+      // Immediate refresh after sending
+      await this.loadChat();
     } catch (e) {
       console.error('Failed to send message', e);
     }
@@ -167,4 +182,3 @@ export class AboutMission implements OnInit, OnDestroy {
     return url;
   }
 }
-

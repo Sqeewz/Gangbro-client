@@ -23,7 +23,8 @@
 
             <div class="panel-content scrollable">
                 @for (mission of missions$ | async; track mission.id) {
-                <div class="mission-row" (click)="onView(mission)" [class.active]="selectedMission?.id === mission.id">
+                <div class="mission-row" (click)="onView(mission)" [class.active]="selectedMission?.id === mission.id"
+                    [attr.data-status]="mission.status">
                     <div class="col-name">
                         <span class="indicator" [class]="mission.status"></span>
                         {{mission.name}}
