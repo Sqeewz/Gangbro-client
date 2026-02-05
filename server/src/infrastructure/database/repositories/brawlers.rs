@@ -45,25 +45,28 @@ impl BrawlerRepository for BrawlerPostgres {
     async fn register(&self, register_brawler_entity: RegisterBrawlerEntity) -> Result<Passport> {
         let mut connection = Arc::clone(&self.db_pool).get()?;
 
-        let user_id = insert_into(brawlers::table)
-            .values(&register_brawler_entity)
-            .returning(brawlers::id)
-            .get_result::<i32>(&mut connection)?;
+        connection.transaction::<Passport, anyhow::Error, _>(|conn| {
+            let user_id = insert_into(brawlers::table)
+                .values(&register_brawler_entity)
+                .returning(brawlers::id)
+                .get_result::<i32>(conn)?;
 
-        let display_name = register_brawler_entity.display_name;
+            let display_name = register_brawler_entity.display_name.clone();
 
-        let jwt_env = get_jwt_env()?;
-        let claims = Claims {
-            sub: user_id.to_string(),
-            exp: (Utc::now() + Duration::days(jwt_env.lift_time_days)).timestamp() as usize,
-            iat: Utc::now().timestamp() as usize,
-        };
-        let token = generate_token(jwt_env.secret, &claims)?;
-        Ok(Passport {
-            user_id,
-            token,
-            display_name,
-            avatar_url: None,
+            let jwt_env = get_jwt_env().map_err(|e| anyhow::anyhow!("Config error: {}", e))?;
+            let claims = Claims {
+                sub: user_id.to_string(),
+                exp: (Utc::now() + Duration::days(jwt_env.lift_time_days)).timestamp() as usize,
+                iat: Utc::now().timestamp() as usize,
+            };
+            let token = generate_token(jwt_env.secret, &claims)?;
+            
+            Ok(Passport {
+                user_id,
+                token,
+                display_name,
+                avatar_url: None,
+            })
         })
     }
 

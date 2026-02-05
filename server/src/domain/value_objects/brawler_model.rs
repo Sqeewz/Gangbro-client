@@ -14,10 +14,13 @@ pub struct RegisterBrawlerModel {
 
 impl RegisterBrawlerModel {
     pub fn to_entity(&self) -> RegisterBrawlerEntity {
+        let now = chrono::Utc::now().naive_utc();
         RegisterBrawlerEntity {
             username: self.username.clone(),
             password: self.password.clone(),
             display_name: self.display_name.clone(),
+            created_at: now,
+            updated_at: now,
         }
     }
 }
