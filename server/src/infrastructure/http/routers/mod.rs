@@ -7,4 +7,3 @@ pub mod missions_management;
 pub mod missions_operations;
 pub mod missions_viewing;
 pub mod system;
-pub mod notifications;

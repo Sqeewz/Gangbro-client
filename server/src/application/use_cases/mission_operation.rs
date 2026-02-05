@@ -9,8 +9,6 @@ use crate::domain::{
     },
     value_objects::mission_statuses::MissionStatuses,
 };
-use crate::infrastructure::notifications::broadcaster::GlobalBroadcaster;
-use serde_json::json;
 
 pub struct MissionOperationUseCase<T1, T2, T3>
 where
@@ -21,7 +19,6 @@ where
     mission_operation_repository: Arc<T1>,
     missiom_viewing_repository: Arc<T2>,
     mission_chat_repository: Arc<T3>,
-    broadcaster: Arc<GlobalBroadcaster>,
 }
 
 impl<T1, T2, T3> MissionOperationUseCase<T1, T2, T3>
@@ -34,13 +31,11 @@ where
         mission_operation_repository: Arc<T1>,
         missiom_viewing_repository: Arc<T2>,
         mission_chat_repository: Arc<T3>,
-        broadcaster: Arc<GlobalBroadcaster>,
     ) -> Self {
         Self {
             mission_operation_repository,
             missiom_viewing_repository,
             mission_chat_repository,
-            broadcaster,
         }
     }
 
@@ -61,7 +56,6 @@ where
             .parse()?;
 
         let update_condition = is_status_open_or_fail
-            // && crew_count > 0 // Allow solo missions for now
             && crew_count < max_crew_per_mission
             && mission.chief_id == chief_id;
         if !update_condition {
@@ -72,13 +66,6 @@ where
             .mission_operation_repository
             .to_progress(mission_id, chief_id)
             .await?;
-
-        self.broadcaster.broadcast(json!({
-            "type": "mission_updated",
-            "id": mission_id,
-            "name": mission.name,
-            "status": "InProgress"
-        }));
 
         Ok(result)
     }
@@ -98,13 +85,6 @@ where
         // Delete mission chats after completion
         let _ = self.mission_chat_repository.delete_messages(mission_id).await;
 
-        self.broadcaster.broadcast(json!({
-            "type": "mission_updated",
-            "id": mission_id,
-            "name": mission.name,
-            "status": "Completed"
-        }));
-
         Ok(result)
     }
     pub async fn to_failed(&self, mission_id: i32, chief_id: i32) -> Result<i32> {
@@ -122,13 +102,6 @@ where
 
         // Delete mission chats after failure
         let _ = self.mission_chat_repository.delete_messages(mission_id).await;
-
-        self.broadcaster.broadcast(json!({
-            "type": "mission_updated",
-            "id": mission_id,
-            "name": mission.name,
-            "status": "Failed"
-        }));
 
         Ok(result)
     }

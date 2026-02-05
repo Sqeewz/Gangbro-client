@@ -22,7 +22,6 @@ use crate::{
     infrastructure::{
         database::postgresql_connection::PgPoolSquad,
         http::routers::{self},
-        notifications::broadcaster::GlobalBroadcaster,
     },
 };
 
@@ -34,7 +33,7 @@ fn static_serve() -> Router {
     Router::new().fallback_service(service)
 }
 
-fn api_serve(db_pool: Arc<PgPoolSquad>, broadcaster: Arc<GlobalBroadcaster>) -> Router {
+fn api_serve(db_pool: Arc<PgPoolSquad>) -> Router {
     Router::new()
         .nest("/brawler", routers::brawlers::routes(Arc::clone(&db_pool)))
         .nest(
@@ -43,11 +42,11 @@ fn api_serve(db_pool: Arc<PgPoolSquad>, broadcaster: Arc<GlobalBroadcaster>) -> 
         )
         .nest(
             "/mission",
-            routers::missions_operations::routes(Arc::clone(&db_pool), Arc::clone(&broadcaster)),
+            routers::missions_operations::routes(Arc::clone(&db_pool)),
         )
         .nest(
             "/crew",
-            routers::crew_operations::routes(Arc::clone(&db_pool), Arc::clone(&broadcaster)),
+            routers::crew_operations::routes(Arc::clone(&db_pool)),
         )
         .nest(
             "/mission-management",
@@ -65,18 +64,13 @@ fn api_serve(db_pool: Arc<PgPoolSquad>, broadcaster: Arc<GlobalBroadcaster>) -> 
             "/system",
             routers::system::routes(crate::infrastructure::database::repositories::system::SystemPostgres::new(Arc::clone(&db_pool))),
         )
-        .nest(
-            "/notifications",
-            routers::notifications::routes(Arc::clone(&broadcaster)),
-        )
         .nest("/util", routers::default_routers::routes())
         .fallback(|| async { (StatusCode::NOT_FOUND, "API not found") })
 }
 
 pub async fn start(config: Arc<DotEnvyConfig>, db_pool: Arc<PgPoolSquad>) -> Result<()> {
-    let broadcaster = Arc::new(GlobalBroadcaster::new());
     let app = Router::new()
-        .nest("/api", api_serve(db_pool, broadcaster))
+        .nest("/api", api_serve(db_pool))
         .fallback_service(static_serve())
         .layer(tower_http::timeout::TimeoutLayer::with_status_code(
             StatusCode::REQUEST_TIMEOUT,

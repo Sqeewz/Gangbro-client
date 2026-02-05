@@ -1,6 +1,5 @@
 import { inject, Injectable, signal, OnDestroy } from '@angular/core';
 import { PassportService } from './passport-service';
-// import { WebsocketService } from './websocket-service'; // DEACTIVATED
 
 export interface Notification {
     id: string;
@@ -16,23 +15,14 @@ export interface Notification {
 })
 export class NotificationService implements OnDestroy {
     private _passport = inject(PassportService);
-    // private _ws = inject(WebsocketService); // DEACTIVATED
 
     notifications = signal<Notification[]>([]);
     unreadCount = signal(0);
 
     constructor() {
-        // WebSocket disabled to prevent Mixed Content errors.
-        // this.initRealtime(); 
+        // HTTP Polling for notifications could be implemented here if a backend endpoint existed.
+        // For now, only local/manual notifications are supported since WebSockets were removed.
     }
-
-    // private initRealtime() {
-    //     this._ws.connect('/notifications/ws').subscribe(msg => {
-    //         this.handleIncomingEvent(msg);
-    //     });
-    // }
-
-    // ... handleIncomingEvent and other methods remain but aren't called via WS
 
     addNotification(notif: Partial<Notification>) {
         const newNotif: Notification = {
@@ -76,6 +66,6 @@ export class NotificationService implements OnDestroy {
     }
 
     ngOnDestroy() {
-        // this._ws.close();
+        // Cleanup logic if any
     }
 }

@@ -5,8 +5,6 @@ use crate::domain::{
     },
     value_objects::mission_statuses::MissionStatuses,
 };
-use crate::infrastructure::notifications::broadcaster::GlobalBroadcaster;
-use serde_json::json;
 
 use anyhow::Result;
 use std::sync::Arc;
@@ -18,7 +16,6 @@ where
 {
     crew_operation_repository: Arc<T1>,
     mission_viewing_repository: Arc<T2>,
-    broadcaster: Arc<GlobalBroadcaster>,
 }
 
 impl<T1, T2> CrewOperationUseCase<T1, T2>
@@ -26,11 +23,10 @@ where
     T1: CrewOperationRepository + Send + Sync + 'static,
     T2: MissionViewingRepository + Send + Sync,
 {
-    pub fn new(crew_operation_repository: Arc<T1>, mission_viewing_repository: Arc<T2>, broadcaster: Arc<GlobalBroadcaster>) -> Self {
+    pub fn new(crew_operation_repository: Arc<T1>, mission_viewing_repository: Arc<T2>) -> Self {
         Self {
             crew_operation_repository,
             mission_viewing_repository,
-            broadcaster,
         }
     }
 
@@ -70,12 +66,6 @@ where
             }, allow_bypass)
             .await?;
 
-        self.broadcaster.broadcast(json!({
-            "type": "crew_movement",
-            "mission_id": mission_id,
-            "message": format!("New brawler joined mission \"{}\"", mission.name)
-        }));
-
         Ok(())
     }
 
@@ -93,12 +83,6 @@ where
                 brawler_id,
             })
             .await?;
-
-        self.broadcaster.broadcast(json!({
-            "type": "crew_movement",
-            "mission_id": mission_id,
-            "message": format!("A brawler left mission \"{}\"", mission.name)
-        }));
 
         Ok(())
     }

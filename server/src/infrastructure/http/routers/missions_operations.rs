@@ -3,7 +3,7 @@ use std::sync::Arc;
 use axum::{Extension, Json, Router, extract::{Path, State}, http::StatusCode, middleware, response::IntoResponse, routing::patch};
 use serde_json::json;
 
-use crate::{application::use_cases::mission_operation::MissionOperationUseCase, domain::{repositories::{mission_chat::MissionChatRepository, mission_operation::MissionOperationRepository, mission_viewing::MissionViewingRepository}, value_objects::mission_statuses::MissionStatuses}, infrastructure::{database::{postgresql_connection::PgPoolSquad, repositories::{mission_chat::MissionChatPostgres, mission_operation::MissionOperationPostgres, mission_viewing::MissionViewingPostgres}}, http::middleware::auth::authorization, notifications::broadcaster::GlobalBroadcaster}};
+use crate::{application::use_cases::mission_operation::MissionOperationUseCase, domain::{repositories::{mission_chat::MissionChatRepository, mission_operation::MissionOperationRepository, mission_viewing::MissionViewingRepository}, value_objects::mission_statuses::MissionStatuses}, infrastructure::{database::{postgresql_connection::PgPoolSquad, repositories::{mission_chat::MissionChatPostgres, mission_operation::MissionOperationPostgres, mission_viewing::MissionViewingPostgres}}, http::middleware::auth::authorization}};
 
 pub async fn in_progress<T1, T2, T3>(
     State(mission_operation_use_case): State<Arc<MissionOperationUseCase<T1, T2, T3>>>,
@@ -92,7 +92,7 @@ where
     }
 }
 
-pub fn routes(db_pool: Arc<PgPoolSquad>, broadcaster: Arc<GlobalBroadcaster>) -> Router {
+pub fn routes(db_pool: Arc<PgPoolSquad>) -> Router {
     let mission_operation_repository = MissionOperationPostgres::new(Arc::clone(&db_pool));
     let mission_viewing_repository = MissionViewingPostgres::new(Arc::clone(&db_pool));
     let mission_chat_repository = MissionChatPostgres::new(Arc::clone(&db_pool));
@@ -100,7 +100,6 @@ pub fn routes(db_pool: Arc<PgPoolSquad>, broadcaster: Arc<GlobalBroadcaster>) ->
         Arc::new(mission_operation_repository),
         Arc::new(mission_viewing_repository),
         Arc::new(mission_chat_repository),
-        broadcaster,
     );
 
     Router::new()

@@ -3,7 +3,7 @@ use std::sync::Arc;
 use axum::{Extension, Json, Router, extract::{Path, State}, http::StatusCode, response::IntoResponse, routing::{delete, post}};
 use serde_json::json;
 
-use crate::{application::use_cases::crew_operation::CrewOperationUseCase, domain::repositories::{crew_operation::CrewOperationRepository, mission_viewing::MissionViewingRepository}, infrastructure::{database::{postgresql_connection::PgPoolSquad, repositories::{crew_operation::CrewOperationPostgres, mission_viewing::MissionViewingPostgres}}, http::middleware::auth::authorization, notifications::broadcaster::GlobalBroadcaster}};
+use crate::{application::use_cases::crew_operation::CrewOperationUseCase, domain::repositories::{crew_operation::CrewOperationRepository, mission_viewing::MissionViewingRepository}, infrastructure::{database::{postgresql_connection::PgPoolSquad, repositories::{crew_operation::CrewOperationPostgres, mission_viewing::MissionViewingPostgres}}, http::middleware::auth::authorization}};
 
 pub async fn join<T1, T2>(
     State(crew_operation_use_case): State<Arc<CrewOperationUseCase<T1, T2>>>,
@@ -57,14 +57,13 @@ where
 
 }
 
-pub fn routes(db_pool: Arc<PgPoolSquad>, broadcaster: Arc<GlobalBroadcaster>) -> Router {
+pub fn routes(db_pool: Arc<PgPoolSquad>) -> Router {
     let crew_operation_repository = CrewOperationPostgres::new(Arc::clone(&db_pool));
     let mission_viewing_repository = MissionViewingPostgres::new(Arc::clone(&db_pool));
 
     let use_case = CrewOperationUseCase::new(
         Arc::new(crew_operation_repository),
         Arc::new(mission_viewing_repository),
-        broadcaster,
     );
 
     Router::new()
@@ -73,4 +72,3 @@ pub fn routes(db_pool: Arc<PgPoolSquad>, broadcaster: Arc<GlobalBroadcaster>) ->
         .route_layer(axum::middleware::from_fn(authorization))
         .with_state(Arc::new(use_case))
 }
-
