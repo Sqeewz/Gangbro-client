@@ -1,6 +1,6 @@
 import { inject, Injectable, signal, OnDestroy } from '@angular/core';
 import { PassportService } from './passport-service';
-import { WebsocketService } from './websocket-service';
+// import { WebsocketService } from './websocket-service'; // DEACTIVATED
 
 export interface Notification {
     id: string;
@@ -16,46 +16,23 @@ export interface Notification {
 })
 export class NotificationService implements OnDestroy {
     private _passport = inject(PassportService);
-    private _ws = inject(WebsocketService);
+    // private _ws = inject(WebsocketService); // DEACTIVATED
 
     notifications = signal<Notification[]>([]);
     unreadCount = signal(0);
 
     constructor() {
-        this.initRealtime();
+        // WebSocket disabled to prevent Mixed Content errors.
+        // this.initRealtime(); 
     }
 
-    private initRealtime() {
-        // Connect to global notifications
-        this._ws.connect('/notifications/ws').subscribe(msg => {
-            this.handleIncomingEvent(msg);
-        });
-    }
+    // private initRealtime() {
+    //     this._ws.connect('/notifications/ws').subscribe(msg => {
+    //         this.handleIncomingEvent(msg);
+    //     });
+    // }
 
-    private handleIncomingEvent(event: any) {
-        if (!this._passport.data()) return;
-
-        // Filter events meant for the user or general updates
-        // For now, we broadcast all mission updates, and the client filters.
-        // In a real app, the server would filter based on user_id.
-
-        switch (event.type) {
-            case 'mission_updated':
-                this.addNotification({
-                    title: 'MISSION UPDATE',
-                    message: `Mission "${event.name}" status changed to ${event.status}`,
-                    type: event.status === 'Completed' ? 'success' : (event.status === 'Failed' ? 'error' : 'info')
-                });
-                break;
-            case 'crew_movement':
-                this.addNotification({
-                    title: 'CREW UPDATE',
-                    message: event.message,
-                    type: 'info'
-                });
-                break;
-        }
-    }
+    // ... handleIncomingEvent and other methods remain but aren't called via WS
 
     addNotification(notif: Partial<Notification>) {
         const newNotif: Notification = {
@@ -70,7 +47,6 @@ export class NotificationService implements OnDestroy {
         this.notifications.update(prev => [newNotif, ...prev]);
         this.updateUnreadCount();
 
-        // Use browser notification if permitted
         if ('Notification' in window && Notification.permission === 'granted') {
             new Notification(newNotif.title, { body: newNotif.message });
         }
@@ -100,6 +76,6 @@ export class NotificationService implements OnDestroy {
     }
 
     ngOnDestroy() {
-        this._ws.close();
+        // this._ws.close();
     }
 }

@@ -1,4 +1,4 @@
-import { Component, computed, inject, Signal, signal } from '@angular/core'
+import { Component, computed, inject, Signal, signal, OnInit, OnDestroy, NgZone } from '@angular/core'
 import { MatDialog, MatDialogModule } from '@angular/material/dialog'
 import { MatMenuModule } from '@angular/material/menu'
 import { MatButtonModule } from '@angular/material/button'
@@ -14,11 +14,9 @@ import { AsyncPipe, UpperCasePipe } from '@angular/common'
 import { MissionService } from '../_service/mission-service'
 import { PassportService } from '../_service/passport-service'
 import { ConfirmDialog } from '../_dialog/confirm-dialog/confirm-dialog'
-
-
 import { MissionStatus } from './mission-status/mission-status'
 import { StateMessage } from '../_components/state-message/state-message'
-
+import { MatIconModule } from '@angular/material/icon'
 
 @Component({
   selector: 'app-missions',
@@ -31,17 +29,19 @@ import { StateMessage } from '../_components/state-message/state-message'
     MatButtonModule,
     MatSnackBarModule,
     MatDialogModule,
+    MatIconModule,
     MissionStatus,
     StateMessage,
   ],
   templateUrl: './missions.html',
   styleUrl: './missions.scss',
 })
-export class Missions {
+export class Missions implements OnInit, OnDestroy {
   private _mission = inject(MissionService)
   private _passport = inject(PassportService)
   private _snackBar = inject(MatSnackBar)
   private _dialog = inject(MatDialog)
+  private _ngZone = inject(NgZone)
 
   filter: MissionFilter = {
     page: 1,
@@ -55,44 +55,77 @@ export class Missions {
 
   selectedMission: Mission | null = null
   isLoading = signal(false)
+  private _pollingHandle: any
 
   constructor() {
     this.isSignin = computed(() => this._passport.data() !== undefined)
     this.myUserId = computed(() => this._passport.data()?.user_id)
-    this.filter = { page: 1, limit: 10 } // Reset filter to show all
+    this.filter = { page: 1, limit: 10 }
     this._mission.filter = this.filter
-    this.loadMyMission()
   }
 
-  async loadMyMission() {
+  async ngOnInit() {
+    await this.loadMyMission()
+    this.startPolling()
+  }
+
+  ngOnDestroy() {
+    this.stopPolling()
+  }
+
+  private startPolling() {
+    this.stopPolling()
+    // Poll mission list every 10 seconds for general lobby updates
+    this._ngZone.runOutsideAngular(() => {
+      this._pollingHandle = setInterval(() => {
+        this.loadMyMission(true) // Silent load
+      }, 10000)
+    })
+  }
+
+  private stopPolling() {
+    if (this._pollingHandle) {
+      clearInterval(this._pollingHandle)
+      this._pollingHandle = undefined
+    }
+  }
+
+  async loadMyMission(silent = false) {
     try {
-      this.isLoading.set(true)
-      // 1. Get all candidates
+      if (!silent) this.isLoading.set(true)
+
       const allMissions = await this._mission.getByFilter(this.filter)
 
-      // 2. Get my joined missions
       let myJoinedMissionIds: number[] = []
       if (this.isSignin()) {
         const myJoined = await this._mission.getMyMissions()
         myJoinedMissionIds = myJoined.map(m => m.id)
       }
 
-      // 3. Filter out joined missions ONLY if they are active. Show History.
       const filtered = allMissions.filter(m => {
         if (m.status === 'Completed' || m.status === 'Failed') return true;
         return !myJoinedMissionIds.includes(m.id)
       })
-      this._missionsSubject.next(filtered)
+
+      // Compare to avoid unnecessary signal updates if data is same
+      const current = this._missionsSubject.value
+      if (JSON.stringify(filtered) !== JSON.stringify(current)) {
+        this._ngZone.run(() => {
+          this._missionsSubject.next(filtered)
+        })
+      }
     } catch (error) {
-      console.error('Failed to load missions', error)
-      this._snackBar.open('System error: Failed to sync mission data', 'Close', { duration: 3000 })
+      if (!silent) {
+        console.error('Failed to load missions', error)
+        this._snackBar.open('Sector sync lost. Check uplink.', 'Close', { duration: 3000 })
+      }
     } finally {
-      this.isLoading.set(false)
+      if (!silent) this.isLoading.set(false)
     }
   }
 
   async onSubmit() {
-    this.filter.page = 1; // Reset to page 1 on search
+    this.filter.page = 1;
     await this.loadMyMission()
   }
 
@@ -142,8 +175,8 @@ export class Missions {
       if (res) {
         try {
           await this._mission.join(missionId)
-          this.selectedMission = null; // Clear detail view
-          await this.loadMyMission() // Refresh list
+          this.selectedMission = null;
+          await this.loadMyMission()
           this._snackBar.open('Joined mission successfully', 'Close', { duration: 4000 })
         } catch (error) {
           console.error('Failed to join mission', error)
