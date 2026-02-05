@@ -81,10 +81,15 @@ export class PassportService {
       this.savePassportToLocalStorage()
       return null
     } catch (error: any) {
-      // console.error(error)
-      // console.log(error.error)
-      return error.error
+      if (error.error && typeof error.error === 'object' && error.error.error) {
+        return error.error.error;
+      }
+      if (error.error && typeof error.error === 'string') {
+        return error.error;
+      }
+      return error.statusText || error.message || 'Unknown error';
     }
+
 
   }
 

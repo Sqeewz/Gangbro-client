@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit, OnDestroy, effect } from '@angular/core';
+import { Component, inject, signal, OnInit, OnDestroy, effect, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MissionService } from '../_service/mission-service';
@@ -34,6 +34,8 @@ export class AboutMission implements OnInit, OnDestroy {
 
   private _missionId?: number;
   private _ws?: WebSocket;
+  private _heartbeatHandle: any;
+  private _ngZone = inject(NgZone);
 
   constructor() {
     // Effect to persist chat messages to localStorage whenever they change
@@ -101,66 +103,94 @@ export class AboutMission implements OnInit, OnDestroy {
     if (!this._missionId) return;
     this.disconnectWs();
 
-    // Force WSS if the page is loaded over HTTPS
+    // Use current location for WS host, handle protocol correctly
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     let host = window.location.host;
 
-    if (environment.baseUrl && environment.baseUrl !== '/') {
+    // Optional: If environment has a specific baseUrl, extract host from it
+    if (environment.baseUrl && environment.baseUrl.startsWith('http')) {
       try {
         const url = new URL(environment.baseUrl);
         host = url.host;
       } catch (e) {
-        console.error('Invalid baseUrl, using current host');
+        // Fallback to current host
       }
     }
 
     const wsUrl = `${protocol}//${host}/api/mission-chats/ws/${this._missionId}`;
 
-    console.log('Connecting to WebSocket:', wsUrl);
+    console.log('[Chat] Connecting to:', wsUrl);
     this._ws = new WebSocket(wsUrl);
 
-    this._ws.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        const newMessage = {
-          user: data.brawler_name,
-          text: data.message,
-          time: new Date(data.created_at)
-        };
-
-        // Append new message if it doesn't exist
-        this.chatMessages.update(msgs => {
-          const exists = msgs.some(m =>
-            (m.id && m.id === data.id) ||
-            (m.text === newMessage.text && m.user === newMessage.user && Math.abs(new Date(m.time).getTime() - newMessage.time.getTime()) < 1000)
-          );
-          if (!exists) return [...msgs, { ...newMessage, id: data.id }];
-          return msgs;
-        });
-      } catch (e) {
-        console.error('WS Message error', e);
-      }
+    this._ws.onopen = () => {
+      console.log('[Chat] WebSocket Connected');
+      this.startHeartbeat();
     };
 
-    this._ws.onclose = () => {
-      console.log('WebSocket disconnected. Reconnecting in 5s...');
+    this._ws.onmessage = (event) => {
+      this._ngZone.run(() => {
+        try {
+          const data = JSON.parse(event.data);
+
+          // Deduplication based on ID
+          const isDuplicate = this.chatMessages().some(m => m.id === data.id);
+          if (isDuplicate) return;
+
+          const newMessage = {
+            id: data.id,
+            user: data.brawler_name,
+            text: data.message,
+            time: new Date(data.created_at)
+          };
+
+          this.chatMessages.update(msgs => [...msgs, newMessage]);
+
+          // Auto scroll
+          setTimeout(() => this.scrollToBottom(), 50);
+        } catch (e) {
+          console.error('[Chat] Handle message error', e);
+        }
+      });
+    };
+
+    this._ws.onclose = (event) => {
+      this.stopHeartbeat();
+      console.log(`[Chat] WebSocket Disconnected (Code: ${event.code}). Reconnecting in 3s...`);
       setTimeout(() => {
-        if (this._missionId) this.connectWs();
-      }, 5000);
+        if (this._missionId && !this._ws) this.connectWs();
+      }, 3000);
     };
 
     this._ws.onerror = (error) => {
-      console.error('WebSocket error:', error);
+      console.error('[Chat] WebSocket Error', error);
     };
   }
 
+  private startHeartbeat() {
+    this.stopHeartbeat();
+    this._heartbeatHandle = setInterval(() => {
+      if (this._ws && this._ws.readyState === WebSocket.OPEN) {
+        this._ws.send('ping');
+      }
+    }, 25000); // 25 seconds ping (Render timeout is ~30s)
+  }
+
+  private stopHeartbeat() {
+    if (this._heartbeatHandle) {
+      clearInterval(this._heartbeatHandle);
+      this._heartbeatHandle = undefined;
+    }
+  }
+
   disconnectWs() {
+    this.stopHeartbeat();
     if (this._ws) {
-      this._ws.onclose = null; // Prevent auto-reconnect
+      this._ws.onclose = null;
       this._ws.close();
       this._ws = undefined;
     }
   }
+
 
   async loadChat() {
     if (!this._missionId) return;

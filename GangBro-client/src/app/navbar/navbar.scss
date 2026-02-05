@@ -284,3 +284,65 @@
         opacity: 0 !important;
     }
 }
+
+// Mobile Responsiveness
+@media (max-width: 768px) {
+    .gang-navbar {
+        height: 60px;
+        padding: 0 16px;
+    }
+
+    .gang-brand {
+        font-size: 18px;
+        margin-right: 20px;
+        letter-spacing: 2px;
+    }
+
+    .nav-links {
+        gap: 8px;
+
+        .nav-btn {
+            font-size: 0.7rem !important;
+            padding: 0 8px !important;
+            height: 32px !important;
+        }
+    }
+
+    .user-actions {
+        gap: 8px;
+    }
+
+    .user-name {
+        display: none;
+    }
+
+    .user-profile {
+        padding: 4px;
+    }
+
+    .user-avatar {
+        width: 32px;
+        height: 32px;
+    }
+
+    .notif-btn {
+        width: 36px !important;
+        height: 36px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .gang-brand {
+        font-size: 16px;
+        letter-spacing: 1px;
+    }
+
+    .nav-links {
+        gap: 4px;
+    }
+
+    .nav-btn {
+        font-size: 0.65rem !important;
+        padding: 0 4px !important;
+    }
+}

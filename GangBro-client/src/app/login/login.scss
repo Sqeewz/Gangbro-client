@@ -198,3 +198,26 @@
         margin-top: 0.5rem;
     }
 }
+
+// Mobile Responsiveness
+@media (max-width: 480px) {
+    .login-container {
+        padding: 1rem;
+    }
+
+    .gang-login-box {
+        padding: 1.5rem;
+    }
+
+    .gang-title {
+        font-size: 1.5rem;
+    }
+
+    .gang-input {
+        padding: 10px;
+    }
+
+    .login-footer .toggle {
+        font-size: 0.75rem;
+    }
+}
