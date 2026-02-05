@@ -81,12 +81,32 @@ export class PassportService {
       this.savePassportToLocalStorage()
       return null
     } catch (error: any) {
-      if (error.error && typeof error.error === 'object' && error.error.error) {
-        return error.error.error;
+      console.error('Passport operation failing:', error);
+
+      // If it's an HttpErrorResponse from Angular
+      if (error.error) {
+        const errorBody = error.error;
+
+        // Handle { error: "message" } or { error: { ... } }
+        if (typeof errorBody === 'object' && errorBody.error) {
+          if (typeof errorBody.error === 'string') return errorBody.error;
+          return JSON.stringify(errorBody.error);
+        }
+
+        // Handle { message: "message" }
+        if (typeof errorBody === 'object' && errorBody.message) {
+          if (typeof errorBody.message === 'string') return errorBody.message;
+          return JSON.stringify(errorBody.message);
+        }
+
+        // Handle string body
+        if (typeof errorBody === 'string') return errorBody;
+
+        // Fallback for other object bodies
+        if (typeof errorBody === 'object') return JSON.stringify(errorBody);
       }
-      if (error.error && typeof error.error === 'string') {
-        return error.error;
-      }
+
+      // Fallback to standard error properties
       return error.statusText || error.message || 'Unknown error';
     }
 

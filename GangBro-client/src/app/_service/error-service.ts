@@ -18,7 +18,13 @@ export class ErrorService {
 
   handleError = (error: any): Observable<never> => {
     if (error) {
-      const msgFromServer = error.error?.error || error.error?.message;
+      let msgFromServer = '';
+      if (error.error) {
+        if (typeof error.error.error === 'string') msgFromServer = error.error.error;
+        else if (typeof error.error.message === 'string') msgFromServer = error.error.message;
+        else if (typeof error.error === 'string') msgFromServer = error.error;
+        else if (typeof error.error === 'object') msgFromServer = JSON.stringify(error.error);
+      }
 
       switch (error.status) {
         case 0:
