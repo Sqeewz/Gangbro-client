@@ -1,18 +1,16 @@
 import { HttpClient } from '@angular/common/http'
 import { inject, Injectable, signal } from '@angular/core'
-import { environment } from '../../environments/environment' ///
+import { environment } from '../../environments/environment'
 import { LoginModel, Passport, RegisterModel } from '../_models/passport'
 import { firstValueFrom } from 'rxjs'
-import { H } from '@angular/cdk/keycodes'
 import { getAvatar } from '../_helpers/util'
-
 
 @Injectable({
   providedIn: 'root',
 })
 export class PassportService {
   private _key = 'passport'
-  private _base_url = environment.baseUrl + '/api'
+  private _base_url = environment.baseUrl ? `${environment.baseUrl}/api` : '/api'
   private _http = inject(HttpClient)
 
   data = signal<undefined | Passport>(undefined)
@@ -22,8 +20,10 @@ export class PassportService {
   saveAvatarImgUrl(url: string) {
     let passport = this.data()
     if (passport) {
-      passport.avatar_url = url
-      this.avatar.set(url)
+      // Force HTTPS for Cloudinary/external images
+      const secureUrl = url.startsWith('http://') ? url.replace('http://', 'https://') : url;
+      passport.avatar_url = secureUrl
+      this.avatar.set(secureUrl)
       this.data.set(passport)
       this.savePassportToLocalStorage()
     }
@@ -37,6 +37,7 @@ export class PassportService {
       this.data.set(passport)
       const avatar = getAvatar(passport)
       this.avatar.set(avatar)
+      this.isSignin.set(true)
     } catch (error) {
       return `${error}`
     }
@@ -76,41 +77,41 @@ export class PassportService {
     try {
       const result = this._http.post<Passport>(api_url, model)
       const passport = await firstValueFrom(result)
+
+      // Sanitization: Ensure avatar_url is HTTPS before saving
+      if (passport.avatar_url && passport.avatar_url.startsWith('http://')) {
+        passport.avatar_url = passport.avatar_url.replace('http://', 'https://');
+      }
+
       this.data.set(passport)
       this.avatar.set(getAvatar(passport))
       this.savePassportToLocalStorage()
       return null
     } catch (error: any) {
-      console.error('Passport operation failing:', error);
+      console.error('[Passport] Operation failed:', error);
 
-      // If it's an HttpErrorResponse from Angular
-      if (error.error) {
-        const errorBody = error.error;
+      // Handle Angular's HttpErrorResponse
+      if (error && error.error) {
+        const body = error.error;
 
-        // Handle { error: "message" } or { error: { ... } }
-        if (typeof errorBody === 'object' && errorBody.error) {
-          if (typeof errorBody.error === 'string') return errorBody.error;
-          return JSON.stringify(errorBody.error);
+        // If body is already a string (common for non-JSON errors)
+        if (typeof body === 'string') return body;
+
+        // If body is { "error": "message" }
+        if (body.error && typeof body.error === 'string') return body.error;
+
+        // If body is { "message": "message" }
+        if (body.message && typeof body.message === 'string') return body.message;
+
+        // Fallback for objects - stringify to avoid [object Object]
+        try {
+          return JSON.stringify(body);
+        } catch (e) {
+          return 'An unexpected error occurred';
         }
-
-        // Handle { message: "message" }
-        if (typeof errorBody === 'object' && errorBody.message) {
-          if (typeof errorBody.message === 'string') return errorBody.message;
-          return JSON.stringify(errorBody.message);
-        }
-
-        // Handle string body
-        if (typeof errorBody === 'string') return errorBody;
-
-        // Fallback for other object bodies
-        if (typeof errorBody === 'object') return JSON.stringify(errorBody);
       }
 
-      // Fallback to standard error properties
-      return error.statusText || error.message || 'Unknown error';
+      return error.statusText || error.message || 'Unknown network error';
     }
-
-
   }
-
 }

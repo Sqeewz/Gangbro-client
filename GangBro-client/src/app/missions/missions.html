@@ -3,7 +3,7 @@
         <h2 class="lobby-title">MISSION HUB: GANG OPERATIONS</h2>
     </div>
 
-    <div class="lobby-main">
+    <div class="lobby-main" [class.has-selection]="!!selectedMission">
         @if (isLoading()) {
         <div class="loading-overlay">
             <app-state-message type="loading" title="SYNCING SECTOR"
@@ -88,7 +88,10 @@
         <!-- Right Panel: Intel / Preview -->
         <div class="intel-panel">
             <div class="intel-frame">
-                <div class="intel-header">MISSION INTEL</div>
+                <div class="intel-header">
+                    MISSION INTEL
+                    <mat-icon class="mobile-close-icon" (click)="selectedMission = null">close</mat-icon>
+                </div>
                 <div class="intel-image-placeholder">
                     <div class="video-noise"></div>
                     <img [src]="selectedMission ? 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=300' : 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=300'"
