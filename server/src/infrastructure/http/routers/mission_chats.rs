@@ -1,6 +1,6 @@
 use std::sync::Arc;
 use axum::{
-    extract::{Path, State},
+    extract::{Path, State, ws::{WebSocket, WebSocketUpgrade}},
     http::StatusCode,
     response::IntoResponse,
     routing::get,
@@ -43,7 +43,43 @@ pub fn routes(db_pool: Arc<PgPoolSquad>) -> Router {
             .post(add_message)
             .layer(axum::middleware::from_fn(authorization))
         )
+        .route("/ws/{mission_id}", get(ws_handler))
         .with_state(state)
+}
+
+async fn ws_handler<T>(
+    ws: WebSocketUpgrade,
+    Path(mission_id): Path<i32>,
+    State(state): State<Arc<MissionChatState<T>>>,
+) -> impl IntoResponse
+where
+    T: MissionChatRepository + Send + Sync + 'static,
+{
+    ws.on_upgrade(move |socket| handle_socket(socket, mission_id, state))
+}
+
+async fn handle_socket<T>(
+    mut _socket: WebSocket,
+    mission_id: i32,
+    state: Arc<MissionChatState<T>>,
+) where
+    T: MissionChatRepository + Send + Sync,
+{
+    tracing::info!("[WS] New connection for mission {}", mission_id);
+    
+    // Initial data: send current messages right away
+    if let Ok(messages) = state.use_case.get_messages(mission_id).await {
+        if let Ok(msg_text) = serde_json::to_string(&messages) {
+            let _ = _socket.send(axum::extract::ws::Message::Text(msg_text.into())).await;
+        }
+    }
+
+    // Listener loop to keep connection alive
+    while let Some(Ok(msg)) = _socket.recv().await {
+        if let axum::extract::ws::Message::Close(_) = msg {
+            break;
+        }
+    }
 }
 
 async fn get_messages<T>(

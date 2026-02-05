@@ -34,6 +34,12 @@ export class PassportService {
     if (!jsonString) return 'not found'
     try {
       const passport = JSON.parse(jsonString) as Passport
+
+      // Sanitization: Ensure avatar_url is HTTPS before using
+      if (passport.avatar_url && passport.avatar_url.startsWith('http://')) {
+        passport.avatar_url = passport.avatar_url.replace('http://', 'https://');
+      }
+
       this.data.set(passport)
       const avatar = getAvatar(passport)
       this.avatar.set(avatar)
