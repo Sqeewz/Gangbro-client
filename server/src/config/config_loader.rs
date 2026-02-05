@@ -64,7 +64,7 @@ pub fn get_jwt_env() -> Result<JwtEnv> {
 
     Ok(JwtEnv {
         secret: std::env::var("JWT_USER_SECRET")?,
-        lift_time_days: std::env::var("JTW_LIFTTIME_DAYS")?.parse::<i64>()?,
+        lift_time_days: std::env::var("JWT_LIFETIME_DAYS")?.parse::<i64>()?,
     })
 }
 

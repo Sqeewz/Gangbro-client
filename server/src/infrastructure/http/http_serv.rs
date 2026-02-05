@@ -76,11 +76,8 @@ fn api_serve(db_pool: Arc<PgPoolSquad>, broadcaster: Arc<GlobalBroadcaster>) -> 
 pub async fn start(config: Arc<DotEnvyConfig>, db_pool: Arc<PgPoolSquad>) -> Result<()> {
     let broadcaster = Arc::new(GlobalBroadcaster::new());
     let app = Router::new()
-        .merge(static_serve())
         .nest("/api", api_serve(db_pool, broadcaster))
-        // .fallback(default_router::health_check)
-        // .route("/health_check", get(default_router::health_check)
-        // .route("/make-error", get(default_router::make_error)
+        .fallback_service(static_serve())
         .layer(tower_http::timeout::TimeoutLayer::with_status_code(
             StatusCode::REQUEST_TIMEOUT,
             Duration::from_secs(config.server.timeout),
