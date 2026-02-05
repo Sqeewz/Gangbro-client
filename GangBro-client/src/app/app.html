@@ -3,6 +3,12 @@
     <div class="content">
         <router-outlet></router-outlet>
     </div>
+
+    <!-- Floating Clear Cache Button -->
+    <button class="clear-cache-btn" (click)="clearCache()" matTooltip="PURGE SYSTEM CACHE">
+        <mat-icon>delete_sweep</mat-icon>
+        <span>CLEAR CACHE</span>
+    </button>
 </div>
 
 <ngx-spinner bdColor="rgba(18, 18, 18, 0.9)" size="large" color="#7c4dff" type="ball-atom" [fullScreen]="true">
