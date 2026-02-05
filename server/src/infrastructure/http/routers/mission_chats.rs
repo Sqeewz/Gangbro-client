@@ -73,8 +73,11 @@ pub fn routes(db_pool: Arc<PgPoolSquad>) -> Router {
 
     Router::new()
         .route("/ws/{mission_id}", get(ws_handler))
-        .route("/{mission_id}", get(get_messages).layer(axum::middleware::from_fn(authorization)))
-        .route("/{mission_id}", post(add_message).layer(axum::middleware::from_fn(authorization)))
+        .route("/{mission_id}", 
+            get(get_messages)
+            .post(add_message)
+            .layer(axum::middleware::from_fn(authorization))
+        )
         .with_state(state)
 }
 
@@ -87,11 +90,13 @@ where
 {
     match state.use_case.get_messages(mission_id).await {
         Ok(messages) => (StatusCode::OK, Json(messages)).into_response(),
-        Err(e) => (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            Json(json!({ "error": e.to_string() })),
-        )
-            .into_response(),
+        Err(e) => {
+            tracing::error!("Failed to get messages: {}", e);
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(json!({ "error": e.to_string() })),
+            ).into_response()
+        }
     }
 }
 
@@ -112,11 +117,13 @@ where
             
             (StatusCode::CREATED, Json(json!({ "status": "sent" }))).into_response()
         },
-        Err(e) => (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            Json(json!({ "error": e.to_string() })),
-        )
-            .into_response(),
+        Err(e) => {
+            tracing::error!("Failed to add message: {}", e);
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(json!({ "error": e.to_string() })),
+            ).into_response()
+        }
     }
 }
 
@@ -148,7 +155,6 @@ async fn handle_socket<T>(
     tracing::info!("[WS] Client joined mission {} channel", mission_id);
 
     // Task to send messages from broadcast channel to WebSocket
-    // We add a ping/pong relay or just rely on traffic
     let mut send_task = tokio::spawn(async move {
         while let Ok(msg) = rx.recv().await {
             let msg_json = match serde_json::to_string(&msg) {

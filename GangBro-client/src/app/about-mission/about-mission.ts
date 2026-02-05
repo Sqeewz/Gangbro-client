@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { environment } from '../../environments/environment';
 import { CacheManager } from '../_helpers/cache';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-about-mission',
@@ -21,6 +22,7 @@ export class AboutMission implements OnInit, OnDestroy {
   private _route = inject(ActivatedRoute);
   private _missionService = inject(MissionService);
   private _passportService = inject(PassportService);
+  private _snackBar = inject(MatSnackBar);
 
   mission = signal<Mission | null>(null);
   roster = signal<Brawler[]>([]);
@@ -74,7 +76,7 @@ export class AboutMission implements OnInit, OnDestroy {
       try {
         const [missionData, rosterData] = await Promise.all([
           this._missionService.getById(this._missionId),
-          this._missionService.getRoster(this._missionId),
+          this._missionService.getRoster(this._missionId).catch(() => []), // Soft fail for roster
         ]);
         this.mission.set(missionData);
         this.roster.set(rosterData);
@@ -86,6 +88,7 @@ export class AboutMission implements OnInit, OnDestroy {
         this.startPolling();
       } catch (error) {
         console.error('Failed to load mission details', error);
+        this._snackBar.open('GRID SYNC FAILURE: Could not locate mission intel.', 'OK', { duration: 5000 });
       } finally {
         this.isLoading.set(false);
       }
@@ -99,18 +102,25 @@ export class AboutMission implements OnInit, OnDestroy {
   private startPolling() {
     this.stopPolling();
 
-    // Visual indicator that polling is active
-    const statusMsg = {
-      user: 'SYSTEM',
-      text: 'POLLING_INIT :: SECURE COMMS ACTIVE (3s interval)',
-      time: new Date()
-    };
-    this.chatMessages.update(msgs => [...msgs, statusMsg]);
+    // Check if we already have the system message
+    const hasInitMsg = this.chatMessages().some(m => m.user === 'SYSTEM' && m.text.includes('SECURE COMMS ACTIVE'));
+
+    if (!hasInitMsg) {
+      const statusMsg = {
+        user: 'SYSTEM',
+        text: 'SECURE COMMS ACTIVE (Polling Mode)',
+        time: new Date()
+      };
+      this.chatMessages.update(msgs => [...msgs, statusMsg]);
+    }
 
     // Poll every 3 seconds for new messages
-    this._pollingHandle = setInterval(() => {
-      this.loadChat();
-    }, 3000);
+    // We use NgZone to avoid triggering change detection on every poll if unnecessary
+    this._ngZone.runOutsideAngular(() => {
+      this._pollingHandle = setInterval(() => {
+        this.loadChat();
+      }, 3000);
+    });
     console.log('[Chat] Polling started (3s interval)');
   }
 
@@ -140,10 +150,13 @@ export class AboutMission implements OnInit, OnDestroy {
 
         // Preserve SYSTEM messages if any
         const systems = this.chatMessages().filter(m => m.user === 'SYSTEM');
-        this.chatMessages.set([...systems, ...newMessages]);
+
+        this._ngZone.run(() => {
+          this.chatMessages.set([...systems, ...newMessages]);
+        });
       }
     } catch (e) {
-      console.error('Failed to load chat via polling', e);
+      console.warn('Chat poll missed connection');
     }
   }
 
@@ -169,8 +182,13 @@ export class AboutMission implements OnInit, OnDestroy {
       this.newMessageText.set('');
       // Immediate refresh after sending
       await this.loadChat();
-    } catch (e) {
-      console.error('Failed to send message', e);
+    } catch (e: any) {
+      console.error('Failed to send message:', e);
+      let errorMsg = 'TRANSMISSION FAILED: GRID DISTURBANCE.';
+      if (e.status === 401) errorMsg = 'AUTHORIZATION EXPIRED: LOGIN AGAIN.';
+      if (e.status === 500) errorMsg = 'HQ SERVER CRASH: TRY AGAIN LATER.';
+
+      this._snackBar.open(errorMsg, 'OK', { duration: 4000 });
     }
   }
 
