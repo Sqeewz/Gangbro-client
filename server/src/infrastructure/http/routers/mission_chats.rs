@@ -72,9 +72,9 @@ pub fn routes(db_pool: Arc<PgPoolSquad>) -> Router {
     });
 
     Router::new()
+        .route("/ws/{mission_id}", get(ws_handler))
         .route("/{mission_id}", get(get_messages).layer(axum::middleware::from_fn(authorization)))
         .route("/{mission_id}", post(add_message).layer(axum::middleware::from_fn(authorization)))
-        .route("/ws/{mission_id}", get(ws_handler))
         .with_state(state)
 }
 

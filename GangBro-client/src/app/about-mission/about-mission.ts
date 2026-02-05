@@ -114,12 +114,12 @@ export class AboutMission implements OnInit, OnDestroy {
     // Security: Send JWT token in query string
     const token = this._passportService.data()?.token || '';
     const wsUrl = `${protocol}//${host}/api/mission-chats/ws/${this._missionId}?token=${token}`;
+    console.log(`[Chat] Attempting connection to ${wsUrl}`);
 
-    console.log('[Chat] Connecting to secured WebSocket...');
     this._ws = new WebSocket(wsUrl);
 
     this._ws.onopen = () => {
-      console.log('[Chat] WebSocket Connected (Secure)');
+      console.log('%c[Chat] WebSocket Connection Established', 'color: #00ff00; font-weight: bold');
       this.startHeartbeat();
     };
 
@@ -127,12 +127,10 @@ export class AboutMission implements OnInit, OnDestroy {
       this._ngZone.run(() => {
         try {
           if (event.data === 'pong') return;
-
           const data = JSON.parse(event.data);
 
           // Deduplication based on ID
-          const isDuplicate = this.chatMessages().some((m) => m.id === data.id);
-          if (isDuplicate) return;
+          if (this.chatMessages().some((m) => m.id === data.id)) return;
 
           const newMessage = {
             id: data.id,
@@ -142,23 +140,26 @@ export class AboutMission implements OnInit, OnDestroy {
           };
 
           this.chatMessages.update((msgs) => [...msgs, newMessage]);
-          setTimeout(() => this.scrollToBottom(), 50);
         } catch (e) {
-          // Ignore non-json messages like pings if server sends them as strings
+          // Heartbeats or system pings from server
+          if (event.data !== 'pong') console.debug('[Chat] Non-JSON message:', event.data);
         }
       });
     };
 
     this._ws.onclose = (event) => {
       this.stopHeartbeat();
-      console.log(`[Chat] WebSocket Disconnected. Reconnecting in 3s...`);
-      setTimeout(() => {
-        if (this._missionId && !this._ws) this.connectWs();
-      }, 3000);
+      if (this._ws) {
+        console.warn(`[Chat] Connection Closed (Code: ${event.code}). Reconnecting in 3s...`);
+        this._ws = undefined;
+        setTimeout(() => {
+          if (this._missionId) this.connectWs();
+        }, 3000);
+      }
     };
 
     this._ws.onerror = (error) => {
-      console.error('[Chat] WebSocket Error', error);
+      console.error('[Chat] WebSocket specific error detected:', error);
     };
   }
 
@@ -168,7 +169,7 @@ export class AboutMission implements OnInit, OnDestroy {
       if (this._ws && this._ws.readyState === WebSocket.OPEN) {
         this._ws.send('ping');
       }
-    }, 25000);
+    }, 20000); // 20s for Render stability
   }
 
   private stopHeartbeat() {
