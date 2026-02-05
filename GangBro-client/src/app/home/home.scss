@@ -417,7 +417,59 @@
         grid-template-columns: 1fr;
     }
 
-    .clock-wrapper .time-block span:first-child {
+    .clock-wrapper {
+        padding: 15px 25px;
+
+        .time-block {
+            min-width: 45px;
+
+            span:first-child {
+                font-size: 2.5rem;
+            }
+        }
+
+        .dots {
+            font-size: 1.8rem;
+        }
+
+        .ampm-block {
+            font-size: 0.9rem;
+        }
+    }
+
+    .gang-title-large {
         font-size: 3rem;
+
+        .subtitle {
+            font-size: 0.8rem;
+            letter-spacing: 5px;
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-section {
+        min-height: 500px;
+    }
+
+    .gang-title-large {
+        font-size: 2.2rem;
+    }
+
+    .clock-wrapper {
+        padding: 10px 20px;
+
+        .time-block {
+            min-width: 35px;
+
+            span:first-child {
+                font-size: 1.8rem;
+            }
+        }
+    }
+
+    .gang-btn.primary {
+        padding: 14px 30px;
+        font-size: 1rem;
     }
 }

@@ -316,6 +316,50 @@ import { ConfirmDialog } from '../../_dialog/confirm-dialog/confirm-dialog';
         70% { box-shadow: 0 0 0 10px rgba(124, 77, 255, 0); }
         100% { box-shadow: 0 0 0 0 rgba(124, 77, 255, 0); }
     }
+
+    @media (max-width: 768px) {
+        .my-missions-container {
+            padding: 1rem;
+        }
+
+        .gang-title {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .mission-grid {
+            gap: 1rem;
+            grid-template-columns: 1fr;
+        }
+
+        .mission-card {
+            padding: 1rem;
+        }
+
+        .card-header .mission-name {
+            font-size: 1.2rem;
+        }
+
+        .fab-add-btn {
+            bottom: 1rem;
+            right: 1rem;
+            width: 3.5rem;
+            height: 3.5rem;
+            font-size: 2rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .gang-title {
+            font-size: 1.5rem;
+        }
+        
+        .description {
+            font-size: 0.8rem;
+            height: auto;
+            max-height: 4.5rem;
+        }
+    }
   `]
 })
 export class MyMissions {

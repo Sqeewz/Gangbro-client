@@ -34,8 +34,7 @@ export class AboutMission implements OnInit, OnDestroy {
   newMessageText = signal('');
 
   private _missionId?: number;
-  private _ws?: WebSocket;
-  private _heartbeatHandle: any;
+  private _pollingHandle: any;
   private _ngZone = inject(NgZone);
 
   constructor() {
@@ -80,11 +79,11 @@ export class AboutMission implements OnInit, OnDestroy {
         this.mission.set(missionData);
         this.roster.set(rosterData);
 
-        // 2. Load fresh history from DB
+        // 2. Initial load of chat
         await this.loadChat();
 
-        // 3. Connect WebSocket for real-time updates
-        this.connectWs();
+        // 3. Start Polling for "Live" feel
+        this.startPolling();
       } catch (error) {
         console.error('Failed to load mission details', error);
       } finally {
@@ -94,109 +93,22 @@ export class AboutMission implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.disconnectWs();
+    this.stopPolling();
   }
 
-  connectWs() {
-    if (!this._missionId) return;
-    this.disconnectWs();
-
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    let host = window.location.host;
-
-    if (environment.baseUrl && environment.baseUrl.startsWith('http')) {
-      try {
-        const url = new URL(environment.baseUrl);
-        host = url.host;
-      } catch (e) { }
-    }
-
-    // Security: Send JWT token in query string
-    const token = this._passportService.data()?.token || '';
-    const wsUrl = `${protocol}//${host}/api/mission-chats/ws/${this._missionId}?token=${token}`;
-    console.log(`[Chat] Attempting connection to ${wsUrl}`);
-
-    this._ws = new WebSocket(wsUrl);
-
-    this._ws.onopen = () => {
-      console.log('%c[Chat] WebSocket Connection Established', 'color: #00ff00; font-weight: bold');
-      this.startHeartbeat();
-
-      // Visual confirmation for user
-      this._ngZone.run(() => {
-        const statusMsg = {
-          user: 'SYSTEM',
-          text: 'COMMS_ESTABLISHED :: REAL-TIME FEED ACTIVE',
-          time: new Date()
-        };
-        this.chatMessages.update(msgs => [...msgs, statusMsg]);
-      });
-    };
-
-    this._ws.onmessage = (event) => {
-      this._ngZone.run(() => {
-        try {
-          if (event.data === 'pong') return;
-          const data = JSON.parse(event.data);
-
-          // Deduplication based on ID
-          if (data.id && this.chatMessages().some((m) => m.id === data.id)) return;
-
-          const newMessage = {
-            id: data.id,
-            user: data.brawler_name,
-            text: data.message,
-            time: new Date(data.created_at),
-          };
-
-          this.chatMessages.update((msgs) => [...msgs, newMessage]);
-        } catch (e) {
-          // Heartbeats or system pings from server
-          if (event.data !== 'pong' && event.data !== 'ping') {
-            // console.debug('[Chat] Non-JSON message:', event.data);
-          }
-        }
-      });
-    };
-
-    this._ws.onclose = (event) => {
-      this.stopHeartbeat();
-      if (this._ws) {
-        console.warn(`[Chat] Connection Closed (Code: ${event.code}). Reconnecting in 3s...`);
-        this._ws = undefined;
-        setTimeout(() => {
-          if (this._missionId) this.connectWs();
-        }, 3000);
-      }
-    };
-
-    this._ws.onerror = (error) => {
-      console.error('[Chat] WebSocket specific error detected:', error);
-    };
+  private startPolling() {
+    this.stopPolling();
+    // Poll every 3 seconds for new messages
+    this._pollingHandle = setInterval(() => {
+      this.loadChat();
+    }, 3000);
+    console.log('[Chat] Polling started (3s interval)');
   }
 
-  private startHeartbeat() {
-    this.stopHeartbeat();
-    this._heartbeatHandle = setInterval(() => {
-      if (this._ws && this._ws.readyState === WebSocket.OPEN) {
-        this._ws.send('ping');
-      }
-    }, 20000); // 20s for Render stability
-  }
-
-  private stopHeartbeat() {
-    if (this._heartbeatHandle) {
-      clearInterval(this._heartbeatHandle);
-      this._heartbeatHandle = undefined;
-    }
-  }
-
-  disconnectWs() {
-    this.stopHeartbeat();
-    if (this._ws) {
-      this._ws.onclose = null;
-      this._ws.close();
-      this._ws = undefined;
+  private stopPolling() {
+    if (this._pollingHandle) {
+      clearInterval(this._pollingHandle);
+      this._pollingHandle = undefined;
     }
   }
 
@@ -204,17 +116,21 @@ export class AboutMission implements OnInit, OnDestroy {
     if (!this._missionId) return;
     try {
       const messages = await this._missionService.getChatMessages(this._missionId);
-      this.chatMessages.set(
-        messages.map((m) => ({
-          id: m.id,
-          user: m.brawler_name,
-          text: m.message,
-          time: new Date(m.created_at),
-        })),
-      );
-      this.scrollToBottom();
+
+      const newMessages = messages.map((m) => ({
+        id: m.id,
+        user: m.brawler_name,
+        text: m.message,
+        time: new Date(m.created_at),
+      }));
+
+      // Only update if something changed (to avoid unnecessary UI flashes/scrolls)
+      const current = this.chatMessages();
+      if (JSON.stringify(newMessages) !== JSON.stringify(current)) {
+        this.chatMessages.set(newMessages);
+      }
     } catch (e) {
-      console.error('Failed to load chat', e);
+      console.error('Failed to load chat via polling', e);
     }
   }
 

@@ -1,8 +1,9 @@
 // Gaming Lobby Theme (WC3 Style)
 .lobby-container {
+    width: 96%; // Fluid width
     max-width: 1200px;
-    margin: 20px auto;
-    padding: 20px;
+    margin: clamp(10px, 2vh, 40px) auto;
+    padding: clamp(10px, 2vw, 20px);
     background: #000;
     border: 3px solid #333;
     border-radius: 4px;
@@ -40,10 +41,9 @@
 }
 
 .lobby-main {
-    display: grid;
-    grid-template-columns: 1fr 300px;
-    gap: 20px;
-    height: 600px;
+    grid-template-columns: 1fr minmax(280px, 320px);
+    gap: clamp(10px, 2vw, 20px);
+    height: 650px;
 }
 
 // Left Panel
@@ -58,8 +58,8 @@
 
 .panel-header {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr 100px 1fr 100px;
-    padding: 12px 20px;
+    grid-template-columns: 2fr 1fr 1fr 0.8fr 1fr 0.8fr; // Use flexible units
+    padding: 12px clamp(10px, 2vw, 20px);
     background: #1a1a1f;
     border-bottom: 2px solid #333;
     color: var(--gang-text-muted);
@@ -84,9 +84,9 @@
 
 .mission-row {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr 100px 1fr 100px;
+    grid-template-columns: 2fr 1fr 1fr 0.8fr 1fr 0.8fr; // Match header
     align-items: center;
-    padding: 10px 20px;
+    padding: 10px clamp(10px, 2vw, 20px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.03);
     cursor: pointer;
     transition: all 0.2s;
@@ -446,18 +446,23 @@
 
 @media (max-width: 768px) {
     .lobby-header .lobby-title {
-        font-size: 1.2rem;
+        font-size: 1rem;
         letter-spacing: 2px;
     }
 
     .panel-header,
     .mission-row {
-        grid-template-columns: 2fr 80px 80px;
+        grid-template-columns: 1.5fr 80px 70px; // Tighten for mobile
 
         .col-category,
         .col-chief,
         .col-status {
             display: none;
+        }
+
+        .col-name {
+            font-size: 0.8rem;
+            gap: 8px;
         }
     }
 
@@ -485,11 +490,12 @@
 }
 
 @media (max-width: 480px) {
+
     .panel-header,
     .mission-row {
-        grid-template-columns: 1fr 60px 70px;
-        padding: 8px 5px;
-        font-size: 0.8rem;
+        grid-template-columns: 1.2fr 50px 70px;
+        padding: 8px 10px;
+        font-size: 0.75rem;
 
         .col-name {
             gap: 5px;
@@ -499,7 +505,7 @@
         }
 
         .col-crew {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             text-align: center;
         }
     }
