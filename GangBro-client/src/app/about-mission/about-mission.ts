@@ -88,8 +88,9 @@ export class AboutMission implements OnInit, OnDestroy {
 
   private startWebSocket() {
     this.stopWebSocket();
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const host = window.location.host;
+    const isSecure = window.location.protocol === 'https:';
+    const protocol = isSecure ? 'wss:' : 'ws:';
+    const host = window.location.host || window.location.hostname;
     const socketUrl = `${protocol}//${host}/api/mission-chats/ws/${this._missionId}`;
 
     try {
