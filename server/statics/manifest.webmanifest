@@ -8,8 +8,8 @@
     "start_url": "/",
     "icons": [
         {
-            "src": "favicon.ico",
-            "sizes": "15x15 32x32 48x48",
+            "src": "assets/logo.ico",
+            "sizes": "16x16 32x32 48x48",
             "type": "image/x-icon"
         }
     ]
