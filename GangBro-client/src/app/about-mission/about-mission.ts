@@ -206,7 +206,7 @@ export class AboutMission implements OnInit, OnDestroy {
   }
 
   ensureHttps(url: string | null): string {
-    if (!url) return 'assets/def.jpg';
+    if (!url) return '/assets/def.jpg';
     return url.replace('http://', 'https://');
   }
 

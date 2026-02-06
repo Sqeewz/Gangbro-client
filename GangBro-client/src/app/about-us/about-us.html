@@ -1,0 +1,128 @@
+<div class="about-us-wrapper">
+    <!-- Header Section -->
+    <div class="section header-section reveal">
+        <div class="content-container">
+            <h1 class="gang-title-large">
+                ABOUT <span class="highlight">GANG BRO</span>
+                <div class="subtitle">THE ELITE DIGITAL SYNDICATE</div>
+            </h1>
+        </div>
+    </div>
+
+    <!-- About Mission Section -->
+    <div class="section mission-summary-section reveal">
+        <div class="content-container">
+            <div class="about-grid">
+                <div class="about-text">
+                    <h2>DOMINATING THE <span class="accent">DIGITAL UNDERWORLD</span></h2>
+                    <p>GangBro is not just a platform; it’s an elite hub for aspiring developers and digital
+                        strategists.
+                        Designed as a hands-on learning environment for Internet Programming, we specialize in
+                        high-stakes mission management, complex task coordination, and fostering the strongest
+                        brotherhood in the silicon sectors.</p>
+                    <p>Founded on the principles of absolute loyalty and surgical precision, we provide the tools for
+                        brawlers to organize, execute, and profit from the most dangerous missions in the grid.</p>
+                </div>
+                <div class="about-visual">
+                    <div class="image-frame">
+                        <img src="/assets/bg-home.png" alt="Syndicate Operations">
+                        <div class="glitch-overlay"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tech Stack Section -->
+    <div class="section tech-section reveal">
+        <div class="content-container">
+            <div class="section-title">
+                <span class="line"></span>
+                CORE ARSENAL
+            </div>
+            <div class="tech-stack-header">
+                <h3>BUILT FOR <span class="accent">MAXIMUM PERFORMANCE</span></h3>
+            </div>
+            <div class="tech-stack-grid">
+                <div class="tech-card">
+                    <div class="tech-icon">
+                        <img src="https://raw.githubusercontent.com/angular/angular/master/aio/src/assets/images/logos/angular/angular.svg"
+                            alt="Angular">
+                    </div>
+                    <div class="tech-name">ANGULAR 21</div>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">
+                        <img src="https://raw.githubusercontent.com/rust-lang/rust-artwork/master/logo/rust-logo-blk.svg"
+                            alt="Rust" style="filter: invert(1);">
+                    </div>
+                    <div class="tech-name">RUST</div>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">
+                        <img src="https://www.postgresql.org/media/img/about/press/elephant.png" alt="PostgreSQL">
+                    </div>
+                    <div class="tech-name">POSTGRESQL</div>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">
+                        <img src="https://www.docker.com/wp-content/uploads/2022/03/Moby-logo.png" alt="Docker">
+                    </div>
+                    <div class="tech-name">DOCKER</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Section -->
+    <div class="section stats-section reveal">
+        <div class="content-container">
+            <div class="section-title">
+                <span class="line"></span>
+                NETWORK INTELLIGENCE
+            </div>
+            <div class="stats-grid" style="position: relative;">
+                @if (isLoading()) {
+                <div class="loading-overlay">
+                    <div class="spinner"></div>
+                </div>
+                }
+                <div class="stat-card">
+                    <div class="stat-value">{{ activeMembers() }}</div>
+                    <div class="stat-label">ACTIVE BRAWLERS</div>
+                    <div class="stat-bar">
+                        <div class="fill" style="width: 85%"></div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">{{ missionsCompleted() }}</div>
+                    <div class="stat-label">MISSIONS ACCOMPLISHED</div>
+                    <div class="stat-bar">
+                        <div class="fill" style="width: 92%"></div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">{{ opsSuccessRate() }}%</div>
+                    <div class="stat-label">SUCCESS RATE</div>
+                    <div class="stat-bar">
+                        <div class="fill" [style.width.%]="opsSuccessRate()"></div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">{{ serverUptime() }}</div>
+                    <div class="stat-label">CORE UPTIME</div>
+                    <div class="stat-bar">
+                        <div class="fill" style="width: 99%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Quote -->
+    <div class="quote-section reveal">
+        <div class="content-container">
+            <div class="footer-msg">TRUSTED BY ELITE GANGS WORLDWIDE</div>
+        </div>
+    </div>
+</div>

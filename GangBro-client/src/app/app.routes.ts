@@ -15,6 +15,7 @@ export const routes: Routes = [
     { path: 'profile', component: Profile, canActivate: [authGuard], runGuardsAndResolvers: 'always' },
     { path: 'missions', component: Missions, canActivate: [authGuard], runGuardsAndResolvers: 'always' },
     { path: 'about-mission/:id', component: AboutMission, canActivate: [authGuard] },
+    { path: 'about-us', loadComponent: () => import('./about-us/about-us').then(c => c.AboutUs) },
 
     {
         path: 'my-missions',

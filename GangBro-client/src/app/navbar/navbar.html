@@ -1,5 +1,6 @@
 <mat-toolbar class="gang-navbar">
     <span class="gang-brand" routerLink="/" routerLinkActive="gang-active" [routerLinkActiveOptions]="{exact:true}">
+        <img src="/assets/logo.ico" alt="Logo" class="brand-logo">
         GANG <span class="highlight">BRO</span>
     </span>
     <div class="nav-links">
@@ -10,6 +11,10 @@
 
     @if (display_name()) {
     <div class="user-actions">
+        <!-- New About Link -->
+        <button mat-button class="nav-btn about-link" routerLink="/about-us"
+            routerLinkActive="gang-active">ABOUT</button>
+
         <!-- Notification Bell -->
         <button mat-icon-button class="notif-btn" [matMenuTriggerFor]="notifMenu" (click)="markAllAsRead()">
             <mat-icon [matBadge]="unreadCount() > 0 ? unreadCount() : null" matBadgeColor="warn"

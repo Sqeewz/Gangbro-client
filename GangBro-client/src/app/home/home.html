@@ -82,44 +82,17 @@
                         </div>
                     </div>
 
-                    <!-- Tech Stack Addition -->
-                    <div class="tech-stack-header">
-                        <span class="label">CORE TECHNOLOGIES</span>
+                    <!-- Tech Stack Header Only -->
+                    <div class="tech-stack-header reveal">
+                        <span class="label">POWERED BY MODERN TECH</span>
                         <h3>BUILT FOR <span class="accent">PERFORMANCE</span></h3>
-                    </div>
-                    <div class="tech-stack-grid">
-                        <div class="tech-card">
-                            <div class="tech-icon">
-                                <img src="https://raw.githubusercontent.com/angular/angular/master/aio/src/assets/images/logos/angular/angular.svg"
-                                    alt="Angular">
-                            </div>
-                            <div class="tech-name">ANGULAR 21</div>
-                        </div>
-                        <div class="tech-card">
-                            <div class="tech-icon">
-                                <img src="https://raw.githubusercontent.com/rust-lang/rust-artwork/master/logo/rust-logo-blk.svg"
-                                    alt="Rust" style="filter: invert(1);">
-                            </div>
-                            <div class="tech-name">RUST</div>
-                        </div>
-                        <div class="tech-card">
-                            <div class="tech-icon">
-                                <img src="https://www.postgresql.org/media/img/about/press/elephant.png"
-                                    alt="PostgreSQL">
-                            </div>
-                            <div class="tech-name">POSTGRESQL</div>
-                        </div>
-                        <div class="tech-card">
-                            <div class="tech-icon">
-                                <img src="https://www.docker.com/wp-content/uploads/2022/03/Moby-logo.png" alt="Docker">
-                            </div>
-                            <div class="tech-name">DOCKER</div>
-                        </div>
+                        <button class="gang-btn secondary sm" routerLink="/about-us" style="margin-top: 20px;">VIEW FULL
+                            SPECS</button>
                     </div>
                 </div>
                 <div class="about-image reveal">
                     <div class="image-frame">
-                        <img src="assets/bg-home.png" alt="Syndicate Operations">
+                        <img src="/assets/bg-home.png" alt="Syndicate Operations">
                         <div class="glitch-overlay"></div>
                     </div>
                 </div>
@@ -130,47 +103,8 @@
     <!-- Statistics Section -->
     <div class="section stats-section">
         <div class="content-container">
-            <div class="section-title reveal">
-                <span class="line"></span>
-                NETWORK PERFORMANCE
-            </div>
-            <div class="stats-grid" style="position: relative;">
-                @if (isLoading()) {
-                <div class="loading-overlay" style="border-radius: 12px; background: rgba(0,0,0,0.5);">
-                    <div class="spinner" style="width: 25px; height: 25px;"></div>
-                </div>
-                }
-                <div class="stat-card reveal" style="transition-delay: 0.1s;">
-                    <div class="stat-value">{{ activeMembers() }}</div>
-                    <div class="stat-label">ACTIVE BRAWLERS</div>
-                    <div class="stat-bar">
-                        <div class="fill" style="width: 85%"></div>
-                    </div>
-                </div>
-                <div class="stat-card reveal" style="transition-delay: 0.2s;">
-                    <div class="stat-value">{{ missionsCompleted() }}</div>
-                    <div class="stat-label">MISSIONS ACCOMPLISHED</div>
-                    <div class="stat-bar">
-                        <div class="fill" style="width: 92%"></div>
-                    </div>
-                </div>
-                <div class="stat-card reveal" style="transition-delay: 0.3s;">
-                    <div class="stat-value">{{ opsSuccessRate() }}%</div>
-                    <div class="stat-label">OPERATION SUCCESS RATE</div>
-                    <div class="stat-bar">
-                        <div class="fill" [style.width.%]="opsSuccessRate()"></div>
-                    </div>
-                </div>
-                <div class="stat-card reveal" style="transition-delay: 0.4s;">
-                    <div class="stat-value">{{ serverUptime() }}</div>
-                    <div class="stat-label">CORE UPTIME</div>
-                    <div class="stat-bar">
-                        <div class="fill" style="width: 99%"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="footer-msg reveal">
+            <!-- Footer Message -->
+            <div class="footer-msg reveal" style="margin-top: 60px;">
                 TRUSTED BY ELITE GANGS WORLDWIDE
             </div>
         </div>

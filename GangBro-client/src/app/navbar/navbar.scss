@@ -19,6 +19,15 @@
     cursor: pointer;
     font-family: 'Oxanium', sans-serif;
     text-shadow: 0 0 10px rgba(157, 80, 187, 0.5);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    .brand-logo {
+        height: 32px;
+        width: auto;
+        filter: drop-shadow(0 0 5px rgba(157, 80, 187, 0.5));
+    }
 
     .highlight {
         color: transparent;
@@ -71,6 +80,13 @@
     display: flex;
     align-items: center;
     gap: 16px;
+
+    .about-link {
+        height: 36px !important;
+        padding: 0 12px !important;
+        font-size: 0.8rem !important;
+        margin-right: -8px; // Pull closer to notif btn
+    }
 }
 
 .notif-btn {
