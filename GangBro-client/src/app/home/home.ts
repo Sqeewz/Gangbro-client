@@ -71,7 +71,7 @@ export class Home implements OnInit, OnDestroy, AfterViewInit {
         }
       });
     }, {
-      threshold: 0.15
+      threshold: 0.05
     });
 
     const revealElements = this.el.nativeElement.querySelectorAll('.reveal');

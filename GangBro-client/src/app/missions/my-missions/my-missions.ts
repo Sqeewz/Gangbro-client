@@ -60,7 +60,7 @@ import { ConfirmDialog } from '../../_dialog/confirm-dialog/confirm-dialog';
                 @if (isChief(m)) {
                    <div class="chief-actions">
                        @if (m.status === 'Open') {
-                          <button class="gang-btn sm" (click)="onStart(m.id)">START MISSION</button>
+                          <button class="gang-btn sm" [disabled]="m.crew_count < 2" (click)="onStart(m.id)" [title]="m.crew_count < 2 ? 'Need at least 1 crew member' : ''">START MISSION</button>
                           <button class="gang-btn secondary sm" (click)="onEdit(m)">EDIT</button>
                           <button class="gang-btn danger sm" (click)="onDelete(m.id)">DELETE</button>
                        }
@@ -254,6 +254,14 @@ import { ConfirmDialog } from '../../_dialog/confirm-dialog/confirm-dialog';
         &:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(124, 77, 255, 0.4);
+        }
+
+        &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: grayscale(1);
+            transform: none !important;
+            box-shadow: none !important;
         }
 
         &.secondary {

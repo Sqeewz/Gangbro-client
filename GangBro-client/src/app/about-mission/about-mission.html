@@ -12,9 +12,18 @@
         </button>
         <div class="title-section">
             <h1 class="mission-name">{{m.name | uppercase}}</h1>
-            <div class="status-indicator" [class]="m.status">
-                <span class="dot"></span>
-                {{m.status | uppercase}}
+            <div class="header-actions">
+                <div class="status-indicator" [class]="m.status">
+                    <span class="dot"></span>
+                    {{m.status | uppercase}}
+                </div>
+                @if (isChief() && m.status === 'Open') {
+                <button class="start-mission-btn" [disabled]="!canStart()" (click)="onStart()"
+                    [title]="!canStart() ? 'NEED AT LEAST 1 CREW MEMBER' : 'START MISSION'">
+                    <mat-icon>play_arrow</mat-icon>
+                    START MISSION
+                </button>
+                }
             </div>
         </div>
     </div>

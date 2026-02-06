@@ -55,11 +55,20 @@ where
             .trim()
             .parse()?;
 
-        let update_condition = is_status_open_or_fail
-            && crew_count < max_crew_per_mission
-            && mission.chief_id == chief_id;
-        if !update_condition {
-            return Err(anyhow::anyhow!("Invalid condition to change stages!"));
+        if !is_status_open_or_fail {
+            return Err(anyhow::anyhow!("Invalid mission status to start!"));
+        }
+
+        if mission.chief_id != chief_id {
+            return Err(anyhow::anyhow!("Only the chief can start the mission!"));
+        }
+
+        if crew_count <= 1 {
+            return Err(anyhow::anyhow!("Mission requires at least one crew member besides the chief to start!"));
+        }
+
+        if crew_count > max_crew_per_mission {
+            return Err(anyhow::anyhow!("Mission crew exceeds maximum limit!"));
         }
 
         let result = self

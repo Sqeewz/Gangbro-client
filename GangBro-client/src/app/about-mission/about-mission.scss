@@ -49,43 +49,85 @@
             text-shadow: 0 0 20px rgba(157, 80, 187, 0.3);
         }
 
-        .status-indicator {
+        .header-actions {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 5px 15px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 4px;
-            font-size: 0.8rem;
-            font-weight: 800;
-            letter-spacing: 2px;
-            border-left: 3px solid #444;
+            gap: 1.5rem;
 
-            .dot {
-                width: 8px;
-                height: 8px;
-                border-radius: 50%;
-                background: #444;
-            }
-
-            &.Open {
-                border-left-color: #00e676;
-                color: #00e676;
+            .status-indicator {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 5px 15px;
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 4px;
+                font-size: 0.8rem;
+                font-weight: 800;
+                letter-spacing: 2px;
+                border-left: 3px solid #444;
 
                 .dot {
-                    background: #00e676;
-                    box-shadow: 0 0 10px #00e676;
+                    width: 8px;
+                    height: 8px;
+                    border-radius: 50%;
+                    background: #444;
+                }
+
+                &.Open {
+                    border-left-color: #00e676;
+                    color: #00e676;
+
+                    .dot {
+                        background: #00e676;
+                        box-shadow: 0 0 10px #00e676;
+                    }
+                }
+
+                &.InProgress {
+                    border-left-color: var(--gang-secondary);
+                    color: var(--gang-secondary);
+
+                    .dot {
+                        background: var(--gang-secondary);
+                        box-shadow: 0 0 10px var(--gang-secondary);
+                        animation: blink 1.5s infinite;
+                    }
                 }
             }
 
-            &.InProgress {
-                border-left-color: var(--gang-secondary);
-                color: var(--gang-secondary);
+            .start-mission-btn {
+                background: var(--gang-gradient-accent);
+                color: black;
+                border: none;
+                padding: 8px 20px;
+                border-radius: 4px;
+                font-family: 'Oxanium', sans-serif;
+                font-weight: 800;
+                font-size: 0.85rem;
+                letter-spacing: 1px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                transition: all 0.3s;
+                text-transform: uppercase;
 
-                .dot {
-                    background: var(--gang-secondary);
-                    box-shadow: 0 0 10px var(--gang-secondary);
-                    animation: blink 1.5s infinite;
+                mat-icon {
+                    font-size: 1.2rem;
+                    width: 1.2rem;
+                    height: 1.2rem;
+                }
+
+                &:hover:not(:disabled) {
+                    transform: translateY(-2px);
+                    box-shadow: 0 5px 15px rgba(255, 215, 64, 0.4);
+                }
+
+                &:disabled {
+                    opacity: 0.4;
+                    cursor: not-allowed;
+                    filter: grayscale(1);
+                    transform: none !important;
                 }
             }
         }
@@ -393,6 +435,18 @@
                 font-size: 2rem;
                 letter-spacing: 3px;
                 line-height: 1.1;
+            }
+
+            .header-actions {
+                width: 100%;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+
+                .start-mission-btn {
+                    width: 100%;
+                    justify-content: center;
+                }
             }
 
             .status-indicator {

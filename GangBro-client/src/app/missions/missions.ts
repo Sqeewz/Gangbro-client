@@ -1,4 +1,5 @@
 import { Component, computed, inject, Signal, signal, OnInit, OnDestroy, NgZone } from '@angular/core'
+import { Router } from '@angular/router'
 import { MatDialog, MatDialogModule } from '@angular/material/dialog'
 import { MatMenuModule } from '@angular/material/menu'
 import { MatButtonModule } from '@angular/material/button'
@@ -42,6 +43,7 @@ export class Missions implements OnInit, OnDestroy {
   private _snackBar = inject(MatSnackBar)
   private _dialog = inject(MatDialog)
   private _ngZone = inject(NgZone)
+  private _router = inject(Router)
 
   filter: MissionFilter = {
     page: 1,
@@ -176,8 +178,9 @@ export class Missions implements OnInit, OnDestroy {
         try {
           await this._mission.join(missionId)
           this.selectedMission = null;
-          await this.loadMyMission()
           this._snackBar.open('Joined mission successfully', 'Close', { duration: 4000 })
+          // Redirect to mission details after joining
+          this._router.navigate(['/about-mission', missionId]);
         } catch (error) {
           console.error('Failed to join mission', error)
           this._snackBar.open('Failed to join mission', 'Close', { duration: 3000 })

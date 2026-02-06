@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit, OnDestroy, effect, NgZone } from '@angular/core';
+import { Component, inject, signal, OnInit, OnDestroy, effect, NgZone, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MissionService } from '../_service/mission-service';
@@ -30,6 +30,18 @@ export class AboutMission implements OnInit, OnDestroy {
   currentUserName = signal<string>('');
   chatMessages = signal<{ id?: number; user: string; text: string; time: Date }[]>([]);
   newMessageText = signal('');
+
+  isChief = computed(() => {
+    const m = this.mission();
+    const p = this._passportService.data();
+    return m && p && m.chief_id === p.user_id;
+  });
+
+  canStart = computed(() => {
+    const m = this.mission();
+    const r = this.roster();
+    return m?.status === 'Open' && r.length >= 2;
+  });
 
   private _missionId?: number;
   private _pollingHandle: any;
@@ -143,12 +155,19 @@ export class AboutMission implements OnInit, OnDestroy {
   }
 
   private updateMessages(messages: any[]) {
-    const newMessages = messages.map((m) => ({
-      id: m.id,
-      user: m.brawler_name,
-      text: m.message,
-      time: new Date(m.created_at),
-    }));
+    const newMessages = messages.map((m) => {
+      // If time doesn't end with Z or offset, assume it's UTC from server
+      let timeStr = m.created_at;
+      if (timeStr && !timeStr.endsWith('Z') && !timeStr.includes('+')) {
+        timeStr += 'Z';
+      }
+      return {
+        id: m.id,
+        user: m.brawler_name,
+        text: m.message,
+        time: new Date(timeStr),
+      };
+    });
 
     const current = this.chatMessages().filter(m => m.user !== 'SYSTEM');
     if (newMessages.length !== current.length ||
@@ -189,5 +208,18 @@ export class AboutMission implements OnInit, OnDestroy {
   ensureHttps(url: string | null): string {
     if (!url) return 'assets/def.jpg';
     return url.replace('http://', 'https://');
+  }
+
+  async onStart() {
+    if (!this._missionId) return;
+    try {
+      await this._missionService.start(this._missionId);
+      this._snackBar.open('MISSION PROTOCOL INITIATED.', 'OK', { duration: 3000 });
+      const missionData = await this._missionService.getById(this._missionId);
+      this.mission.set(missionData);
+    } catch (e: any) {
+      const msg = e?.error?.message || e?.error || 'START FAILED: GRID OFFLINE.';
+      this._snackBar.open(msg, 'OK', { duration: 5000 });
+    }
   }
 }
