@@ -25,17 +25,10 @@ use crate::{
     },
 };
 
-fn static_serve() -> Router {
-    let dir = "statics";
-
-    let service = ServeDir::new(dir).not_found_service(ServeFile::new(format!("{dir}/index.html")));
-
-    Router::new().fallback_service(service)
-}
-
 fn api_serve(db_pool: Arc<PgPoolSquad>) -> Router {
     Router::new()
         .nest("/brawler", routers::brawlers::routes(Arc::clone(&db_pool)))
+        // ... (rest of api_serve)
         .nest(
             "/view",
             routers::missions_viewing::routes(Arc::clone(&db_pool)),
@@ -69,9 +62,12 @@ fn api_serve(db_pool: Arc<PgPoolSquad>) -> Router {
 }
 
 pub async fn start(config: Arc<DotEnvyConfig>, db_pool: Arc<PgPoolSquad>) -> Result<()> {
+    let static_service = ServeDir::new("statics")
+        .fallback(ServeFile::new("statics/index.html"));
+
     let app = Router::new()
         .nest("/api", api_serve(db_pool))
-        .fallback_service(static_serve())
+        .fallback_service(static_service)
         .layer(tower_http::timeout::TimeoutLayer::with_status_code(
             StatusCode::REQUEST_TIMEOUT,
             Duration::from_secs(config.server.timeout),
