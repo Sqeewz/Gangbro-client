@@ -9,124 +9,133 @@
         </div>
     </div>
 
-    <!-- About Mission Section -->
-    <div class="section mission-summary-section reveal">
+    <!-- Top Intelligence: About & Visual -->
+    <div class="section info-section reveal">
         <div class="content-container">
-            <div class="about-grid">
-                <div class="about-text">
+            <div class="intel-grid">
+                <div class="intel-text-card">
+                    <div class="card-tag">SYSTEM_OVERVIEW</div>
                     <h2>DOMINATING THE <span class="accent">DIGITAL UNDERWORLD</span></h2>
                     <p>GangBro is not just a platform; it’s an elite hub for aspiring developers and digital
-                        strategists.
-                        Designed as a hands-on learning environment for Internet Programming, we specialize in
-                        high-stakes mission management, complex task coordination, and fostering the strongest
-                        brotherhood in the silicon sectors.</p>
-                    <p>Founded on the principles of absolute loyalty and surgical precision, we provide the tools for
-                        brawlers to organize, execute, and profit from the most dangerous missions in the grid.</p>
+                        strategists. Designed as a hands-on learning environment, we specialize in
+                        high-stakes mission management and silicon sector fosterhood.</p>
+                    <div class="feature-bar">
+                        <div class="f-item"><mat-icon>security</mat-icon> SECURE</div>
+                        <div class="f-item"><mat-icon>bolt</mat-icon> FAST</div>
+                        <div class="f-item"><mat-icon>group</mat-icon> ELITE</div>
+                    </div>
                 </div>
-                <div class="about-visual">
-                    <div class="image-frame">
+                <div class="intel-visual-card">
+                    <div class="image-scanner">
                         <img src="/assets/bg-home.png" alt="Syndicate Operations">
-                        <div class="glitch-overlay"></div>
+                        <div class="scan-line"></div>
+                        <div class="corner t-l"></div>
+                        <div class="corner t-r"></div>
+                        <div class="corner b-l"></div>
+                        <div class="corner b-r"></div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Tech Stack Section -->
-    <div class="section tech-section reveal">
+    <!-- Main Dashboard: Tech + Stats -->
+    <div class="section dashboard-section reveal">
         <div class="content-container">
-            <div class="section-title">
-                <span class="line"></span>
-                CORE ARSENAL
-            </div>
-            <div class="tech-stack-header">
-                <h3>BUILT FOR <span class="accent">MAXIMUM PERFORMANCE</span></h3>
-            </div>
-            <div class="tech-stack-grid">
-                <div class="tech-card">
-                    <div class="tech-icon">
-                        <img src="https://angular.io/assets/images/logos/angular/angular.svg" alt="Angular">
-                    </div>
-                    <div class="tech-name">ANGULAR 21</div>
-                </div>
-                <div class="tech-card">
-                    <div class="tech-icon">
-                        <img src="https://raw.githubusercontent.com/rust-lang/rust-artwork/master/logo/rust-logo-blk.svg"
-                            alt="Rust" style="filter: invert(1); width: 60px;">
-                    </div>
-                    <div class="tech-name">RUST</div>
-                </div>
-                <div class="tech-card">
-                    <div class="tech-icon">
-                        <img src="https://www.postgresql.org/media/img/about/press/elephant.png" alt="PostgreSQL">
-                    </div>
-                    <div class="tech-name">POSTGRESQL</div>
-                </div>
-                <div class="tech-card">
-                    <div class="tech-icon">
-                        <img src="https://www.vectorlogo.zone/logos/docker/docker-icon.svg" alt="Docker">
-                    </div>
-                    <div class="tech-name">DOCKER</div>
-                </div>
-                <div class="tech-card">
-                    <div class="tech-icon">
-                        <img src="https://www.vectorlogo.zone/logos/supabase/supabase-icon.svg" alt="Supabase">
-                    </div>
-                    <div class="tech-name">SUPABASE</div>
-                </div>
-            </div>
-        </div>
+            <div class="dashboard-grid">
 
-        <!-- Statistics Section -->
-        <div class="section stats-section reveal">
-            <div class="content-container">
-                <div class="section-title">
-                    <span class="line"></span>
-                    NETWORK INTELLIGENCE
-                </div>
-                <div class="stats-grid" style="position: relative;">
-                    @if (isLoading()) {
-                    <div class="loading-overlay">
-                        <div class="spinner"></div>
+                <!-- Left: Core Arsenal (Tech) -->
+                <div class="dashboard-col tech-col">
+                    <div class="section-label">
+                        <mat-icon>terminal</mat-icon> CORE_ARSENAL
                     </div>
-                    }
-                    <div class="stat-card">
-                        <div class="stat-value">{{ activeMembers() }}</div>
-                        <div class="stat-label">ACTIVE BRAWLERS</div>
-                        <div class="stat-bar">
-                            <div class="fill" style="width: 85%"></div>
+                    <div class="tech-grid">
+                        <div class="tech-item" title="Angular 21">
+                            <img src="https://angular.io/assets/images/logos/angular/angular.svg" alt="Angular">
+                            <span>ANGULAR</span>
                         </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">{{ missionsCompleted() }}</div>
-                        <div class="stat-label">MISSIONS ACCOMPLISHED</div>
-                        <div class="stat-bar">
-                            <div class="fill" style="width: 92%"></div>
+                        <div class="tech-item" title="Rust">
+                            <img src="https://raw.githubusercontent.com/rust-lang/rust-artwork/master/logo/rust-logo-blk.svg"
+                                alt="Rust" class="invert">
+                            <span>RUST</span>
                         </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">{{ opsSuccessRate() }}%</div>
-                        <div class="stat-label">SUCCESS RATE</div>
-                        <div class="stat-bar">
-                            <div class="fill" [style.width.%]="opsSuccessRate()"></div>
+                        <div class="tech-item" title="PostgreSQL">
+                            <img src="https://www.postgresql.org/media/img/about/press/elephant.png" alt="PostgreSQL">
+                            <span>POSTGRES</span>
                         </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">{{ serverUptime() }}</div>
-                        <div class="stat-label">CORE UPTIME</div>
-                        <div class="stat-bar">
-                            <div class="fill" style="width: 99%"></div>
+                        <div class="tech-item" title="Docker">
+                            <img src="https://www.vectorlogo.zone/logos/docker/docker-icon.svg" alt="Docker">
+                            <span>DOCKER</span>
+                        </div>
+                        <div class="tech-item" title="Supabase">
+                            <img src="https://www.vectorlogo.zone/logos/supabase/supabase-icon.svg" alt="Supabase">
+                            <span>SUPABASE</span>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- Footer Quote -->
-        <div class="quote-section reveal">
-            <div class="content-container">
-                <div class="footer-msg">TRUSTED BY ELITE GANGS WORLDWIDE</div>
+                <!-- Right: Network Intelligence (Stats) -->
+                <div class="dashboard-col stats-col">
+                    <div class="section-label">
+                        <mat-icon>analytics</mat-icon> NETWORK_INTELLIGENCE
+                    </div>
+
+                    <div class="stats-container">
+                        @if (isLoading()) {
+                        <div class="loading-overlay">
+                            <div class="spinner"></div>
+                        </div>
+                        }
+
+                        <div class="stat-box">
+                            <div class="stat-info">
+                                <span class="label">ACTIVE BRAWLERS</span>
+                                <span class="value">{{ activeMembers() }}</span>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-fill" style="width: 85%"></div>
+                            </div>
+                        </div>
+
+                        <div class="stat-box">
+                            <div class="stat-info">
+                                <span class="label">OPS COMPLETED</span>
+                                <span class="value">{{ missionsCompleted() }}</span>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-fill" style="width: 92%"></div>
+                            </div>
+                        </div>
+
+                        <div class="stat-row-half">
+                            <div class="stat-box mini">
+                                <div class="stat-info">
+                                    <span class="label">SUCCESS RATE</span>
+                                    <span class="value">{{ opsSuccessRate() }}%</span>
+                                </div>
+                            </div>
+                            <div class="stat-box mini">
+                                <div class="stat-info">
+                                    <span class="label">CORE UPTIME</span>
+                                    <span class="value">{{ serverUptime() }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
+
+    <!-- Footer Quote -->
+    <div class="quote-section reveal">
+        <div class="content-container">
+            <div class="syndicate-footer">
+                <div class="line"></div>
+                <div class="footer-msg">TRUSTED BY ELITE GANGS WORLDWIDE</div>
+                <div class="line"></div>
+            </div>
+        </div>
+    </div>
+</div>
