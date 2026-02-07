@@ -2,7 +2,7 @@
 FROM node:20-slim AS frontend-builder
 WORKDIR /build-frontend
 COPY GangBro-client/package*.json ./
-RUN npm install
+RUN npm install --legacy-peer-deps
 COPY GangBro-client/ ./
 RUN npm run build -- --configuration production
 
