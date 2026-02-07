@@ -7,6 +7,7 @@ import { NotFound } from './not-found/not-found'
 import { authGuard } from './_guard/auth-guard'
 import { Missions } from './missions/missions'
 import { AboutMission } from './about-mission/about-mission'
+import { AboutUs } from './about-us/about-us'
 
 
 export const routes: Routes = [
@@ -15,7 +16,7 @@ export const routes: Routes = [
     { path: 'profile', component: Profile, canActivate: [authGuard], runGuardsAndResolvers: 'always' },
     { path: 'missions', component: Missions, canActivate: [authGuard], runGuardsAndResolvers: 'always' },
     { path: 'about-mission/:id', component: AboutMission, canActivate: [authGuard] },
-    { path: 'about-us', loadComponent: () => import('./about-us/about-us').then(c => c.AboutUs) },
+    { path: 'about-us', component: AboutUs },
 
     {
         path: 'my-missions',
