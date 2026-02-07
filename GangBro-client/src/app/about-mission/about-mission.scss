@@ -130,6 +130,69 @@
                     transform: none !important;
                 }
             }
+
+            .mission-control-btns {
+                display: flex;
+                gap: 1rem;
+
+                .complete-btn {
+                    background: #00e676;
+                    color: black;
+                    border: none;
+                    padding: 8px 16px;
+                    border-radius: 4px;
+                    font-family: 'Oxanium', sans-serif;
+                    font-weight: 800;
+                    font-size: 0.8rem;
+                    letter-spacing: 1px;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    transition: all 0.3s;
+
+                    mat-icon {
+                        font-size: 1.1rem;
+                        width: 1.1rem;
+                        height: 1.1rem;
+                    }
+
+                    &:hover {
+                        background: #00c853;
+                        box-shadow: 0 0 15px rgba(0, 230, 118, 0.4);
+                        transform: translateY(-2px);
+                    }
+                }
+
+                .fail-btn {
+                    background: #ff5252;
+                    color: white;
+                    border: none;
+                    padding: 8px 16px;
+                    border-radius: 4px;
+                    font-family: 'Oxanium', sans-serif;
+                    font-weight: 800;
+                    font-size: 0.8rem;
+                    letter-spacing: 1px;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    transition: all 0.3s;
+
+                    mat-icon {
+                        font-size: 1.1rem;
+                        width: 1.1rem;
+                        height: 1.1rem;
+                    }
+
+                    &:hover {
+                        background: #ff1744;
+                        box-shadow: 0 0 15px rgba(255, 82, 82, 0.4);
+                        transform: translateY(-2px);
+                    }
+                }
+            }
         }
     }
 }

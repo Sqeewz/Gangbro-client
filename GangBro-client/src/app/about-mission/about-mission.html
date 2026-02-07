@@ -24,6 +24,18 @@
                     START MISSION
                 </button>
                 }
+                @if (isChief() && m.status === 'InProgress') {
+                <div class="mission-control-btns">
+                    <button class="complete-btn" (click)="onComplete()">
+                        <mat-icon>check_circle</mat-icon>
+                        COMPLETE
+                    </button>
+                    <button class="fail-btn" (click)="onFail()">
+                        <mat-icon>cancel</mat-icon>
+                        FAIL
+                    </button>
+                </div>
+                }
             </div>
         </div>
     </div>

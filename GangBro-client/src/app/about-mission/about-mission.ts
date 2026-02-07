@@ -222,4 +222,28 @@ export class AboutMission implements OnInit, OnDestroy {
       this._snackBar.open(msg, 'OK', { duration: 5000 });
     }
   }
+
+  async onComplete() {
+    if (!this._missionId) return;
+    try {
+      await this._missionService.complete(this._missionId);
+      this._snackBar.open('MISSION ACCOMPLISHED.', 'OK', { duration: 3000 });
+      const missionData = await this._missionService.getById(this._missionId);
+      this.mission.set(missionData);
+    } catch (e: any) {
+      this._snackBar.open('UPDATE FAILED.', 'OK', { duration: 5000 });
+    }
+  }
+
+  async onFail() {
+    if (!this._missionId) return;
+    try {
+      await this._missionService.fail(this._missionId);
+      this._snackBar.open('MISSION FAILED. SYSTEM OVERRIDE.', 'OK', { duration: 3000 });
+      const missionData = await this._missionService.getById(this._missionId);
+      this.mission.set(missionData);
+    } catch (e: any) {
+      this._snackBar.open('UPDATE FAILED.', 'OK', { duration: 5000 });
+    }
+  }
 }

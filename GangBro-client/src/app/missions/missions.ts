@@ -148,9 +148,10 @@ export class Missions implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe(async (result: AddMission) => {
       if (result) {
         try {
-          await this._mission.add(result)
-          await this.loadMyMission()
+          const missionId = await this._mission.add(result)
           this._snackBar.open('Mission deployed successfully', 'Close', { duration: 3000 })
+          // Redirect to mission details after creating
+          this._router.navigate(['/about-mission', missionId]);
         } catch (error) {
           console.error('Failed to add mission', error)
           this._snackBar.open('Failed to deploy mission', 'Close', { duration: 3000 })
