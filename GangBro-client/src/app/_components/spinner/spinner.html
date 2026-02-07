@@ -1,4 +1,5 @@
-<div class="loader-wrapper" *ngIf="isLoading()">
+@if (isLoading()) {
+<div class="loader-wrapper">
     <div class="glitch-container">
         <div class="glitch-text" data-text="SYNCING SECTOR">SYNCING SECTOR</div>
         <div class="glitch-bar"></div>
@@ -9,3 +10,4 @@
         <span></span>
     </div>
 </div>
+}

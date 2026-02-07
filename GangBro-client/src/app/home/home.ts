@@ -1,11 +1,12 @@
 import { Component, OnDestroy, OnInit, signal, ElementRef, inject, AfterViewInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { SystemService } from '../_service/system-service';
+import { ShowcaseCardComponent } from '../_components/showcase-card/showcase-card.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, ShowcaseCardComponent],
   templateUrl: './home.html',
   styleUrl: './home.scss'
 })
@@ -16,6 +17,15 @@ export class Home implements OnInit, OnDestroy, AfterViewInit {
   minutes = signal('00');
   seconds = signal('00');
   ampm = signal('AM');
+
+  showcaseItems = [
+    { label: 'OPERATIONS', title: 'Mission Hub', variant: 'default', icon: '📜' },
+    { label: 'INTELLIGENCE', title: 'Real-time Ops', variant: 'audio', icon: '📡' },
+    { label: 'LOYALTY', title: 'The Syndicate', variant: 'default', icon: '🤝' },
+    { label: 'TERMINAL', title: 'Core Stack', variant: 'default', tech: true }
+  ];
+
+  // Site Statistics
 
   // Site Statistics
   activeMembers = signal(0);

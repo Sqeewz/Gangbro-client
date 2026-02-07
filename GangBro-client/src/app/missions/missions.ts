@@ -15,7 +15,6 @@ import { AsyncPipe, UpperCasePipe } from '@angular/common'
 import { MissionService } from '../_service/mission-service'
 import { PassportService } from '../_service/passport-service'
 import { ConfirmDialog } from '../_dialog/confirm-dialog/confirm-dialog'
-import { MissionStatus } from './mission-status/mission-status'
 import { StateMessage } from '../_components/state-message/state-message'
 import { MatIconModule } from '@angular/material/icon'
 
@@ -31,7 +30,6 @@ import { MatIconModule } from '@angular/material/icon'
     MatSnackBarModule,
     MatDialogModule,
     MatIconModule,
-    MissionStatus,
     StateMessage,
   ],
   templateUrl: './missions.html',

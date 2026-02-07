@@ -1,4 +1,5 @@
 <div class="homepage-wrapper">
+
     <!-- Hero Section -->
     <div class="section hero-section reveal">
         <div class="hero-container">
@@ -40,62 +41,37 @@
         </div>
     </div>
 
-    <!-- About Us Section -->
-    <div class="section about-section">
+    <!-- Modern Showcase Section -->
+    <div class="section showcase-section">
         <div class="content-container">
-            <div class="section-title reveal">
-                <span class="line"></span>
-                ABOUT US
+            <div class="header-group reveal">
+                <p class="pre-title">Also, you can view more Elements below ...</p>
             </div>
-            <div class="about-grid">
-                <div class="about-text reveal">
-                    <h2>DOMINATING THE <span class="accent">DIGITAL UNDERWORLD</span></h2>
-                    <p>GangBro is not just a platform; it’s an elite hub for aspiring developers and digital
-                        strategists.
-                        Designed as a hands-on learning environment for Internet Programming, we specialize in
-                        high-stakes mission management,
-                        complex task coordination, and fostering the strongest brotherhood in the silicon sectors.</p>
-                    <p>Founded on the principles of absolute loyalty and surgical precision, we provide the tools for
-                        brawlers to organize, execute, and profit from the most dangerous missions in the grid.</p>
-                    <div class="feature-list">
-                        <div class="feature-item">
-                            <span class="icon">⚡</span>
-                            <div class="feature-info">
-                                <strong>REAL-TIME OPS</strong>
-                                <p>Coordinate through secure encrypted channels.</p>
-                            </div>
-                        </div>
-                        <div class="feature-item">
-                            <span class="icon">🛡️</span>
-                            <div class="feature-info">
-                                <strong>IRONCLAD SECURITY</strong>
-                                <p>Your intel is protected by the latest block-ciphers.</p>
-                            </div>
-                        </div>
-                        <div class="feature-item">
-                            <span class="icon">📜</span>
-                            <div class="feature-info">
-                                <strong>MISSION CENTER</strong>
-                                <p>Create, deploy, and complete assignments designed to push your programming limits.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
 
-                    <!-- Tech Stack Header Only -->
-                    <div class="tech-stack-header reveal">
-                        <span class="label">POWERED BY MODERN TECH</span>
-                        <h3>BUILT FOR <span class="accent">PERFORMANCE</span></h3>
-                        <button class="gang-btn secondary sm" routerLink="/about-us" style="margin-top: 20px;">VIEW FULL
-                            SPECS</button>
+            <div class="showcase-grid reveal">
+                @for (item of showcaseItems; track item.title) {
+                <app-showcase-card [label]="item.label" [title]="item.title" [variant]="$any(item.variant)">
+                    <div class="visual-content">
+                        @if (item.tech) {
+                        <div class="tech-grid">
+                            <div class="tech-tag">Angular</div>
+                            <div class="tech-tag">Rust</div>
+                            <div class="tech-tag">Bun</div>
+                            <div class="tech-tag">WSS</div>
+                        </div>
+                        } @else {
+                        <div class="large-icon">{{ item.icon }}</div>
+                        }
                     </div>
-                </div>
-                <div class="about-image reveal">
-                    <div class="image-frame">
-                        <img src="/assets/bg-home.png" alt="Syndicate Operations">
-                        <div class="glitch-overlay"></div>
-                    </div>
-                </div>
+                </app-showcase-card>
+                }
+            </div>
+
+            <div class="view-more reveal">
+                <a routerLink="/about-us" class="view-link">
+                    View More
+                    <span class="arrow">→</span>
+                </a>
             </div>
         </div>
     </div>
@@ -103,9 +79,8 @@
     <!-- Statistics Section -->
     <div class="section stats-section">
         <div class="content-container">
-            <!-- Footer Message -->
-            <div class="footer-msg reveal" style="margin-top: 60px;">
-                TRUSTED BY ELITE GANGS WORLDWIDE
+            <div class="footer-msg reveal">
+                DOMINATING THE DIGITAL BATTLEGROUND
             </div>
         </div>
     </div>

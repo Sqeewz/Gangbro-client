@@ -7,7 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 @Component({
     selector: 'app-about-us',
     standalone: true,
-    imports: [RouterLink, CommonModule, MatIconModule],
+    imports: [CommonModule, MatIconModule],
     templateUrl: './about-us.html',
     styleUrl: './about-us.scss'
 })

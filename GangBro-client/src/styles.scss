@@ -37,13 +37,16 @@ html {
   --gang-glow-yellow: 0 0 15px rgba(249, 212, 35, 0.4);
 }
 
+html,
+body {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
 html {
   height: 100%;
-  // Apply the dark theme (already applied in html block above, so we can remove this or ensure it's not duplicated)
-  // @include mat.all-component-themes($gang-theme);
 
   body {
-    background-color: var(--gang-bg);
     color: var(--gang-text);
     font-family: 'Roboto', sans-serif;
     margin: 0;
@@ -155,10 +158,212 @@ html {
   justify-content: center;
   z-index: 1000;
   color: var(--gang-primary);
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  font-weight: 800;
+}
+
+// Hide default ngx-spinner balls
+::ng-deep .ngx-spinner-overlay>div:not(.loading-terminal) {
+  display: none !important;
+}
+
+.loading-terminal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
   font-family: 'Oxanium', sans-serif;
+
+  .battery-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 30px;
+  }
+
+  .glitch-text {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: 6px;
+    color: white;
+    text-transform: uppercase;
+    position: relative;
+    text-shadow: 0 0 10px rgba(157, 80, 187, 0.5);
+
+    &::before,
+    &::after {
+      content: attr(data-text);
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0.8;
+    }
+
+    &::before {
+      color: #0ff;
+      z-index: -1;
+      animation: glitch 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
+    }
+
+    &::after {
+      color: #f0f;
+      z-index: -2;
+      animation: glitch 0.3s cubic-bezier(.25, .46, .45, .94) reverse both infinite;
+    }
+  }
+
+  .battery-container {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    z-index: 2;
+    position: relative;
+
+    .battery-body {
+      width: 140px;
+      height: 60px;
+      border: 3px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      padding: 4px;
+      position: relative;
+      background: rgba(0, 0, 0, 0.5);
+      box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      .battery-level {
+        position: absolute;
+        left: 4px;
+        top: 4px;
+        bottom: 4px;
+        width: 0%;
+        background: var(--gang-primary);
+        box-shadow: 0 0 20px rgba(157, 80, 187, 0.6);
+        border-radius: 4px;
+        animation: battery-charge 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        transition: background 0.5s ease;
+      }
+
+      .electricity-bolt {
+        position: absolute;
+        width: 25px;
+        height: 38px;
+        background: #ffffff;
+        z-index: 10;
+        // Sharper lightning bolt path
+        clip-path: polygon(40% 0%, 100% 0%, 65% 45%, 95% 45%, 25% 100%, 45% 55%, 5% 55%);
+        filter: drop-shadow(0 0 8px var(--gang-accent));
+        animation: bolt-glow 1.2s infinite ease-in-out;
+        pointer-events: none;
+      }
+
+      .battery-glass {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to bottom,
+            rgba(255, 255, 255, 0.1) 0%,
+            transparent 50%,
+            rgba(0, 0, 0, 0.2) 100%);
+        pointer-events: none;
+      }
+    }
+
+    .battery-cap {
+      width: 6px;
+      height: 18px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 0 3px 3px 0;
+    }
+  }
+
+  .status-text {
+    font-size: 0.65rem;
+    color: var(--gang-primary);
+    letter-spacing: 3px;
+    font-weight: 800;
+    margin-top: 15px;
+    opacity: 0.8;
+    animation: pulse-text 1.5s infinite;
+  }
+}
+
+@keyframes battery-charge {
+  0% {
+    width: 0%;
+    background: #ff1744; // Start Red
+    box-shadow: 0 0 15px #ff1744;
+  }
+
+  30% {
+    background: #ff9100; // Orange
+    box-shadow: 0 0 15px #ff9100;
+  }
+
+  100% {
+    width: 100%;
+    background: var(--gang-primary); // End Global Purple
+    box-shadow: 0 0 20px var(--gang-primary);
+  }
+}
+
+@keyframes pulse-text {
+
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+
+  50% {
+    opacity: 1;
+    text-shadow: 0 0 8px var(--gang-primary);
+  }
+}
+
+@keyframes glitch {
+  0% {
+    transform: translate(0);
+  }
+
+  20% {
+    transform: translate(-2px, 2px);
+  }
+
+  40% {
+    transform: translate(-2px, -2px);
+  }
+
+  60% {
+    transform: translate(2px, 2px);
+  }
+
+  80% {
+    transform: translate(2px, -2px);
+  }
+
+  100% {
+    transform: translate(0);
+  }
+}
+
+@keyframes bolt-glow {
+
+  0%,
+  100% {
+    filter: drop-shadow(0 0 5px var(--gang-accent)) brightness(1);
+    transform: scale(1);
+  }
+
+  50% {
+    filter: drop-shadow(0 0 15px var(--gang-accent)) brightness(1.5);
+    transform: scale(1.1);
+  }
+
+  10%,
+  40%,
+  80% {
+    filter: drop-shadow(0 0 8px var(--gang-accent)) brightness(1.2);
+  }
 }
 
 /* Scrollbar Styling */

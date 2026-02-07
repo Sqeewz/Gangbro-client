@@ -147,7 +147,7 @@ export class AboutMission implements OnInit, OnDestroy {
   async loadChat() {
     if (!this._missionId) return;
     try {
-      const messages = await this._missionService.getChatMessages(this._missionId);
+      const messages = await this._missionService.getChatMessages(this._missionId, true);
       this.updateMessages(messages);
     } catch (e) {
       console.warn('Chat sync missed');
@@ -197,7 +197,7 @@ export class AboutMission implements OnInit, OnDestroy {
     const text = this.newMessageText().trim();
     if (!text || !this._missionId) return;
     try {
-      await this._missionService.sendChatMessage(this._missionId, text);
+      await this._missionService.sendChatMessage(this._missionId, text, true);
       this.newMessageText.set('');
       await this.loadChat();
     } catch (e: any) {
@@ -215,7 +215,7 @@ export class AboutMission implements OnInit, OnDestroy {
     try {
       await this._missionService.start(this._missionId);
       this._snackBar.open('MISSION PROTOCOL INITIATED.', 'OK', { duration: 3000 });
-      const missionData = await this._missionService.getById(this._missionId);
+      const missionData = await this._missionService.getById(this._missionId, true);
       this.mission.set(missionData);
     } catch (e: any) {
       const msg = e?.error?.message || e?.error || 'START FAILED: GRID OFFLINE.';
@@ -228,7 +228,7 @@ export class AboutMission implements OnInit, OnDestroy {
     try {
       await this._missionService.complete(this._missionId);
       this._snackBar.open('MISSION ACCOMPLISHED.', 'OK', { duration: 3000 });
-      const missionData = await this._missionService.getById(this._missionId);
+      const missionData = await this._missionService.getById(this._missionId, true);
       this.mission.set(missionData);
     } catch (e: any) {
       this._snackBar.open('UPDATE FAILED.', 'OK', { duration: 5000 });
@@ -240,7 +240,7 @@ export class AboutMission implements OnInit, OnDestroy {
     try {
       await this._missionService.fail(this._missionId);
       this._snackBar.open('MISSION FAILED. SYSTEM OVERRIDE.', 'OK', { duration: 3000 });
-      const missionData = await this._missionService.getById(this._missionId);
+      const missionData = await this._missionService.getById(this._missionId, true);
       this.mission.set(missionData);
     } catch (e: any) {
       this._snackBar.open('UPDATE FAILED.', 'OK', { duration: 5000 });

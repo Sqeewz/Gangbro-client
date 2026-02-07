@@ -1,3 +1,4 @@
+<app-shadow-cursor></app-shadow-cursor>
 <div class="container">
     <app-navbar></app-navbar>
     <div class="content">
@@ -11,9 +12,21 @@
     </button>
 </div>
 
-<ngx-spinner bdColor="rgba(18, 18, 18, 0.9)" size="large" color="#7c4dff" type="ball-atom" [fullScreen]="true">
-    <p
-        style="color: white; font-family: 'Oxanium', sans-serif; letter-spacing: 4px; font-weight: 700; text-transform: uppercase;">
-        INITIALIZING_SYSTEM...
-    </p>
+<ngx-spinner bdColor="rgba(10, 10, 15, 0.98)" [fullScreen]="true">
+    <div class="loading-terminal">
+        <div class="glitch-text" data-text="CHARGING_SYSTEM...">CHARGING_SYSTEM...</div>
+
+        <div class="battery-wrapper">
+            <div class="battery-container">
+                <div class="battery-body">
+                    <div class="battery-level"></div>
+                    <div class="electricity-bolt"></div>
+                    <div class="battery-glass"></div>
+                </div>
+                <div class="battery-cap"></div>
+            </div>
+        </div>
+
+        <p class="status-text">CHARGING_SYSTEM...</p>
+    </div>
 </ngx-spinner>

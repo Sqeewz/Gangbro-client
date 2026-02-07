@@ -24,24 +24,28 @@ export class MissionService {
     return missions
   }
 
-  async getById(id: number): Promise<Mission> {
+  async getById(id: number, silent = false): Promise<Mission> {
     const url = this._base_url + `/view/${id}`
-    return await firstValueFrom(this._http.get<Mission>(url))
+    const headers = silent ? { 'X-Skip-Loading': 'true' } : undefined
+    return await firstValueFrom(this._http.get<Mission>(url, { headers }))
   }
 
-  async getRoster(id: number): Promise<Brawler[]> {
+  async getRoster(id: number, silent = false): Promise<Brawler[]> {
     const url = this._base_url + `/view/roster/${id}`
-    return await firstValueFrom(this._http.get<Brawler[]>(url))
+    const headers = silent ? { 'X-Skip-Loading': 'true' } : undefined
+    return await firstValueFrom(this._http.get<Brawler[]>(url, { headers }))
   }
 
-  async getChatMessages(missionId: number): Promise<any[]> {
+  async getChatMessages(missionId: number, silent = false): Promise<any[]> {
     const url = this._base_url + `/mission-chats/${missionId}`
-    return await firstValueFrom(this._http.get<any[]>(url))
+    const headers = silent ? { 'X-Skip-Loading': 'true' } : undefined
+    return await firstValueFrom(this._http.get<any[]>(url, { headers }))
   }
 
-  async sendChatMessage(missionId: number, message: string): Promise<void> {
+  async sendChatMessage(missionId: number, message: string, silent = false): Promise<void> {
     const url = this._base_url + `/mission-chats/${missionId}`
-    await firstValueFrom(this._http.post(url, { message }))
+    const headers = silent ? { 'X-Skip-Loading': 'true' } : undefined
+    await firstValueFrom(this._http.post(url, { message }, { headers }))
   }
 
   private createQueryString(filter: MissionFilter): string {

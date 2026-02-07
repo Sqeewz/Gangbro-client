@@ -5,15 +5,19 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterOutlet } from '@angular/router';
 import { Navbar } from './navbar/navbar';
 import { NgxSpinnerComponent } from 'ngx-spinner';
+import { ShadowCursorComponent } from './_components/shadow-cursor/shadow-cursor.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, Navbar, NgxSpinnerComponent, MatSnackBarModule, MatIconModule, MatTooltipModule],
+  imports: [RouterOutlet, Navbar, NgxSpinnerComponent, MatSnackBarModule, MatIconModule, MatTooltipModule, ShadowCursorComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
 export class App {
+  constructor() {
+    console.log('GangBro App Initialized - V2 Loading Screen');
+  }
   protected readonly title = signal('GangBro-client');
   private _snackBar = inject(MatSnackBar);
 
