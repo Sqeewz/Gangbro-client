@@ -38,18 +38,6 @@
             <button mat-icon-button class="logout-btn" (click)="logout()" matTooltip="LOG OUT">
                 <mat-icon>logout</mat-icon>
             </button>
-
-            <!-- Clear Cache -->
-            <button mat-icon-button class="cache-btn" (click)="clearCache()" matTooltip="PURGE CACHE">
-                <mat-icon>delete_forever</mat-icon>
-            </button>
-
-            <!-- Notification Bell -->
-            <button mat-icon-button class="notif-btn" [matMenuTriggerFor]="notifMenu" (click)="markAllAsRead()"
-                matTooltip="NOTIFICATIONS">
-                <mat-icon [matBadge]="unreadCount() > 0 ? unreadCount() : null" matBadgeColor="warn"
-                    [class.has-unread]="unreadCount() > 0">notifications</mat-icon>
-            </button>
         </div>
         }
     </div>
