@@ -23,6 +23,11 @@ export const routes: Routes = [
         loadComponent: () => import('./missions/my-missions/my-missions').then(c => c.MyMissions),
         canActivate: [authGuard]
     },
+    {
+        path: 'setting',
+        loadComponent: () => import('./setting/setting').then(c => c.Setting),
+        canActivate: [authGuard]
+    },
     { path: 'server-error', component: ServerError },
     { path: '**', component: NotFound },
 ]

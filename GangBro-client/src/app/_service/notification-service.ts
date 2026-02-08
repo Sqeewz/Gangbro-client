@@ -1,4 +1,5 @@
 import { inject, Injectable, signal, OnDestroy, NgZone } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { PassportService } from './passport-service';
 import { MissionService } from './mission-service';
 import { Mission } from '../_models/mission';
@@ -112,6 +113,8 @@ export class NotificationService implements OnDestroy {
         }
     }
 
+    private _snackBar = inject(MatSnackBar);
+
     addNotification(notif: Partial<Notification>) {
         const newNotif: Notification = {
             id: Math.random().toString(36).substr(2, 9),
@@ -124,6 +127,14 @@ export class NotificationService implements OnDestroy {
 
         this.notifications.update(prev => [newNotif, ...prev]);
         this.updateUnreadCount();
+
+        // Show toast popup in top-right
+        this._snackBar.open(newNotif.message, newNotif.title, {
+            duration: 5000,
+            horizontalPosition: 'right',
+            verticalPosition: 'top',
+            panelClass: ['gang-snackbar', `snackbar-${newNotif.type}`]
+        });
 
         if ('Notification' in window && Notification.permission === 'granted') {
             new Notification(newNotif.title, { body: newNotif.message });

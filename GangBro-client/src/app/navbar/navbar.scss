@@ -13,11 +13,11 @@
     box-shadow: 5px 0 30px rgba(0, 0, 0, 0.5);
 
     &:hover {
-        width: 200px;
+        width: 260px;
 
         .btn-text,
         .brand-text,
-        .user-name {
+        .profile-info {
             opacity: 1;
             visibility: visible;
             width: auto;
@@ -28,6 +28,54 @@
 
 .sidebar-top {
     margin-bottom: 40px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.user-profile-top {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    width: 100%;
+    padding: 0 18px;
+    transition: all 0.3s;
+
+    &:hover {
+        .user-avatar {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px var(--gang-primary);
+        }
+    }
+
+    .profile-info {
+        display: flex;
+        flex-direction: column;
+        margin-left: 15px;
+        opacity: 0;
+        visibility: hidden;
+        width: 0;
+        transition: all 0.3s;
+        white-space: nowrap;
+
+        .user-name {
+            font-family: 'Oxanium', sans-serif;
+            font-weight: 800;
+            font-size: 0.9rem;
+            color: white;
+            letter-spacing: 1px;
+        }
+
+        .user-status {
+            font-size: 0.6rem;
+            color: #00e676;
+            font-weight: 900;
+            letter-spacing: 2px;
+            margin-top: 2px;
+        }
+    }
 }
 
 .gang-brand {
@@ -35,6 +83,7 @@
     align-items: center;
     cursor: pointer;
     text-decoration: none;
+    padding: 0 20px;
 
     .brand-logo {
         width: 40px;
@@ -53,6 +102,7 @@
         visibility: hidden;
         width: 0;
         transition: all 0.3s;
+        margin-left: 15px;
 
         .highlight {
             color: var(--gang-accent);
@@ -236,7 +286,8 @@
             width: 60px;
 
             .btn-text,
-            .brand-text {
+            .brand-text,
+            .profile-info {
                 display: none;
             }
         }
@@ -245,5 +296,41 @@
     .user-avatar {
         width: 36px;
         height: 36px;
+    }
+}
+
+/* SnackBar Notification Popup Styles */
+::ng-deep .gang-snackbar {
+    background: rgba(15, 15, 20, 0.95) !important;
+    backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 8px !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8) !important;
+    font-family: 'Oxanium', sans-serif !important;
+
+    .mdc-snackbar__label {
+        font-weight: 700 !important;
+        letter-spacing: 0.5px !important;
+        color: white !important;
+    }
+
+    .mdc-snackbar__surface {
+        background: transparent !important;
+    }
+
+    &.snackbar-success {
+        border-left: 4px solid #00e676 !important;
+    }
+
+    &.snackbar-error {
+        border-left: 4px solid #ff1744 !important;
+    }
+
+    &.snackbar-warning {
+        border-left: 4px solid #ff9100 !important;
+    }
+
+    &.snackbar-info {
+        border-left: 4px solid var(--gang-primary) !important;
     }
 }

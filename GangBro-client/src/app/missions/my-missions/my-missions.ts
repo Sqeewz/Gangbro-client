@@ -12,6 +12,7 @@ import { Router } from '@angular/router';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ConfirmDialog } from '../../_dialog/confirm-dialog/confirm-dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { getAvatar } from '../../_helpers/util';
 
 @Component({
   selector: 'app-my-missions',
@@ -55,10 +56,10 @@ import { MatIconModule } from '@angular/material/icon';
               } @else {
                 <div class="map-grid">
                   @for (m of missions(); track m.id; let i = $index) {
-                    <div class="map-card" 
-                         [class.selected]="selectedMissionId() === m.id" 
-                         [class.chief-mode]="isChief(m)"
-                         (click)="onViewAbout(m.id)">
+                     <div class="map-card" 
+                          [class.selected]="selectedMissionId() === m.id" 
+                          [class.chief-mode]="isChief(m)"
+                          (click)="handleCardClick(m)">
                         
                         <div class="map-image">
                             <img [src]="getBgImage(i)" alt="Mission Background">
@@ -535,9 +536,25 @@ export class MyMissions {
   selectedMissionId = signal<number | null>(null);
   selectedMission = signal<Mission | null>(null);
 
+  isMobile = signal(window.innerWidth <= 768);
+  display_name = computed(() => this._passportService.data()?.display_name);
+  avatar_url = computed(() => getAvatar(this._passportService.data()));
+
   constructor() {
     this.myId.set(this._passportService.data()?.user_id);
     this.loadMissions();
+
+    window.addEventListener('resize', () => {
+      this.isMobile.set(window.innerWidth <= 768);
+    });
+  }
+
+  handleCardClick(m: Mission) {
+    if (this.isMobile()) {
+      this.onViewAbout(m.id);
+    } else {
+      this.selectMission(m);
+    }
   }
 
   getBgImage(index: number): string {

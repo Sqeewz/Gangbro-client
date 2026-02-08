@@ -4,6 +4,16 @@
             <img src="/logo.ico" alt="Logo" class="brand-logo">
             <span class="brand-text">GANG <span class="highlight">BRO</span></span>
         </span>
+
+        @if (display_name()) {
+        <div class="user-profile-top" [matMenuTriggerFor]="menu">
+            <img [src]="avatar_url()" alt="User Avatar" class="user-avatar shadow-glow">
+            <div class="profile-info">
+                <span class="user-name">{{display_name()}}</span>
+                <span class="user-status">ONLINE</span>
+            </div>
+        </div>
+        }
     </div>
 
     <div class="sidebar-center">
@@ -22,6 +32,11 @@
                 matTooltip="ABOUT US">
                 <mat-icon>info</mat-icon>
                 <span class="btn-text">ABOUT US</span>
+            </button>
+            <button mat-button class="nav-btn" routerLink="/setting" routerLinkActive="gang-active"
+                matTooltip="SETTINGS">
+                <mat-icon>settings</mat-icon>
+                <span class="btn-text">SETTINGS</span>
             </button>
         </div>
     </div>
@@ -56,11 +71,6 @@
                     }
                 </div>
             </mat-menu>
-
-            <!-- Profile Menu -->
-            <div class="user-profile" [matMenuTriggerFor]="menu">
-                <img [src]="avatar_url()" alt="User Avatar" class="user-avatar shadow-glow">
-            </div>
         </div>
 
         <mat-menu #menu="matMenu" class="gang-menu" panelClass="gang-menu">
