@@ -1,6 +1,5 @@
 import { Component, computed, inject, Signal } from '@angular/core'
 import { MatButtonModule } from '@angular/material/button'
-import { MatToolbarModule } from '@angular/material/toolbar'
 import { MatMenuModule } from '@angular/material/menu'
 import { MatIconModule } from '@angular/material/icon'
 import { Router, RouterLink, RouterLinkActive } from "@angular/router"
@@ -15,7 +14,6 @@ import { MatSnackBarModule } from '@angular/material/snack-bar'
 @Component({
   selector: 'app-navbar',
   imports: [
-    MatToolbarModule,
     MatButtonModule,
     MatMenuModule,
     RouterLink,
