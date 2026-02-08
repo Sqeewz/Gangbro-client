@@ -4,15 +4,20 @@
             <img src="/logo.ico" alt="Logo" class="brand-logo">
             <span class="brand-text">GANG <span class="highlight">BRO</span></span>
         </span>
+
+        @if (display_name()) {
+        <div class="user-profile-top" [matMenuTriggerFor]="profileMenu">
+            <img [src]="avatar_url() || 'assets/default-avatar.png'" class="user-avatar shadow-glow" alt="User">
+            <div class="profile-info">
+                <span class="user-name">{{ display_name() }}</span>
+                <span class="user-status">OPERATIVE ONLINE</span>
+            </div>
+        </div>
+        }
     </div>
 
     <div class="sidebar-center">
         <div class="nav-links">
-            <button mat-button class="nav-btn" routerLink="/profile" routerLinkActive="gang-active"
-                matTooltip="MY PROFILE">
-                <mat-icon>account_circle</mat-icon>
-                <span class="btn-text">PROFILE</span>
-            </button>
             <button mat-button class="nav-btn" routerLink="/missions" routerLinkActive="gang-active"
                 matTooltip="MISSIONS">
                 <mat-icon>explore</mat-icon>
@@ -32,15 +37,37 @@
     </div>
 
     <div class="sidebar-bottom">
-        @if (display_name()) {
         <div class="user-actions">
-            <!-- Logout -->
-            <button mat-icon-button class="logout-btn" (click)="logout()" matTooltip="LOG OUT">
-                <mat-icon>logout</mat-icon>
+            <button mat-icon-button class="notif-btn" [matMenuTriggerFor]="notifMenu" matTooltip="NOTIFICATIONS">
+                <mat-icon [matBadge]="unreadCount()" [matBadgeHidden]="unreadCount() === 0" matBadgeColor="warn"
+                    [class.has-unread]="unreadCount() > 0">
+                    notifications
+                </mat-icon>
+            </button>
+            <button mat-icon-button class="cache-btn" (click)="clearCache()" matTooltip="PURGE CACHE">
+                <mat-icon>delete_sweep</mat-icon>
             </button>
         </div>
-        }
     </div>
+
+    <mat-menu #profileMenu="matMenu" class="gang-menu">
+        <div class="menu-user-info">
+            <span class="menu-name">{{ display_name() }}</span>
+        </div>
+        <button mat-menu-item routerLink="/profile">
+            <mat-icon>account_circle</mat-icon>
+            <span>PROFILE</span>
+        </button>
+        <button mat-menu-item routerLink="/profile" [queryParams]="{tab: 'active'}">
+            <mat-icon>assignment</mat-icon>
+            <span>MY MISSION</span>
+        </button>
+        <hr class="menu-divider">
+        <button mat-menu-item (click)="logout()" class="logout-item">
+            <mat-icon>logout</mat-icon>
+            <span>LOGOUT SYSTEM</span>
+        </button>
+    </mat-menu>
 
     <!-- Notifications Menu -->
 

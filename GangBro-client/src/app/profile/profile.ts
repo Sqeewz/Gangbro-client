@@ -10,7 +10,7 @@ import { CommonModule } from '@angular/common'
 import { MatIconModule } from '@angular/material/icon'
 import { MatButtonModule } from '@angular/material/button'
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar'
-import { Router } from '@angular/router'
+import { ActivatedRoute, Router } from '@angular/router'
 import { Mission } from '../_models/mission'
 import { MissionStatus } from '../_enums/mission-status.enum'
 import { confirmAndExecute } from '../_helpers/dialog.helper'
@@ -34,6 +34,7 @@ export class Profile implements OnDestroy {
   private _missionService = inject(MissionService)
   private _router = inject(Router)
   private _snackBar = inject(MatSnackBar)
+  private _route = inject(ActivatedRoute)
 
   avatar_url: Signal<string>
   display_name: Signal<string | undefined>
@@ -69,6 +70,14 @@ export class Profile implements OnDestroy {
     this.avatar_url = computed(() => this._passport.avatar())
     this.display_name = computed(() => this._passport.data()?.display_name)
     this.loadMissions();
+
+    this._route.queryParams.subscribe(params => {
+      const tab = params['tab'];
+      if (tab === 'active' || tab === 'archives' || tab === 'training') {
+        this.activeTab.set(tab);
+      }
+    });
+
     window.addEventListener('resize', this._resizeListener);
   }
 
