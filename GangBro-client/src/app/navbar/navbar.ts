@@ -9,6 +9,7 @@ import { getAvatar } from '../_helpers/util'
 import { NotificationService } from '../_service/notification-service'
 import { CommonModule, DatePipe } from '@angular/common'
 import { MatBadgeModule } from '@angular/material/badge'
+import { MatTooltipModule } from '@angular/material/tooltip'
 
 @Component({
   selector: 'app-navbar',
@@ -21,6 +22,7 @@ import { MatBadgeModule } from '@angular/material/badge'
     MatIconModule,
     CommonModule,
     MatBadgeModule,
+    MatTooltipModule,
     DatePipe
   ],
   templateUrl: './navbar.html',

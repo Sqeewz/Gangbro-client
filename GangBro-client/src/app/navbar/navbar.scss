@@ -1,105 +1,147 @@
-.gang-navbar {
-    background: rgba(18, 18, 18, 0.85);
-    backdrop-filter: blur(15px);
-    border-bottom: 2px solid var(--gang-primary);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.7);
-    height: 80px;
-    padding: 0 clamp(16px, 4vw, 32px);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
+.gang-sidebar {
+    height: 100vh;
+    width: 80px;
+    background: rgba(10, 10, 12, 0.95);
+    backdrop-filter: blur(20px);
+    border-right: 1px solid rgba(157, 80, 187, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0;
+    z-index: 1001;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 5px 0 30px rgba(0, 0, 0, 0.5);
+
+    &:hover {
+        width: 200px;
+
+        .btn-text,
+        .brand-text,
+        .user-name {
+            opacity: 1;
+            visibility: visible;
+            width: auto;
+            margin-left: 15px;
+        }
+    }
+}
+
+.sidebar-top {
+    margin-bottom: 40px;
 }
 
 .gang-brand {
-    font-size: 26px;
-    font-weight: 900;
-    letter-spacing: 4px;
-    color: white;
-    margin-right: 60px;
-    cursor: pointer;
-    font-family: 'Oxanium', sans-serif;
-    text-shadow: 0 0 10px rgba(157, 80, 187, 0.5);
     display: flex;
     align-items: center;
-    gap: 12px;
+    cursor: pointer;
+    text-decoration: none;
 
     .brand-logo {
-        height: 32px;
-        width: auto;
-        filter: drop-shadow(0 0 5px rgba(157, 80, 187, 0.5));
+        width: 40px;
+        height: 40px;
+        filter: drop-shadow(0 0 10px rgba(157, 80, 187, 0.5));
     }
 
-    .highlight {
-        color: transparent;
-        background: var(--gang-gradient-main);
-        -webkit-background-clip: text;
-        background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
+    .brand-text {
+        font-family: 'Oxanium', sans-serif;
+        font-weight: 900;
+        font-size: 1.2rem;
+        letter-spacing: 2px;
+        color: white;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        width: 0;
+        transition: all 0.3s;
 
-    &:hover {
-        text-shadow: 0 0 20px rgba(157, 80, 187, 0.8);
+        .highlight {
+            color: var(--gang-accent);
+        }
     }
+}
+
+.sidebar-center {
+    flex: 1;
+    width: 100%;
 }
 
 .nav-links {
     display: flex;
-    gap: 24px;
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
 }
 
 .nav-btn {
+    width: 100% !important;
+    height: 50px !important;
+    border-radius: 0 !important;
     color: var(--gang-text-muted) !important;
-    font-family: 'Oxanium', sans-serif !important;
-    font-weight: 700 !important;
-    letter-spacing: 2px !important;
-    font-size: 0.9rem !important;
-    transition: all 0.3s ease !important;
-    height: 40px !important;
-    padding: 0 20px !important;
-    border-radius: 4px !important;
-    background: transparent !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    padding: 0 25px !important;
+    transition: all 0.3s !important;
+    position: relative;
+
+    mat-icon {
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+    }
+
+    .btn-text {
+        font-family: 'Oxanium', sans-serif;
+        font-weight: 700;
+        font-size: 0.8rem;
+        letter-spacing: 2px;
+        opacity: 0;
+        visibility: hidden;
+        width: 0;
+        transition: all 0.3s;
+        white-space: nowrap;
+    }
 
     &:hover {
         color: white !important;
-        background: transparent !important;
-        box-shadow: none !important;
+        background: rgba(255, 255, 255, 0.05) !important;
+    }
+
+    &.gang-active {
+        color: var(--gang-accent) !important;
+        background: rgba(249, 212, 35, 0.05) !important;
+
+        &::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 20%;
+            height: 60%;
+            width: 4px;
+            background: var(--gang-accent);
+            box-shadow: 0 0 10px var(--gang-accent);
+        }
     }
 }
 
-.gang-active {
-    color: var(--gang-accent) !important;
-    box-shadow: inset 0 -2px 0 var(--gang-accent) !important;
-    background: transparent !important;
-}
-
-.spacer {
-    flex: 1 1 auto;
+.sidebar-bottom {
+    width: 100%;
+    padding-bottom: 20px;
 }
 
 .user-actions {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 16px;
-
-    .about-link {
-        height: 36px !important;
-        padding: 0 12px !important;
-        font-size: 0.8rem !important;
-        margin-right: -8px; // Pull closer to notif btn
-    }
+    gap: 20px;
+    width: 100%;
 }
 
 .notif-btn {
-    width: 44px !important;
-    height: 44px !important;
     color: var(--gang-text-muted) !important;
-    transition: all 0.3s ease;
-    background: transparent !important;
 
     &:hover {
         color: var(--gang-accent) !important;
-        background: transparent !important;
-        box-shadow: none !important;
     }
 
     .has-unread {
@@ -107,33 +149,65 @@
     }
 }
 
+.user-profile {
+    cursor: pointer;
+    transition: transform 0.3s;
+
+    &:hover {
+        transform: scale(1.1);
+    }
+}
+
+.user-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid var(--gang-primary);
+    object-fit: cover;
+
+    &.shadow-glow {
+        box-shadow: 0 0 15px rgba(157, 80, 187, 0.3);
+    }
+}
+
+.menu-user-info {
+    padding: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+
+    .menu-name {
+        display: block;
+        font-family: 'Oxanium', sans-serif;
+        font-weight: 800;
+        font-size: 0.9rem;
+        color: var(--gang-accent);
+        letter-spacing: 1px;
+    }
+}
+
 @keyframes pulse-glow {
-    0% {
+
+    0%,
+    100% {
         filter: drop-shadow(0 0 2px var(--gang-accent));
     }
 
     50% {
         filter: drop-shadow(0 0 8px var(--gang-accent));
     }
-
-    100% {
-        filter: drop-shadow(0 0 2px var(--gang-accent));
-    }
 }
 
+/* Notification Menu Refinement */
 ::ng-deep .gang-notif-menu {
-    background: #121212 !important;
-    border: 2px solid var(--gang-primary) !important;
-    border-radius: 4px !important;
+    background: #0f0f11 !important;
+    border: 1px solid rgba(157, 80, 187, 0.3) !important;
+    border-radius: 8px !important;
     width: 320px;
-    max-height: 450px;
-    margin-top: 15px !important;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8) !important;
+    margin-left: 20px !important;
 
     .notif-header {
-        padding: 16px;
-        background: #1a1a1a;
-        border-bottom: 1px solid #333;
+        padding: 15px;
+        background: rgba(255, 255, 255, 0.02);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -141,238 +215,35 @@
         h3 {
             margin: 0;
             font-size: 0.8rem;
-            font-weight: 800;
             color: var(--gang-accent);
             letter-spacing: 2px;
-            font-family: 'Oxanium', sans-serif;
         }
+    }
+}
 
-        .clear-btn {
-            font-size: 0.65rem !important;
-            padding: 0 8px !important;
-            height: 24px !important;
-            line-height: 24px !important;
-            color: var(--gang-text-muted) !important;
+/* Material Menu Overrides */
+::ng-deep .gang-menu {
+    background: #0f0f11 !important;
+    border: 1px solid rgba(157, 80, 187, 0.3) !important;
+    margin-left: 20px !important;
+}
 
-            &:hover {
-                color: white !important;
-                background: transparent !important;
+@media (max-width: 768px) {
+    .gang-sidebar {
+        width: 60px;
+
+        &:hover {
+            width: 60px;
+
+            .btn-text,
+            .brand-text {
+                display: none;
             }
         }
     }
 
-    .notif-list {
-        max-height: 350px;
-        overflow-y: auto;
-
-        &::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        &::-webkit-scrollbar-thumb {
-            background: var(--gang-primary);
-        }
-    }
-
-    .notif-item {
-        padding: 14px 16px;
-        border-bottom: 1px solid #222;
-        transition: all 0.2s;
-        border-left: 3px solid transparent;
-
-        &:hover {
-            background: rgba(255, 255, 255, 0.03);
-        }
-
-        &.unread {
-            background: rgba(157, 80, 187, 0.05);
-            border-left-color: var(--gang-primary);
-        }
-
-        &.success {
-            border-left-color: #00e676;
-        }
-
-        &.error {
-            border-left-color: #ff1744;
-        }
-
-        .notif-title {
-            font-family: 'Oxanium', sans-serif;
-            font-size: 0.75rem;
-            font-weight: 800;
-            color: var(--gang-text-muted);
-            margin-bottom: 4px;
-        }
-
-        .notif-msg {
-            color: #ddd;
-            font-size: 0.8rem;
-            line-height: 1.4;
-            margin-bottom: 4px;
-        }
-
-        .notif-time {
-            color: #555;
-            font-size: 0.65rem;
-            font-weight: 700;
-        }
-    }
-
-    .empty-notif {
-        padding: 40px 20px;
-        text-align: center;
-        color: #444;
-        font-family: 'Oxanium', sans-serif;
-        font-size: 0.8rem;
-        font-weight: 700;
-        letter-spacing: 2px;
-    }
-}
-
-.user-profile {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 8px 16px;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    background: transparent !important;
-    font-family: 'Oxanium', sans-serif;
-    border: none !important;
-    box-shadow: none !important;
-
-    &:hover {
-        color: var(--gang-primary);
-        background: transparent !important;
-        box-shadow: none !important;
-    }
-}
-
-.user-avatar {
-    width: 38px;
-    height: 38px;
-    border-radius: 4px;
-    border: 2px solid var(--gang-secondary);
-    object-fit: cover;
-    background: var(--gang-surface);
-}
-
-.user-name {
-    font-weight: 700;
-    color: white;
-    font-size: 14px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-}
-
-// Global Mat-Menu overrides are in styles.scss, but we can refine here if needed
-::ng-deep .gang-menu {
-    border: 2px solid var(--gang-primary) !important;
-    background: #121212 !important;
-    margin-top: 15px !important;
-}
-
-// Aggressively remove Material button hover/focus backgrounds
-::ng-deep {
-
-    .nav-btn,
-    .notif-btn {
-
-        .mat-mdc-button-persistent-ripple::before,
-        .mat-mdc-icon-button-persistent-ripple::before {
-            display: none !important;
-        }
-
-        &:hover,
-        &:focus,
-        &:active {
-            background: transparent !important;
-            --mat-mdc-button-persistent-ripple-color: transparent !important;
-            --mat-ripple-color: transparent !important;
-        }
-    }
-
-    // Remove background from the whole button container if Material adds it
-    .mat-mdc-button:hover .mat-mdc-button-focus-overlay,
-    .mat-mdc-icon-button:hover .mat-mdc-button-focus-overlay {
-        opacity: 0 !important;
-    }
-}
-
-// Mobile Responsiveness
-@media (max-width: 768px) {
-    .gang-navbar {
-        height: 60px;
-        padding: 0 12px;
-    }
-
-    .gang-brand {
-        font-size: 16px;
-        margin-right: 12px;
-        letter-spacing: 1.5px;
-    }
-
-    .nav-links {
-        gap: 4px;
-
-        .nav-btn {
-            font-size: 0.65rem !important;
-            padding: 0 6px !important;
-            height: 32px !important;
-            letter-spacing: 1px !important;
-        }
-    }
-
-    .user-actions {
-        gap: 4px;
-    }
-
-    .user-name {
-        display: none;
-    }
-
-    .user-profile {
-        padding: 4px;
-        gap: 0;
-    }
-
     .user-avatar {
-        width: 30px;
-        height: 30px;
-    }
-
-    .notif-btn {
-        width: 32px !important;
-        height: 32px !important;
-
-        mat-icon {
-            font-size: 20px;
-            width: 20px;
-            height: 20px;
-        }
-    }
-}
-
-@media (max-width: 480px) {
-    .gang-navbar {
-        padding: 0 8px;
-    }
-
-    .gang-brand {
-        font-size: 14px;
-        letter-spacing: 1px;
-        margin-right: 8px;
-    }
-
-    .nav-links {
-        gap: 0;
-    }
-
-    .nav-btn {
-        font-size: 0.6rem !important;
-        padding: 0 4px !important;
-        min-width: unset !important;
+        width: 36px;
+        height: 36px;
     }
 }

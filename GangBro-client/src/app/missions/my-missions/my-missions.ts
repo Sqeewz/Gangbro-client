@@ -19,22 +19,6 @@ import { MatIconModule } from '@angular/material/icon';
   imports: [CommonModule, MatMenuModule, MatButtonModule, MatSnackBarModule, MatDialogModule, MatIconModule],
   template: `
     <div class="lobby-wrapper">
-      <!-- Sidebar Navigation -->
-      <div class="side-nav">
-          <div class="side-logo">
-              <mat-icon>security</mat-icon>
-          </div>
-          <div class="nav-items">
-              <div class="nav-item active"><mat-icon>view_module</mat-icon></div>
-              <div class="nav-item"><mat-icon>account_balance_wallet</mat-icon></div>
-              <div class="nav-item"><mat-icon>equalizer</mat-icon></div>
-              <div class="nav-item"><mat-icon>settings</mat-icon></div>
-          </div>
-          <div class="side-footer">
-              <mat-icon>logout</mat-icon>
-          </div>
-      </div>
-
       <!-- Main Lobby Content -->
       <div class="lobby-content">
           <!-- Top Navigation Header -->
@@ -74,7 +58,7 @@ import { MatIconModule } from '@angular/material/icon';
                     <div class="map-card" 
                          [class.selected]="selectedMissionId() === m.id" 
                          [class.chief-mode]="isChief(m)"
-                         (click)="selectMission(m)">
+                         (click)="onViewAbout(m.id)">
                         
                         <div class="map-image">
                             <img [src]="getBgImage(i)" alt="Mission Background">
@@ -163,52 +147,6 @@ import { MatIconModule } from '@angular/material/icon';
         height: 100vh;
         background: radial-gradient(circle at center, #1a1a24 0%, #0a0a0c 100%);
         position: relative;
-    }
-
-    /* Sidebar Navigation */
-    .side-nav {
-        width: 60px;
-        background: rgba(0, 0, 0, 0.4);
-        border-right: 1px solid rgba(255, 255, 255, 0.05);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 20px 0;
-        z-index: 10;
-        backdrop-filter: blur(10px);
-    }
-
-    .side-logo {
-        color: var(--gang-accent);
-        margin-bottom: 40px;
-        mat-icon { font-size: 32px; width: 32px; height: 32px; }
-    }
-
-    .nav-items {
-        display: flex;
-        flex-direction: column;
-        gap: 25px;
-        flex: 1;
-
-        .nav-item {
-            color: rgba(255, 255, 255, 0.3);
-            cursor: pointer;
-            transition: all 0.3s;
-            &:hover, &.active {
-                color: white;
-                transform: scale(1.1);
-            }
-            &.active {
-                color: var(--gang-primary);
-                filter: drop-shadow(0 0 5px var(--gang-primary));
-            }
-        }
-    }
-
-    .side-footer {
-        color: rgba(255, 255, 255, 0.3);
-        cursor: pointer;
-        &:hover { color: #ff5252; }
     }
 
     /* Main Content */
