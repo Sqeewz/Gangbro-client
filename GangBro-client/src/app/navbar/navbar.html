@@ -6,11 +6,32 @@
         </span>
 
         @if (display_name()) {
-        <div class="user-profile-top" [matMenuTriggerFor]="profileMenu">
-            <img [src]="avatar_url() || 'assets/default-avatar.png'" class="user-avatar shadow-glow" alt="User">
-            <div class="profile-info">
-                <span class="user-name">{{ display_name() }}</span>
-                <span class="user-status">OPERATIVE ONLINE</span>
+        <div class="user-profile-wrapper">
+            <div class="user-profile-top" (click)="toggleProfileSub()">
+                <img [src]="avatar_url() || 'assets/default-avatar.png'" class="user-avatar shadow-glow" alt="User">
+                <div class="profile-info">
+                    <div class="user-details">
+                        <span class="user-name">{{ display_name() }}</span>
+                        <span class="user-status">OPERATIVE ONLINE</span>
+                    </div>
+                    <mat-icon class="expand-icon">{{ isProfileExpanded() ? 'expand_less' : 'expand_more' }}</mat-icon>
+                </div>
+            </div>
+
+            <div class="profile-submenu" [class.expanded]="isProfileExpanded()">
+                <button mat-button class="nav-btn sub-item" routerLink="/profile" routerLinkActive="gang-active">
+                    <mat-icon>account_circle</mat-icon>
+                    <span class="btn-text">PROFILE</span>
+                </button>
+                <button mat-button class="nav-btn sub-item" routerLink="/profile" [queryParams]="{tab: 'active'}"
+                    routerLinkActive="gang-active">
+                    <mat-icon>assignment</mat-icon>
+                    <span class="btn-text">MY MISSION</span>
+                </button>
+                <button mat-button class="nav-btn sub-item logout-item-inline" (click)="logout()">
+                    <mat-icon>logout</mat-icon>
+                    <span class="btn-text">LOGOUT SYSTEM</span>
+                </button>
             </div>
         </div>
         }
@@ -49,25 +70,6 @@
             </button>
         </div>
     </div>
-
-    <mat-menu #profileMenu="matMenu" class="gang-menu">
-        <div class="menu-user-info">
-            <span class="menu-name">{{ display_name() }}</span>
-        </div>
-        <button mat-menu-item routerLink="/profile">
-            <mat-icon>account_circle</mat-icon>
-            <span>PROFILE</span>
-        </button>
-        <button mat-menu-item routerLink="/profile" [queryParams]="{tab: 'active'}">
-            <mat-icon>assignment</mat-icon>
-            <span>MY MISSION</span>
-        </button>
-        <hr class="menu-divider">
-        <button mat-menu-item (click)="logout()" class="logout-item">
-            <mat-icon>logout</mat-icon>
-            <span>LOGOUT SYSTEM</span>
-        </button>
-    </mat-menu>
 
     <!-- Notifications Menu -->
 

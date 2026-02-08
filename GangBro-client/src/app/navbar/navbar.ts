@@ -1,4 +1,4 @@
-import { Component, computed, inject, Signal } from '@angular/core'
+import { Component, computed, inject, Signal, signal } from '@angular/core'
 import { MatButtonModule } from '@angular/material/button'
 import { MatMenuModule } from '@angular/material/menu'
 import { MatIconModule } from '@angular/material/icon'
@@ -37,12 +37,18 @@ export class Navbar {
   display_name: Signal<string | undefined>
   avatar_url: Signal<string | undefined>
 
+  isProfileExpanded = signal(false);
+
   notifications = this._notification.notifications
   unreadCount = this._notification.unreadCount
 
   constructor() {
     this.display_name = computed(() => this._passport.data()?.display_name)
     this.avatar_url = computed(() => this._passport.avatar())
+  }
+
+  toggleProfileSub() {
+    this.isProfileExpanded.update(v => !v);
   }
 
   logout() {
