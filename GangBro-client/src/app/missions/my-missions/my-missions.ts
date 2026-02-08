@@ -11,6 +11,7 @@ import { AddMission } from '../../_models/add-mission';
 import { Router } from '@angular/router';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ConfirmDialog } from '../../_dialog/confirm-dialog/confirm-dialog';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-my-missions',
