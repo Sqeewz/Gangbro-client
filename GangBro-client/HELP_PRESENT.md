@@ -530,6 +530,7 @@ export const routes: Routes = [
 - **Antigravity:** AI-powered IDE จาก Google สำหรับการพัฒนาซอฟต์แวร์ยุค Agent-first
 - **Postman:** เครื่องมือทดสอบ API
 - **Podman:** Container engine สำหรับจัดการระบบ
+- **GitHub:** แพลตฟอร์มสำหรับเก็บโค้ดและทำงานร่วมกัน
 - **Testing:** Vitest (Next generation testing framework)
 - **Infrastructure:** Docker + Render Deployment
 

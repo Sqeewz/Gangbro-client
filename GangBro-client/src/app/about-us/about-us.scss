@@ -366,6 +366,8 @@
     gap: 12px;
 
     .tech-item {
+        text-decoration: none;
+        cursor: pointer;
         background: rgba(255, 255, 255, 0.02);
         border: 1px solid rgba(255, 255, 255, 0.04);
         border-radius: 10px;
@@ -397,6 +399,10 @@
             background: rgba(255, 255, 255, 0.06);
             transform: translateY(-5px);
             border-color: var(--gang-primary);
+
+            span {
+                color: var(--gang-primary);
+            }
         }
     }
 }
