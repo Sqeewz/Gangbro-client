@@ -519,11 +519,18 @@ export const routes: Routes = [
 - **Frontend:** Angular 21 (v19/v20+)
 - **Backend:** Rust (Axum Web Framework)
 - **Database:** PostgreSQL (via Supabase)
+- **Runtime:** Bun (Fastest JS Runtime)
+- **Language:** TypeScript (Type-safe Logic)
+- **Styling:** SCSS / SASS (Dynamic Styling)
+- **Storage:** Cloudinary (Media Assets)
 - **Real-time:** WebSockets & Polling fallback
 
 ### 🔧 DEV_ENVIRONMENT
 - **VS Code:** IDE หลักที่ใช้พัฒนา
-- **Antigravity AI:** ตัวช่วยจัดการ Codebase และพัฒนาระบบ
+- **Antigravity:** AI-powered IDE จาก Google สำหรับการพัฒนาซอฟต์แวร์ยุค Agent-first
+- **Postman:** เครื่องมือทดสอบ API
+- **Podman:** Container engine สำหรับจัดการระบบ
+- **Testing:** Vitest (Next generation testing framework)
 - **Infrastructure:** Docker + Render Deployment
 
 ### 🧠 AI_INTELLIGENCE
