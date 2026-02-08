@@ -56,11 +56,80 @@
         </div>
     </div>
 
-    <!-- Mission History -->
-    <div class="history-section">
+    <!-- Tab Navigation -->
+    <div class="profile-tabs">
+        <div class="tab-item" [class.active]="activeTab() === 'active'" (click)="activeTab.set('active')">
+            <span>ACTIVE OPS</span>
+        </div>
+        <div class="tab-item" [class.active]="activeTab() === 'archives'" (click)="activeTab.set('archives')">
+            <span>ARCHIVES</span>
+        </div>
+        <div class="tab-item" [class.active]="activeTab() === 'training'" (click)="activeTab.set('training')">
+            <span>TRAINING</span>
+        </div>
+        <div class="tab-indicator" [class]="activeTab()"></div>
+    </div>
+
+    <!-- Active Missions Section -->
+    @if (activeTab() === 'active') {
+    <div class="active-missions-section animate-fade-in">
+        <div class="section-header">
+            <h2 class="section-title">ACTIVE_OPERATIONS</h2>
+            <button class="gang-btn sm" (click)="onAdd()">NEW MISSION</button>
+        </div>
+
+        @if (isLoading()) {
+        <div class="loading-state">
+            <div class="cyber-spinner"></div>
+            <p>SYNCING_DATA_CORES...</p>
+        </div>
+        } @else if (activeMissions().length === 0) {
+        <div class="empty-state">
+            <mat-icon>security_update_warning</mat-icon>
+            <p>NO ACTIVE CONTRACTS DETECTED</p>
+        </div>
+        } @else {
+        <div class="active-grid">
+            @for (m of activeMissions(); track m.id) {
+            <div class="active-card" [class.chief-mode]="isChief(m)">
+                <div class="card-glow"></div>
+                <div class="category-tag">
+                    <mat-icon>{{ getCategoryIcon(m.category) }}</mat-icon>
+                    <span>{{ m.category }}</span>
+                </div>
+                <h3 class="mission-name">{{ m.name }}</h3>
+                <div class="mission-meta">
+                    <span class="status-badge" [class]="m.status">{{ m.status }}</span>
+                    <span class="crew-count">CREW: {{ m.crew_count }}</span>
+                </div>
+                <div class="card-actions">
+                    <button class="action-btn intel" (click)="onViewAbout(m.id)">INTEL</button>
+                    @if (isChief(m)) {
+                    <button class="action-btn edit" (click)="onEdit(m)">EDIT</button>
+                    }
+                    <button class="action-btn execute"
+                        [disabled]="isChief(m) && m.status === 'Open' && m.crew_count < 2" (click)="onExecute(m)">
+                        {{ getExecuteText(m) }}
+                    </button>
+                </div>
+            </div>
+            }
+        </div>
+        }
+    </div>
+    }
+
+    <!-- Mission History Logs -->
+    @if (activeTab() === 'archives') {
+    <div class="history-section animate-fade-in">
         <h2 class="section-title">CHRONOLOGICAL_LOGS</h2>
 
-        @if (historyMissions().length === 0) {
+        @if (isLoading()) {
+        <div class="loading-state">
+            <div class="cyber-spinner"></div>
+            <p>SYNCING_DATA_CORES...</p>
+        </div>
+        } @else if (historyMissions().length === 0) {
         <div class="empty-state">
             <mat-icon>storage</mat-icon>
             <p>NO ARCHIVED DATA FOUND IN SYSTEM</p>
@@ -90,4 +159,16 @@
         </div>
         }
     </div>
+    }
+
+    <!-- Training Placeholder -->
+    @if (activeTab() === 'training') {
+    <div class="training-section animate-fade-in">
+        <div class="empty-state training">
+            <mat-icon>terminal</mat-icon>
+            <p>TRAINING_SIMULATOR: OFFLINE</p>
+            <span class="sub-text">ENCRYPTION_KEY_REQUIRED</span>
+        </div>
+    </div>
+    }
 </div>

@@ -3,6 +3,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { PassportService } from './passport-service';
 import { MissionService } from './mission-service';
 import { Mission } from '../_models/mission';
+import { APP_CONFIG } from '../_constants/config.constants';
+import { MissionStatus } from '../_enums/mission-status.enum';
 
 export interface Notification {
     id: string;
@@ -16,10 +18,15 @@ export interface Notification {
 @Injectable({
     providedIn: 'root',
 })
+/**
+ * Service for handling real-time notifications by polling for mission updates.
+ * Manages notification state and displays toast messages.
+ */
 export class NotificationService implements OnDestroy {
     private _passport = inject(PassportService);
     private _mission = inject(MissionService);
     private _ngZone = inject(NgZone);
+    private _snackBar = inject(MatSnackBar);
 
     notifications = signal<Notification[]>([]);
     unreadCount = signal(0);
@@ -32,15 +39,21 @@ export class NotificationService implements OnDestroy {
         this.startPolling();
     }
 
+    /**
+     * Starts the polling mechanism to check for updates outside of Angular's zone for performance.
+     */
     private startPolling() {
         this.stopPolling();
         this._ngZone.runOutsideAngular(() => {
             this._pollingHandle = setInterval(() => {
                 this.checkForUpdates();
-            }, 15000); // Check every 15 seconds
+            }, APP_CONFIG.POLL_INTERVAL_MS);
         });
     }
 
+    /**
+     * Stops the polling mechanism.
+     */
     private stopPolling() {
         if (this._pollingHandle) {
             clearInterval(this._pollingHandle);
@@ -48,13 +61,16 @@ export class NotificationService implements OnDestroy {
         }
     }
 
+    /**
+     * Checks for mission updates and adds notifications if changes are detected.
+     */
     private async checkForUpdates() {
         const passport = this._passport.data();
         if (!passport) return;
 
         try {
             // Get all missions to find new ones
-            const allMissions = await this._mission.getByFilter({ page: 1, limit: 10 });
+            const allMissions = await this._mission.getByFilter({ page: 1, limit: APP_CONFIG.DEFAULT_PAGE_SIZE });
 
             // Get my missions to find status changes
             const myMissions = await this._mission.getMyMissions();
@@ -63,7 +79,7 @@ export class NotificationService implements OnDestroy {
                 // Check for new missions
                 if (this._lastMissions.length > 0) {
                     const newMissions = allMissions.filter(m =>
-                        m.status === 'Open' &&
+                        m.status === MissionStatus.Open &&
                         !this._lastMissions.some(lm => lm.id === m.id) &&
                         m.chief_id !== passport.user_id
                     );
@@ -85,13 +101,13 @@ export class NotificationService implements OnDestroy {
                             let title = 'MISSION UPDATE';
                             let type: 'info' | 'warning' | 'success' | 'error' = 'info';
 
-                            if (m.status === 'InProgress') {
+                            if (m.status === MissionStatus.InProgress) {
                                 title = 'MISSION STARTED';
                                 type = 'warning';
-                            } else if (m.status === 'Completed') {
+                            } else if (m.status === MissionStatus.Completed) {
                                 title = 'MISSION ACCOMPLISHED';
                                 type = 'success';
-                            } else if (m.status === 'Failed') {
+                            } else if (m.status === MissionStatus.Failed) {
                                 title = 'MISSION FAILED';
                                 type = 'error';
                             }
@@ -109,15 +125,17 @@ export class NotificationService implements OnDestroy {
                 this._lastMyMissions = myMissions;
             });
         } catch (e) {
-            console.warn('Notification poll failed');
+            // Silent fail for polling
         }
     }
 
-    private _snackBar = inject(MatSnackBar);
-
+    /**
+     * Adds a new notification and displays a snackbar.
+     * @param notif The partial notification data.
+     */
     addNotification(notif: Partial<Notification>) {
         const newNotif: Notification = {
-            id: Math.random().toString(36).substr(2, 9),
+            id: Math.random().toString(36).substring(2, 9),
             title: notif.title || 'NOTIFICATION',
             message: notif.message || '',
             time: new Date(),
@@ -128,19 +146,24 @@ export class NotificationService implements OnDestroy {
         this.notifications.update(prev => [newNotif, ...prev]);
         this.updateUnreadCount();
 
-        // Show toast popup in top-right
+        // Show toast popup
         this._snackBar.open(newNotif.message, newNotif.title, {
-            duration: 5000,
+            duration: APP_CONFIG.NOTIFICATION_DURATION,
             horizontalPosition: 'right',
             verticalPosition: 'top',
             panelClass: ['gang-snackbar', `snackbar-${newNotif.type}`]
         });
 
+        // Browser notification
         if ('Notification' in window && Notification.permission === 'granted') {
             new Notification(newNotif.title, { body: newNotif.message });
         }
     }
 
+    /**
+     * Marks a specific notification as read.
+     * @param id Notification ID.
+     */
     markAsRead(id: string) {
         this.notifications.update(prev =>
             prev.map(n => n.id === id ? { ...n, read: true } : n)
@@ -148,6 +171,9 @@ export class NotificationService implements OnDestroy {
         this.updateUnreadCount();
     }
 
+    /**
+     * Marks all notifications as read.
+     */
     markAllAsRead() {
         this.notifications.update(prev =>
             prev.map(n => ({ ...n, read: true }))
@@ -155,11 +181,17 @@ export class NotificationService implements OnDestroy {
         this.updateUnreadCount();
     }
 
+    /**
+     * Clears all notifications.
+     */
     clearAll() {
         this.notifications.set([]);
         this.updateUnreadCount();
     }
 
+    /**
+     * Updates the unread count signal.
+     */
     private updateUnreadCount() {
         this.unreadCount.set(this.notifications().filter(n => !n.read).length);
     }

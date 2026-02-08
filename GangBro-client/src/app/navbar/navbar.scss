@@ -187,7 +187,9 @@
     width: 100%;
 }
 
-.notif-btn {
+.notif-btn,
+.cache-btn,
+.logout-btn {
     color: var(--gang-text-muted) !important;
 
     &:hover {

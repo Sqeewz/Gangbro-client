@@ -15,35 +15,5 @@ import { ShadowCursorComponent } from './_components/shadow-cursor/shadow-cursor
   styleUrl: './app.scss'
 })
 export class App {
-  constructor() {
-    console.log('GangBro App Initialized - V2 Loading Screen');
-  }
   protected readonly title = signal('GangBro-client');
-  private _snackBar = inject(MatSnackBar);
-
-  clearCache() {
-    // Clear all storage
-    localStorage.clear();
-    sessionStorage.clear();
-
-    // Clear cookie-based cache if any (basic approach)
-    const cookies = document.cookie.split(";");
-    for (let i = 0; i < cookies.length; i++) {
-      const cookie = cookies[i];
-      const eqPos = cookie.indexOf("=");
-      const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
-      document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
-    }
-
-    this._snackBar.open('CACHE PURGED: SYSTEM REBOOTING...', 'OK', {
-      duration: 2000,
-      horizontalPosition: 'center',
-      verticalPosition: 'bottom'
-    });
-
-    // Force reload after a short delay
-    setTimeout(() => {
-      window.location.reload();
-    }, 1500);
-  }
 }

@@ -1,92 +1,74 @@
-<div class="gang-sidebar">
-    <div class="sidebar-top">
-        <span class="gang-brand" routerLink="/" routerLinkActive="gang-active" [routerLinkActiveOptions]="{exact:true}">
-            <img src="/logo.ico" alt="Logo" class="brand-logo">
-            <span class="brand-text">GANG <span class="highlight">BRO</span></span>
-        </span>
+<div class="sidebar-top">
+    <span class="gang-brand" routerLink="/" routerLinkActive="gang-active" [routerLinkActiveOptions]="{exact:true}">
+        <img src="/logo.ico" alt="Logo" class="brand-logo">
+        <span class="brand-text">GANG <span class="highlight">BRO</span></span>
+    </span>
+</div>
 
-        @if (display_name()) {
-        <div class="user-profile-top" [matMenuTriggerFor]="menu">
-            <img [src]="avatar_url()" alt="User Avatar" class="user-avatar shadow-glow">
-            <div class="profile-info">
-                <span class="user-name">{{display_name()}}</span>
-                <span class="user-status">ONLINE</span>
-            </div>
-        </div>
-        }
-    </div>
-
-    <div class="sidebar-center">
-        <div class="nav-links">
-            <button mat-button class="nav-btn" routerLink="/missions" routerLinkActive="gang-active"
-                matTooltip="MISSIONS">
-                <mat-icon>explore</mat-icon>
-                <span class="btn-text">MISSIONS</span>
-            </button>
-            <button mat-button class="nav-btn" routerLink="/my-missions" routerLinkActive="gang-active"
-                matTooltip="MY MISSIONS">
-                <mat-icon>assignment</mat-icon>
-                <span class="btn-text">MY MISSIONS</span>
-            </button>
-            <button mat-button class="nav-btn" routerLink="/about-us" routerLinkActive="gang-active"
-                matTooltip="ABOUT US">
-                <mat-icon>info</mat-icon>
-                <span class="btn-text">ABOUT US</span>
-            </button>
-            <button mat-button class="nav-btn" routerLink="/setting" routerLinkActive="gang-active"
-                matTooltip="SETTINGS">
-                <mat-icon>settings</mat-icon>
-                <span class="btn-text">SETTINGS</span>
-            </button>
-        </div>
-    </div>
-
-    <div class="sidebar-bottom">
-        @if (display_name()) {
-        <div class="user-actions">
-            <!-- Notification Bell -->
-            <button mat-icon-button class="notif-btn" [matMenuTriggerFor]="notifMenu" (click)="markAllAsRead()"
-                matTooltip="NOTIFICATIONS">
-                <mat-icon [matBadge]="unreadCount() > 0 ? unreadCount() : null" matBadgeColor="warn"
-                    [class.has-unread]="unreadCount() > 0">notifications</mat-icon>
-            </button>
-        </div>
-        }
-    </div>
-
-    <!-- Menus moved outside @if for global scope visibility -->
-    <mat-menu #menu="matMenu" class="gang-menu" panelClass="gang-menu">
-        <div class="menu-user-info">
-            <span class="menu-name">{{display_name()}}</span>
-        </div>
-        <button mat-menu-item routerLink="/profile">
-            <mat-icon>person</mat-icon>
-            <span>Profile</span>
+<div class="sidebar-center">
+    <div class="nav-links">
+        <button mat-button class="nav-btn" routerLink="/profile" routerLinkActive="gang-active" matTooltip="MY PROFILE">
+            <mat-icon>account_circle</mat-icon>
+            <span class="btn-text">PROFILE</span>
         </button>
-        <button mat-menu-item (click)="logout()">
+        <button mat-button class="nav-btn" routerLink="/missions" routerLinkActive="gang-active" matTooltip="MISSIONS">
+            <mat-icon>explore</mat-icon>
+            <span class="btn-text">MISSIONS</span>
+        </button>
+        <button mat-button class="nav-btn" routerLink="/about-us" routerLinkActive="gang-active" matTooltip="ABOUT US">
+            <mat-icon>info</mat-icon>
+            <span class="btn-text">ABOUT US</span>
+        </button>
+        <button mat-button class="nav-btn" routerLink="/setting" routerLinkActive="gang-active" matTooltip="SETTINGS">
+            <mat-icon>settings</mat-icon>
+            <span class="btn-text">SETTINGS</span>
+        </button>
+    </div>
+</div>
+
+<div class="sidebar-bottom">
+    @if (display_name()) {
+    <div class="user-actions">
+        <!-- Logout -->
+        <button mat-icon-button class="logout-btn" (click)="logout()" matTooltip="LOG OUT">
             <mat-icon>logout</mat-icon>
-            <span>Log Out</span>
         </button>
-    </mat-menu>
 
-    <mat-menu #notifMenu="matMenu" class="gang-notif-menu">
-        <div class="notif-header">
-            <h3>NOTIFICATIONS</h3>
-            <button mat-button class="clear-btn" (click)="clearNotifications(); $event.stopPropagation()">CLEAR
-                ALL</button>
-        </div>
-        <div class="notif-list" (click)="$event.stopPropagation()">
-            @for (notif of notifications(); track notif.id) {
-            <div class="notif-item" [class.unread]="!notif.read" [class]="notif.type">
-                <div class="notif-content">
-                    <div class="notif-title">{{notif.title}}</div>
-                    <div class="notif-msg">{{notif.message}}</div>
-                    <div class="notif-time">{{notif.time | date:'shortTime'}}</div>
-                </div>
+        <!-- Clear Cache -->
+        <button mat-icon-button class="cache-btn" (click)="clearCache()" matTooltip="PURGE CACHE">
+            <mat-icon>delete_forever</mat-icon>
+        </button>
+
+        <!-- Notification Bell -->
+        <button mat-icon-button class="notif-btn" [matMenuTriggerFor]="notifMenu" (click)="markAllAsRead()"
+            matTooltip="NOTIFICATIONS">
+            <mat-icon [matBadge]="unreadCount() > 0 ? unreadCount() : null" matBadgeColor="warn"
+                [class.has-unread]="unreadCount() > 0">notifications</mat-icon>
+        </button>
+    </div>
+    }
+</div>
+
+<!-- Notifications Menu -->
+
+<mat-menu #notifMenu="matMenu" class="gang-notif-menu">
+    <div class="notif-header">
+        <h3>NOTIFICATIONS</h3>
+        <button mat-button class="clear-btn" (click)="clearNotifications(); $event.stopPropagation()">CLEAR
+            ALL</button>
+    </div>
+    <div class="notif-list" (click)="$event.stopPropagation()">
+        @for (notif of notifications(); track notif.id) {
+        <div class="notif-item" [class.unread]="!notif.read" [class]="notif.type">
+            <div class="notif-content">
+                <div class="notif-title">{{notif.title}}</div>
+                <div class="notif-msg">{{notif.message}}</div>
+                <div class="notif-time">{{notif.time | date:'shortTime'}}</div>
             </div>
-            } @empty {
-            <div class="empty-notif">NO NEW UPDATES</div>
-            }
         </div>
-    </mat-menu>
+        } @empty {
+        <div class="empty-notif">NO NEW UPDATES</div>
+        }
+    </div>
+</mat-menu>
 </div>

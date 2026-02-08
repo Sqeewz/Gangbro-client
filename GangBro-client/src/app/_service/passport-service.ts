@@ -8,15 +8,30 @@ import { getAvatar } from '../_helpers/util'
 @Injectable({
   providedIn: 'root',
 })
+/**
+ * Service for managing user authentication state, passport data, and session.
+ * Handles login, registration, and persistent storage of user credentials.
+ */
 export class PassportService {
   private _key = 'passport'
   private _base_url = environment.baseUrl ? `${environment.baseUrl}/api` : '/api'
   private _http = inject(HttpClient)
 
+  /** Current user passport data signal. */
   data = signal<undefined | Passport>(undefined)
+  /** Current user avatar URL signal. */
   avatar = signal<string>(getAvatar())
+  /** User sign-in status signal. */
   isSignin = signal<boolean>(false)
 
+  constructor() {
+    this.loadPassportFormLocalStorage()
+  }
+
+  /**
+   * Saves a new avatar URL and persists it to local storage.
+   * @param url The new avatar image URL.
+   */
   saveAvatarImgUrl(url: string) {
     let passport = this.data()
     if (passport) {
@@ -29,6 +44,9 @@ export class PassportService {
     }
   }
 
+  /**
+   * Loads passport data from local storage on initialization.
+   */
   private loadPassportFormLocalStorage(): string | null {
     const jsonString = localStorage.getItem(this._key)
     if (!jsonString) return 'not found'
@@ -50,6 +68,9 @@ export class PassportService {
     return null
   }
 
+  /**
+   * Persists the current passport data to local storage.
+   */
   private savePassportToLocalStorage() {
     const passport = this.data()
     if (!passport) return
@@ -58,10 +79,9 @@ export class PassportService {
     this.isSignin.set(true)
   }
 
-  constructor() {
-    this.loadPassportFormLocalStorage()
-  }
-
+  /**
+   * Destroys the current session and clears local storage.
+   */
   destroy() {
     this.data.set(undefined)
     this.avatar.set(getAvatar())
@@ -69,16 +89,29 @@ export class PassportService {
     this.isSignin.set(false)
   }
 
+  /**
+   * Authenticates a user.
+   * @param login The login credentials.
+   * @returns A promise of an error message if failed, otherwise null.
+   */
   async login(login: LoginModel): Promise<null | string> {
     const api_url = this._base_url + '/authentication/login'
     return await this.fetchPassport(api_url, login)
   }
 
+  /**
+   * Registers a new brawler.
+   * @param register The registration data.
+   * @returns A promise of an error message if failed, otherwise null.
+   */
   async register(register: RegisterModel): Promise<null | string> {
     const api_url = this._base_url + '/brawler/register'
     return await this.fetchPassport(api_url, register)
   }
 
+  /**
+   * Internal helper to fetch passport from API and handle storage/sanitization.
+   */
   private async fetchPassport(api_url: string, model: LoginModel | RegisterModel): Promise<string | null> {
     try {
       const result = this._http.post<Passport>(api_url, model)
@@ -96,20 +129,11 @@ export class PassportService {
     } catch (error: any) {
       console.error('[Passport] Operation failed:', error);
 
-      // Handle Angular's HttpErrorResponse
       if (error && error.error) {
         const body = error.error;
-
-        // If body is already a string (common for non-JSON errors)
         if (typeof body === 'string') return body;
-
-        // If body is { "error": "message" }
         if (body.error && typeof body.error === 'string') return body.error;
-
-        // If body is { "message": "message" }
         if (body.message && typeof body.message === 'string') return body.message;
-
-        // Fallback for objects - stringify to avoid [object Object]
         try {
           return JSON.stringify(body);
         } catch (e) {

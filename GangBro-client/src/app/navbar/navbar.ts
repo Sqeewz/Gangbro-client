@@ -5,11 +5,12 @@ import { MatMenuModule } from '@angular/material/menu'
 import { MatIconModule } from '@angular/material/icon'
 import { Router, RouterLink, RouterLinkActive } from "@angular/router"
 import { PassportService } from '../_service/passport-service'
-import { getAvatar } from '../_helpers/util'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { NotificationService } from '../_service/notification-service'
 import { CommonModule, DatePipe } from '@angular/common'
 import { MatBadgeModule } from '@angular/material/badge'
 import { MatTooltipModule } from '@angular/material/tooltip'
+import { MatSnackBarModule } from '@angular/material/snack-bar'
 
 @Component({
   selector: 'app-navbar',
@@ -23,7 +24,8 @@ import { MatTooltipModule } from '@angular/material/tooltip'
     CommonModule,
     MatBadgeModule,
     MatTooltipModule,
-    DatePipe
+    DatePipe,
+    MatSnackBarModule
   ],
   templateUrl: './navbar.html',
   styleUrl: './navbar.scss',
@@ -32,6 +34,7 @@ export class Navbar {
   private _router = inject(Router)
   private _passport = inject(PassportService)
   private _notification = inject(NotificationService)
+  private _snackBar = inject(MatSnackBar)
 
   display_name: Signal<string | undefined>
   avatar_url: Signal<string | undefined>
@@ -41,7 +44,7 @@ export class Navbar {
 
   constructor() {
     this.display_name = computed(() => this._passport.data()?.display_name)
-    this.avatar_url = computed(() => getAvatar(this._passport.data()))
+    this.avatar_url = computed(() => this._passport.avatar())
   }
 
   logout() {
@@ -55,5 +58,32 @@ export class Navbar {
 
   clearNotifications() {
     this._notification.clearAll()
+  }
+
+  /**
+   * Purges all local storage, session storage, and cookies, then reloads the app.
+   * Useful for debugging or resetting the system state.
+   */
+  clearCache() {
+    localStorage.clear();
+    sessionStorage.clear();
+
+    const cookies = document.cookie.split(";");
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i];
+      const eqPos = cookie.indexOf("=");
+      const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+      document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+    }
+
+    this._snackBar.open('CACHE PURGED: SYSTEM REBOOTING...', 'OK', {
+      duration: 2000,
+      horizontalPosition: 'center',
+      verticalPosition: 'bottom'
+    });
+
+    setTimeout(() => {
+      window.location.reload();
+    }, 1500);
   }
 }

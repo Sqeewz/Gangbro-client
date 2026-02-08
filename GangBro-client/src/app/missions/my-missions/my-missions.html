@@ -1,0 +1,113 @@
+<div class="lobby-wrapper">
+    <!-- Main Lobby Content -->
+    <div class="lobby-content">
+        <!-- Top Navigation Header -->
+        <div class="lobby-header">
+            <div class="header-main">
+                <div class="lobby-title">PLAY</div>
+                <div class="lobby-tabs">
+                    <button class="tab-btn active" (click)="setFilter('Active')">ACTIVE OPS</button>
+                    <button class="tab-btn" (click)="setFilter('Archives')">ARCHIVES</button>
+                    <button class="tab-btn">TRAINING</button>
+                </div>
+            </div>
+            <div class="header-sub">
+                <div class="status-badge">
+                    <mat-icon>verified_user</mat-icon>
+                    <span>ENCRYPTION ACTIVE</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mission Map Grid -->
+        <div class="mission-maps-container">
+            @if (isLoading()) {
+            <div class="loading-state">
+                <div class="cyber-spinner"></div>
+                <p>SCANNING SECTORS...</p>
+            </div>
+            } @else if (missions().length === 0) {
+            <div class="empty-state">
+                <mat-icon>visibility_off</mat-icon>
+                <p>NO ACTIVE MISSIONS DETECTED</p>
+                <button class="gang-btn sm" (click)="onAdd()">CREATE MISSION</button>
+            </div>
+            } @else {
+            <div class="map-grid">
+                @for (m of missions(); track m.id; let i = $index) {
+                <div class="map-card" [class.selected]="selectedMissionId() === m.id" [class.chief-mode]="isChief(m)"
+                    (click)="handleCardClick(m)">
+
+                    <div class="map-image">
+                        <img [src]="getBgImage(i)" alt="Mission Background">
+                    </div>
+
+                    <div class="map-overlay">
+                        @if (selectedMissionId() === m.id) {
+                        <div class="selection-check">
+                            <mat-icon>check</mat-icon>
+                        </div>
+                        }
+
+                        @if (isChief(m)) {
+                        <div class="chief-marker">CHIEF</div>
+                        }
+
+                        <div class="category-icon">
+                            <mat-icon>{{ getCategoryIcon(m.category) }}</mat-icon>
+                        </div>
+
+                        <div class="map-info">
+                            <div class="map-name">{{ m.name }}</div>
+                            <div class="map-details">
+                                <span class="status-text" [class]="m.status">{{ m.status }}</span>
+                                <span class="crew-text">CREW: {{ m.crew_count }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-glow"></div>
+                </div>
+                }
+            </div>
+            }
+        </div>
+
+        <!-- Bottom Action Bar -->
+        <div class="lobby-footer">
+            <div class="footer-left">
+                <div class="squad-status">
+                    <mat-icon>group</mat-icon>
+                    <span>{{ selectedMission() ? (selectedMission()?.crew_count + ' CREW MEMBERS READY') : 'SELECT AN
+                        OPERATION' }}</span>
+                </div>
+            </div>
+
+            <div class="footer-right">
+                @if (selectedMission()) {
+                <div class="selected-actions">
+                    <button class="intel-btn" (click)="onViewAbout(selectedMission()!.id)">INTEL</button>
+                    @if (isChief(selectedMission()!)) {
+                    <button class="edit-btn" (click)="onEdit(selectedMission()!)">EDIT</button>
+                    }
+                </div>
+
+                <button class="go-btn"
+                    [disabled]="isChief(selectedMission()!) && selectedMission()?.status === 'Open' && selectedMission()!.crew_count < 2"
+                    (click)="onExecute()">
+                    <span>{{ getExecuteText() }}</span>
+                </button>
+                } @else {
+                <button class="go-btn disabled">
+                    <span>SELECT OP</span>
+                </button>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Add FAB removed, integrated into empty state and top menu potential -->
+    <button class="side-add-btn" (click)="onAdd()" title="Create New Operation">
+        <mat-icon>add</mat-icon>
+    </button>
+</div>

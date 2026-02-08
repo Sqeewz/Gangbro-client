@@ -18,11 +18,7 @@ export const routes: Routes = [
     { path: 'about-mission/:id', component: AboutMission, canActivate: [authGuard] },
     { path: 'about-us', component: AboutUs },
 
-    {
-        path: 'my-missions',
-        loadComponent: () => import('./missions/my-missions/my-missions').then(c => c.MyMissions),
-        canActivate: [authGuard]
-    },
+    // Integrated into Profile
     {
         path: 'setting',
         loadComponent: () => import('./setting/setting').then(c => c.Setting),
