@@ -328,6 +328,18 @@
                 background: rgba(255, 255, 255, 0.15);
                 border-color: rgba(255, 255, 255, 0.3);
             }
+
+            &.leave-btn {
+                background: rgba(255, 82, 82, 0.1);
+                color: #ff5252;
+                border-color: rgba(255, 82, 82, 0.2);
+
+                &:hover {
+                    background: rgba(255, 82, 82, 0.2);
+                    border-color: #ff5252;
+                    box-shadow: 0 0 15px rgba(255, 82, 82, 0.2);
+                }
+            }
         }
     }
 

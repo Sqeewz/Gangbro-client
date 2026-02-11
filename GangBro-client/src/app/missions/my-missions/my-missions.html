@@ -89,6 +89,8 @@
                     <button class="intel-btn" (click)="onViewAbout(selectedMission()!.id)">INTEL</button>
                     @if (isChief(selectedMission()!)) {
                     <button class="edit-btn" (click)="onEdit(selectedMission()!)">EDIT</button>
+                    } @else if (selectedMission()?.status === 'Open') {
+                    <button class="leave-btn" (click)="onLeave(selectedMission()!.id)">LEAVE</button>
                     }
                 </div>
 

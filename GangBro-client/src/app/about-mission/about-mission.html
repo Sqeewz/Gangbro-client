@@ -23,6 +23,11 @@
                     <mat-icon>play_arrow</mat-icon>
                     START MISSION
                 </button>
+                } @else if (!isChief() && m.status === 'Open') {
+                <button class="leave-mission-btn" (click)="onLeave()">
+                    <mat-icon>exit_to_app</mat-icon>
+                    LEAVE MISSION
+                </button>
                 }
                 @if (isChief() && m.status === 'InProgress') {
                 <div class="mission-control-btns">

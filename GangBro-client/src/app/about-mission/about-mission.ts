@@ -9,6 +9,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CacheManager } from '../_helpers/cache';
+import { MatDialog } from '@angular/material/dialog';
+import { MISSION_MESSAGES } from '../_constants/messages.constants';
+import { confirmAndExecute } from '../_helpers/dialog.helper';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-about-mission',
@@ -23,6 +27,8 @@ export class AboutMission implements OnInit, OnDestroy {
   private _passportService = inject(PassportService);
   private _snackBar = inject(MatSnackBar);
   private _ngZone = inject(NgZone);
+  private _dialog = inject(MatDialog);
+  private _router = inject(Router);
 
   mission = signal<Mission | null>(null);
   roster = signal<Brawler[]>([]);
@@ -244,6 +250,14 @@ export class AboutMission implements OnInit, OnDestroy {
       this.mission.set(missionData);
     } catch (e: any) {
       this._snackBar.open('UPDATE FAILED.', 'OK', { duration: 5000 });
+    }
+  }
+
+  async onLeave() {
+    if (!this._missionId) return;
+    const success = await confirmAndExecute(this._dialog, MISSION_MESSAGES.ABANDON, () => this._missionService.leave(this._missionId!));
+    if (success) {
+      this._router.navigate(['/my-mission']);
     }
   }
 }
